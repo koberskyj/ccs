@@ -13,9 +13,12 @@
   },
   "homepage": "https://ccs.koberskyj.cz/",
   "dependencies": {
+    "@codemirror/state": "^6.5.2",
     "@tailwindcss/vite": "^4.1.17",
+    "@uiw/react-codemirror": "^4.25.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "codemirror": "^6.0.2",
     "gh-pages": "^6.3.0",
     "lucide-react": "^0.555.0",
     "next-themes": "^0.4.6",

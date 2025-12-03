@@ -149,3 +149,7 @@ body *::-webkit-scrollbar-thumb {
 body *::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground); 
 }
+
+.ͼ1.cm-focused {
+  outline: none !important;
+}
