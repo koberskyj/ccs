@@ -1,18 +1,20 @@
-import TextEditor from "@/components/TextEditor";
+import CCSVisualizer from "@/components/CCSVisualizer";
+import TextCCSParser from "@/components/TextCCSParser";
+import { transformAstToCytoscape } from "@/lib/ccsToCytoscape";
+import type { CCSProgram } from "@/types";
 import { useState } from "react";
 
 function Homepage() {
-  const [ccsCode, setCcsCode] = useState("");
+  const [ccsInput, setCcsInput] = useState<CCSProgram|null>(null);
 
-  const handleEditorChange = (newCode: string) => {
-    setCcsCode(newCode);
+  const handleInputChange = (input: CCSProgram) => {
+    setCcsInput(input);
   };
   
   return <div className='p-4'>
     <h1 className='text-2xl font-bold'>Home</h1>
-    <TextEditor onTextChange={handleEditorChange} />
-
-    <pre>{ccsCode}</pre>
+    <TextCCSParser onInputChange={handleInputChange} initValue={"P = a.'b.0 + c.P"} />
+    <CCSVisualizer elements={ccsInput ? transformAstToCytoscape(ccsInput) : []} />
   </div>;
 }
 
