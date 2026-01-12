@@ -10,8 +10,19 @@ export type CCSNodeType =
   | 'Nil' 
   | 'ProcessRef';
 
+export interface SourceLocation {
+  start: { offset: number; line: number; column: number };
+  end: { offset: number; line: number; column: number };
+}
+
+export interface CCSAction {
+  label: string;
+  isOutput: boolean;
+}
+
 interface BaseNode {
   type: CCSNodeType;
+  loc?: SourceLocation;
 }
 
 export interface CCSDefinition extends BaseNode {
@@ -22,7 +33,7 @@ export interface CCSDefinition extends BaseNode {
 
 export interface CCSPrefix extends BaseNode {
   type: 'Prefix';
-  action: string;
+  action: CCSAction;
   next: CCSExpression;
 }
 
@@ -73,4 +84,5 @@ export type CCSExpression =
   | CCSNil 
   | CCSProcessRef;
 
+export type CCSNode = CCSDefinition | CCSExpression;
 export type CCSProgram = CCSDefinition[];

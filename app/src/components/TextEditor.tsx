@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
+import { useState, useCallback, useMemo } from 'react';
+import CodeMirror, { Decoration, EditorView } from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -98,15 +98,40 @@ export const ccsLanguage = StreamLanguage.define({
   }
 });
 
-export default function TextEditor({ initValue, onTextChange }: { initValue?: string, onTextChange?: (text: string) => void }) {
-  const [value, setValue] = useState(initValue ?? ""); 
+const highlightTheme = EditorView.baseTheme({
+  ".cm-ast-highlight": { 
+    backgroundColor: "rgba(255, 235, 59, 0.3)" 
+  } 
+});
 
-  const onChange = useCallback((val: string, _: any) => {
+export type TextEditorProps = {
+  initValue?: string;
+  onTextChange?: (text: string) => void;
+  highlightRange?: { from: number; to: number } | null;
+}
+
+export default function TextEditor({ initValue, onTextChange, highlightRange }: TextEditorProps) {
+  const [value, setValue] = useState(initValue ?? "");
+
+  const onChange = useCallback((val: string) => {
     setValue(val);
     if (onTextChange) {
       onTextChange(val);
     }
   }, [onTextChange]);
+
+  const highlightExtension = useMemo(() => {
+    if(!highlightRange) {
+      return [];
+    }
+
+    const mark = Decoration.mark({ class: "cm-ast-highlight" });
+    const decorations = Decoration.set([
+      mark.range(highlightRange.from, highlightRange.to)
+    ]);
+
+    return EditorView.decorations.of(decorations);
+  }, [highlightRange]);
 
   return (
     <div>
@@ -119,7 +144,9 @@ export default function TextEditor({ initValue, onTextChange }: { initValue?: st
         }}
         extensions={[
             ccsLanguage, 
-            syntaxHighlighting(ccsHighlightStyle)
+            syntaxHighlighting(ccsHighlightStyle),
+            highlightTheme,
+            highlightExtension
         ]} 
         onChange={onChange} 
       />

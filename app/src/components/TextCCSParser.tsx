@@ -6,9 +6,10 @@ import type { CCSProgram } from "@/types";
 type TextCCSParserProps = {
   onInputChange?: (input: CCSProgram) => void;
   initValue?: string;
+  highlightRange?: { from: number; to: number } | null;
 };
 
-export default function TextCCSParser({ onInputChange, initValue }: TextCCSParserProps) {
+export default function TextCCSParser({ onInputChange, initValue, highlightRange }: TextCCSParserProps) {
   const [ccsCode, setCcsCode] = useState(initValue ?? "");
   const [error, setError] = useState<string | null>(null);
   
@@ -53,7 +54,7 @@ export default function TextCCSParser({ onInputChange, initValue }: TextCCSParse
   return (
     <div>
       <h1>CCS Parser</h1>
-      <TextEditor onTextChange={handleEditorChange} initValue={ccsCode} />
+      <TextEditor onTextChange={handleEditorChange} initValue={ccsCode} highlightRange={highlightRange} />
       {error && (
         <div className="text-red-500 mt-2 text-sm">
           ⚠ {error}
