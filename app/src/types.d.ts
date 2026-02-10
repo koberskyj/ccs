@@ -1,4 +1,18 @@
 
+export type ViewMode = 'id' | 'mixed' | 'full';
+
+export interface NodeInfo {
+  id: string;
+  ccs: string;
+  label: string;
+}
+
+export type EdgeHighlightRequest = {
+  sourceId: string;
+  targetId: string;
+  action: string;
+} | null;
+
 export type CCSNodeType = 
   | 'Program' 
   | 'Definition' 
@@ -86,3 +100,19 @@ export type CCSExpression =
 
 export type CCSNode = CCSDefinition | CCSExpression;
 export type CCSProgram = CCSDefinition[];
+
+
+export type ProofRuleName = 'ACT' | 'SUM_LEFT' | 'SUM_RIGHT' | 'COM_LEFT' | 'COM_RIGHT' | 'COM_SYNC' | 'RES' | 'REL' | 'CON';
+export type ProofStatus = 'pending' | 'proved' | 'invalid';
+
+export interface ProofStep {
+  id: string;
+  source: CCSExpression;
+  target: CCSExpression;
+  action: CCSAction;
+  status: ProofStatus;
+  appliedRule?: ProofRuleName;
+  children: ProofStep[];
+  errorMessage?: string;
+  syncLabel?: string; 
+}

@@ -9,7 +9,7 @@
 }
 
 Start
-  = _ prog:Program _ { return prog; }
+  = _ prog:Program _ !. { return prog; }
 
 Program
   = head:Definition tail:(_ Definition)* {
@@ -34,7 +34,7 @@ Expression
 
 
 ParallelComponent
-  = head:ActionComponent tail:(_ "|" _ ActionComponent)* {
+  = head:RestrictionComponent tail:(_ "|" _ RestrictionComponent)* {
       if(tail.length === 0) {
         return head;
       }
@@ -42,12 +42,25 @@ ParallelComponent
         node("Parallel", { left: acc, right: curr[3] }), head);
     }
 
+RestrictionComponent
+  = base:PrefixComponent ops:(_ (Restriction / Relabeling))* {
+      return ops.reduce((acc, op) => {
+        const operation = op[1];
+        if(operation.type === "Restriction") {
+          return node("Restriction", { process: acc, labels: operation.labels });
+        } 
+        else {
+          return node("Relabeling", { process: acc, relabels: operation.relabels });
+        }
+      }, base);
+    }
 
-ActionComponent
-  = action:Action _ "." _ next:ActionComponent {
+
+PrefixComponent
+  = action:Action _ "." _ next:PrefixComponent {
       return node("Prefix", { action, next });
     }
-  / TightComponent
+  / Primary
 
 
 
@@ -65,7 +78,12 @@ TightComponent
     }
 
 Restriction
-  = "\\" _ "{" _ labels:LabelList _ "}" { return { type: "Restriction", labels }; }
+  = "\\" _ "{" _ labels:LabelList _ "}" { 
+      if(labels.includes("tau")) {
+        error("Cannot restrict 'tau'.");
+      }
+      return { type: "Restriction", labels }; 
+    }
 
 Relabeling
   = "[" _ relabels:RelabelList _ "]" { return { type: "Relabeling", relabels }; }
@@ -98,7 +116,12 @@ RelabelList
   = head:RelabelPair tail:(_ "," _ RelabelPair)* { return [head, ...tail.map(t => t[3])]; }
 
 RelabelPair
-  = newLabel:LabelName _ "/" _ oldLabel:LabelName { return { new: newLabel, old: oldLabel }; }
+  = newLabel:LabelName _ "/" _ oldLabel:LabelName { 
+      if(oldLabel === "tau") {
+        error("Cannot rename 'tau'.");
+      }
+      return { new: newLabel, old: oldLabel }; 
+    }
 
 _ "whitespace"
   = (White / Comment)*

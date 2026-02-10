@@ -1,0 +1,9 @@
+{
+  "core": {
+    "ccs": "Calculus of Communicating Systems",
+    "selectProgram": "Select CCS program",
+    "program": "Program {{name}}",
+    "proof": "Proof",
+    "simulation": "Simulation"
+  }
+}

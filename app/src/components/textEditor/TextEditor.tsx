@@ -3,6 +3,7 @@ import CodeMirror, { Decoration, EditorView } from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { cn } from '@/lib/utils';
 
 export const ccsHighlightStyle = HighlightStyle.define([
   {
@@ -20,9 +21,9 @@ export const ccsHighlightStyle = HighlightStyle.define([
   },
   {
     tag: t.labelName, // Výstupní akce
-    color: "#d32f2f",
+    color: "#1976d2", // #d32f2f
     textDecoration: "overline",
-    textDecorationThickness: "2px"
+    textDecorationThickness: "1px"
   },
   {
     tag: t.operator, // ., +, |, \, =
@@ -100,7 +101,7 @@ export const ccsLanguage = StreamLanguage.define({
 
 const highlightTheme = EditorView.baseTheme({
   ".cm-ast-highlight": { 
-    backgroundColor: "rgba(255, 235, 59, 0.3)" 
+    backgroundColor: "rgba(255, 59, 59, 0.3)" 
   } 
 });
 
@@ -108,9 +109,9 @@ export type TextEditorProps = {
   initValue?: string;
   onTextChange?: (text: string) => void;
   highlightRange?: { from: number; to: number } | null;
-}
+} & React.ComponentProps<"div">;
 
-export default function TextEditor({ initValue, onTextChange, highlightRange }: TextEditorProps) {
+export default function TextEditor({ initValue, onTextChange, highlightRange, className, ...props }: TextEditorProps) {
   const [value, setValue] = useState(initValue ?? "");
 
   const onChange = useCallback((val: string) => {
@@ -134,19 +135,21 @@ export default function TextEditor({ initValue, onTextChange, highlightRange }: 
   }, [highlightRange]);
 
   return (
-    <div>
+    <div className={cn("flex", className)} {...props}>
       <CodeMirror 
         value={value} 
-        height="200px"
-        style={{ border: '1px solid #ccc', fontSize: '1.2em' }} 
+        style={{ fontSize: '1.2em', flex: 1 }} 
         basicSetup={{
           closeBrackets: false,
         }}
         extensions={[
-            ccsLanguage, 
-            syntaxHighlighting(ccsHighlightStyle),
-            highlightTheme,
-            highlightExtension
+          ccsLanguage, 
+          syntaxHighlighting(ccsHighlightStyle),
+          highlightTheme,
+          highlightExtension,
+          EditorView.theme({
+            "&": { height: "100%", maxHeight: "500px" }
+          })
         ]} 
         onChange={onChange} 
       />

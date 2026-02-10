@@ -4,11 +4,17 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape, { type StylesheetStyle } from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 import type { CCSNode, CCSProgram } from '@/types';
-import { transformAstToSyntaxTree } from '@/lib/ccsToSyntaxTree';
+import { handleExport, transformAstToSyntaxTree } from '@/lib/ccsToSyntaxTree';
+import { cn } from '@/lib/utils';
+import { Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import cysvg from 'cytoscape-svg';
 
 cytoscape.use(dagre);
+cytoscape.use(cysvg);
 
-const academicStylesheet: StylesheetStyle[] = [
+const mainStylesheet: StylesheetStyle[] = [
   {
     selector: 'core',
     // @ts-ignore
@@ -74,7 +80,7 @@ const academicStylesheet: StylesheetStyle[] = [
   { // Výstupní akce ('a, 'b)
     selector: '.output-action',
     style: {
-      'color': '#d32f2f',
+      'color': '#1976d2',
     }
   },
   { // +, |, \, =
@@ -90,55 +96,110 @@ const academicStylesheet: StylesheetStyle[] = [
 export type SyntaxTreeProps = {
   parsedAst: CCSProgram | CCSNode | null;
   onHoverNode?: (range: { from: number; to: number } | null) => void;
-}
+  onContentResize?: (size: { width: number, height: number }) => void;
+} & React.ComponentProps<"div">;
 
-export default function SyntaxTree({ parsedAst, onHoverNode }: SyntaxTreeProps) {
+export default function SyntaxTree({ parsedAst, onHoverNode, onContentResize, className, ...props }: SyntaxTreeProps) {
   const cyRef = useRef<cytoscape.Core | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const elements = useMemo(() => {
     return transformAstToSyntaxTree(parsedAst);
   }, [parsedAst]);
 
+  const fitGraph = (cy: cytoscape.Core) => {
+    cy.resize();
+    cy.fit(undefined, 5); 
+
+    if(cy.zoom() > 1.15) {
+      cy.zoom(1.15);
+      cy.center();
+    }
+    if(cy.zoom() < 0.6) {
+      cy.zoom(0.6);
+      cy.center();
+    }
+
+    const currentPan = cy.pan();
+    cy.pan({ x: currentPan.x, y: currentPan.y });
+  };
+
   useEffect(() => {
     const cy = cyRef.current;
-    if (!cy) return;
+    if(!cy) {
+      return;
+    }
 
-    if (cyRef.current) {
-      const layout = cyRef.current.layout({
+    if(cy) {
+      const layout = cy.layout({
         name: 'dagre',
         // @ts-ignore
         rankDir: 'TB',
         spacingFactor: 0.7,
-        nodeSep: 60,
+        nodeSep: 70,
         rankSep: 70,
         fit: false, // Custom fit in layoutstop
       });
 
       layout.on('layoutstop', () => {
-        cy.fit(undefined, 10); 
-
-        if(cy.zoom() > 1.15) {
-          cy.zoom(1.15);
-          cy.center();
+        const bb = cy.elements().boundingBox();
+        if(onContentResize) {
+          onContentResize({ width: bb.w + 50, height: bb.h + 0 });
         }
 
-        const bb = cy.elements().boundingBox();
-        const currentZoom = cy.zoom();
-        const currentPan = cy.pan();
-        const newPanY = 0 - (bb.y1 * currentZoom);
-        
-        cy.pan({ x: currentPan.x, y: newPanY });
+        fitGraph(cy);
       });
       layout.run();
     }
-  }, [elements]);
+  }, [elements, onContentResize]);
+
+  useEffect(() => {
+    if(!containerRef.current) {
+      return;
+    }
+
+    const ro = new ResizeObserver(() => {
+      if(cyRef.current) {
+        requestAnimationFrame(() => {
+          if(cyRef.current) {
+            fitGraph(cyRef.current);
+          }
+        });
+      }
+    });
+    ro.observe(containerRef.current);
+
+    return () => ro.disconnect();
+  }, []);
 
   return (
-    <div style={{ border: '1px solid #ccc', height: '500px', width: '350px', backgroundColor: '#fff' }}>
+    <div ref={containerRef} className={cn("relative", className)} {...props}>
+
+      <div className="absolute top-4 right-0 z-10">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="bg-stone-100/50 backdrop-blur-sm shadow-sm hover:bg-stone-50 cursor-pointer">
+              <Download className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'png')}>
+              Stáhnout jako PNG
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'svg')}>
+              Stáhnout jako SVG
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'json')}>
+              Stáhnout jako JSON
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <CytoscapeComponent
         elements={elements}
         style={{ width: '100%', height: '100%' }}
-        stylesheet={academicStylesheet}
+        stylesheet={mainStylesheet}
         textureOnViewport={false}
         hideEdgesOnViewport={false}
         pixelRatio={1.5}

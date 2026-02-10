@@ -7,7 +7,7 @@ import { Toaster } from 'sonner';
 
 function RouteList() {
   return (
-    <div className='max-w-[1280px] m-auto w-full px-2 flex-grow-1'>
+    <div className='max-w-[1280px] m-auto w-full px-2 grow'>
       <Routes>
         <Route path='/' element={<Homepage />} />
         <Route path='/about' element={<Aboutpage />} />

@@ -1,16 +1,15 @@
-import { Link } from "react-router-dom";
+
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 function Header() {
+  const { t } = useTranslation();
+
   return (
-    <header className="hidden">
-      <div className="max-w-[1280px] m-auto w-full px-2 flex items-center">
-        <div className="h-16">
-          <img className="h-full" src="/logo.svg" />
-        </div>
-        <nav className=''>
-          <Link to='/' className=''>Home</Link>
-          <Link to='/about'>About</Link>
-        </nav>
+    <header className="max-w-[1280px] w-full mx-auto my-6 px-6 flex justify-between items-center gap-4 flex-wrap">
+      <h1 className="text-2xl font-semibold">{t('core.ccs')}</h1>
+      <div className="flex gap-4 justify-end flex-1">
+        <LanguageSwitcher />
       </div>
     </header>
   );

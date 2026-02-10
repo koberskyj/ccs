@@ -1,0 +1,9 @@
+{
+  "core": {
+    "ccs": "Kalkulus Komunikujících Systémů",
+    "selectProgram": "Výběr CCS programu",
+    "program": "Program {{name}}",
+    "proof": "Důkaz",
+    "simulation": "Simulace"
+  }
+}

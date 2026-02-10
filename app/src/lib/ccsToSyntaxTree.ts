@@ -58,7 +58,7 @@ function traverse(node: CCSNode, parentId: string | null = null): ElementDefinit
       break;
       
     case 'Restriction':
-      label = `\\ {${node.labels.join(',')}}`;
+      label = `\\{}`;
       classes += ' operator';
       break;
       
@@ -132,4 +132,39 @@ export function transformAstToSyntaxTree(astRoot: CCSProgram | CCSNode | null): 
   }
 
   return elements;
-};
+}
+
+
+export function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export async function handleExport(cy: cytoscape.Core|null, format: 'png' | 'svg' | 'json') {
+  if(!cy) {
+    return;
+  }
+
+  if(format === 'png') {
+    const blob = cy.png({ output: 'blob', bg: 'white', full: true, scale: 2 });
+    downloadBlob(blob, 'ccs-export.png');
+  } 
+  else if(format === 'svg') {
+    // @ts-ignore
+    const svgContent = cy.svg({ full: true, bg: 'white', scale: 1 });
+    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+    downloadBlob(blob, 'ccs-export.svg');
+  } 
+  else if(format === 'json') {
+    const jsonContent = JSON.stringify(cy.json(), null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    downloadBlob(blob, 'ccs-export.json');
+  }
+}
