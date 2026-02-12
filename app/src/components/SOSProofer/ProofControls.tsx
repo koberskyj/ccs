@@ -5,7 +5,9 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Badge } from "../ui/badge";
 import { useEffect, useMemo, useState } from "react";
-import { Check } from "lucide-react";
+import { BookOpen, Check } from "lucide-react";
+import DivHover from "../custom/DivHover";
+import { InferenceRuleTooltip, RuleAct, RuleCom1, RuleCom2, RuleCom3, RuleCon, RuleRel, RuleRes, RuleSum, SOSRulesHelp } from "./ProofRuleHelp";
 
 
 interface ProofControlsProps {
@@ -53,15 +55,15 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
   const [manualBool, setManualBool] = useState<boolean>(true);
 
   const ALL_RULES: { value: ProofRuleName; label: string }[] = [
-    { value: "ACT", label: "ACT (Prefix)" },
-    { value: "SUM_LEFT", label: "SUM_L (Levá volba)" },
-    { value: "SUM_RIGHT", label: "SUM_R (Pravá volba)" },
-    { value: "COM_LEFT", label: "COM_L (Paralelně vlevo)" },
-    { value: "COM_RIGHT", label: "COM_R (Paralelně vpravo)" },
-    { value: "COM_SYNC", label: "COM_SYNC (Synchronizace)" },
-    { value: "RES", label: "RES (Restrikce)" },
-    { value: "REL", label: "REL (Přejmenování)" },
-    { value: "CON", label: "CON (Konstanta)" },
+    { value: "ACT", label: "ACT" },
+    { value: "SUM_LEFT", label: "SUM Left" },
+    { value: "SUM_RIGHT", label: "SUM Right" },
+    { value: "COM_LEFT", label: "COM Left" },
+    { value: "COM_RIGHT", label: "COM Right" },
+    { value: "COM_SYNC", label: "COM Sync" },
+    { value: "RES", label: "RES" },
+    { value: "REL", label: "REL" },
+    { value: "CON", label: "CON" },
   ];
 
   useEffect(() => {
@@ -74,10 +76,10 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
   const needsBoolInput = manualRule === 'COM_SYNC';
   const getPlaceholder = () => {
     if(manualRule === 'COM_SYNC') {
-      return 'Sync akce (např. a)';
+      return 'Sync akce';
     }
     if(manualRule === 'REL') {
-      return 'Původní akce (old)';
+      return 'Původní akce';
     }
     return 'Parametr';
   };
@@ -98,24 +100,36 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
       <div className="flex flex-wrap items-center gap-2">
 
         {type === 'Prefix' && (
-          <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'ACT')}>ACT</Button>
+          <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleAct /></InferenceRuleTooltip>}>
+            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'ACT')}>ACT</Button>
+          </DivHover>
         )}
 
         {type === 'Summation' && (
           <>
-            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'SUM_LEFT')}>SUM Left</Button>
-            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'SUM_RIGHT')}>SUM Right</Button>
+            <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleSum /></InferenceRuleTooltip>}>
+              <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'SUM_LEFT')}>SUM Left</Button>
+            </DivHover>
+            <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleSum /></InferenceRuleTooltip>}>
+              <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'SUM_RIGHT')}>SUM Right</Button>
+            </DivHover>
           </>
         )}
 
         {type === 'Parallel' && (
           <>
-            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'COM_LEFT')}>COM Left</Button>
-            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'COM_RIGHT')}>COM Right</Button>
+            <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleCom1 /></InferenceRuleTooltip>}>
+              <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'COM_LEFT')}>COM Left</Button>
+            </DivHover>
+            <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleCom2 /></InferenceRuleTooltip>}>
+              <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'COM_RIGHT')}>COM Right</Button>
+            </DivHover>
             
             {label === 'tau' && (
               <div className="flex items-center gap-2 bg-secondary p-1 px-2 rounded-md border shadow ml-2">
-                <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">COM Sync</Badge>
+                <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleCom3 /></InferenceRuleTooltip>}>
+                  <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">COM Sync</Badge>
+                </DivHover>
                 <span className="text-xs font-medium text-stone-800 pl-1">na:</span>
                 <Input className="h-7 w-16 text-xs font-mono bg-white" value={selectedSyncLabel} onChange={e => setSelectedSyncLabel(e.target.value)} placeholder="akce" />
                 <div className="flex items-center space-x-1">
@@ -131,13 +145,19 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
         )}
 
         {type === 'Restriction' && (
-          <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'RES')}>RES</Button>
+          <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleRes /></InferenceRuleTooltip>}>
+            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'RES')}>RES</Button>
+          </DivHover>
         )}
 
         {type === 'Relabeling' && (
           <div className="flex items-center gap-2 bg-secondary p-1 px-2 rounded-md border shadow">
-            <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">REL</Badge>
-            <span className="text-xs font-medium text-stone-800 pl-1">Přejm.:</span>
+            <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleRel /></InferenceRuleTooltip>}>
+              <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">REL</Badge>
+            </DivHover>
+            <DivHover delayDuration={750} hoverContent={<span>Zde si vyberte původní akci <br /> (před přejmenováním)</span>}>
+              <span className="text-xs font-medium text-stone-800 pl-1">Původní akce:</span>
+            </DivHover>
             {relCandidates.length > 0 ? (
               <Select value={relCandidate} onValueChange={setRelCandidate}>
                 <SelectTrigger className="h-7 w-24 text-xs bg-white">
@@ -158,7 +178,9 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
         )}
 
         {type === 'ProcessRef' && (
-          <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'CON')}>CON</Button>
+          <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleCon /></InferenceRuleTooltip>}>
+            <Button size="sm" variant="secondary" onClick={() => onApplyRule(step.id, 'CON')}>CON</Button>
+          </DivHover>
         )}
       </div>
     );
@@ -169,8 +191,14 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
   else {
     return (
       <div className="flex flex-wrap items-center gap-2 w-full">
+        <SOSRulesHelp>
+          <Button variant="secondary" size="icon" className="cursor-pointer">
+            <BookOpen size={16} />
+          </Button>
+        </SOSRulesHelp>
+
         <Select value={manualRule} onValueChange={(v) => setManualRule(v as ProofRuleName)}>
-          <SelectTrigger className="h-9 w-[180px] bg-white">
+          <SelectTrigger className="h-9 w-[120px] bg-white">
              <SelectValue placeholder="Vyberte pravidlo..." />
           </SelectTrigger>
           <SelectContent>
@@ -187,7 +215,7 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
         {needsBoolInput && (
           <div className="flex items-center gap-2 border px-3 h-9 rounded-md bg-white">
             <Checkbox id={`manual-ls-${step.id}`} checked={manualBool} onCheckedChange={(c) => setManualBool(c as boolean)} />
-            <label htmlFor={`manual-ls-${step.id}`} className="text-sm cursor-pointer select-none">Left sends</label>
+            <label htmlFor={`manual-ls-${step.id}`} className="text-sm cursor-pointer select-none">Levá posílá</label>
           </div>
         )}
 

@@ -8,6 +8,7 @@ import CCSViewer from "../textEditor/CCSViewer";
 import ProofControls from "./ProofControls";
 import AlertBox from "../custom/AlertBox";
 import ButtonHover from "../custom/ButtonHover";
+import { TransitionArrow } from "./ProofRuleHelp";
 
 export function getStatusStyle(status: ProofStatus) {
   switch(status) {
@@ -41,9 +42,11 @@ export default function ProofNode({ step, program, showHints, depth, onApplyRule
 
           <div className="flex-1 p-3">
             <div className="flex flex-wrap items-center gap-3 mb-3">
-              <div className="flex flex-wrap items-center px-1 gap-x-2 font-mono">
+              <div className="flex flex-wrap items-center px-1 font-mono">
                 <CCSViewer code={ccsToString(step.source)} className='w-auto! wrap-break-word p-1' />
-                <span className="shrink-0">&mdash; <span className={`text-[#1976d2] ${step.action.isOutput ? 'overline' : ''}`}>{step.action.isOutput ? `'${step.action.label}` : step.action.label}</span> &rarr;</span>
+                <div className="-translate-y-1.25">
+                  <TransitionArrow label={<CCSViewer code={(step.action.isOutput ? "'" : "") +step.action.label} />} />
+                </div>
                 <CCSViewer code={ccsToString(step.target)} className='w-auto! wrap-break-word p-1' />                  
               </div>
 

@@ -1,20 +1,23 @@
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type DivHoverProps = { 
-  hoverContent?: ReactNode;
-} & React.ComponentProps<"div">;
+  hoverContent: ReactNode;
+  children: ReactNode;
+  delayDuration?: number;
+} & React.ComponentProps<typeof TooltipContent>;
 
-export default function DivHover({ hoverContent, ...props}: DivHoverProps) {
+export default function DivHover({ hoverContent, children, className, delayDuration=250, ...props}: DivHoverProps) {
 
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={250} disableHoverableContent={true}>
+      <Tooltip delayDuration={delayDuration} disableHoverableContent={true}>
         <TooltipTrigger asChild>
-          <div {...props}></div>
+          {children}
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent {...props} className={cn("bg-popover text-popover-foreground border border-foreground/20 shadow-lg", className)}>
           {hoverContent}
         </TooltipContent>
       </Tooltip>

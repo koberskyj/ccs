@@ -113,6 +113,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
   const cyRef = useRef<Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const stylesheet = useMemo(() => {
     return [
@@ -121,7 +122,13 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     ];
   }, [viewMode]);
 
-
+  useEffect(() => {
+    return () => {
+      if(hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if(!cyRef.current || !elements) {
@@ -204,7 +211,12 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
 
 
 
-  const handleMouseOut = useCallback(() => setTooltip(null), []);
+  const handleMouseOut = useCallback(() => {
+    if(hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setTooltip(null)
+  }, []);
   const handleMouseOver = useCallback((evt: EventObject) => {
     const node = evt.target as NodeSingular;
     const bb = node.renderedBoundingBox(); 
@@ -217,12 +229,14 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     const absoluteX = containerRect.left + bb.x1 + (bb.w / 2);
     const absoluteY = containerRect.top + bb.y1;
 
-    setTooltip({
-      x: absoluteX,
-      y: absoluteY,
-      text: node.data('ccs'),
-      nodeId: node.data('id'),
-    } as any); 
+    hoverTimeoutRef.current = setTimeout(() => {
+      setTooltip({
+        x: absoluteX,
+        y: absoluteY,
+        text: node.data('ccs'),
+        nodeId: node.data('id'),
+      });
+    }, 250);
   }, []);
 
 
@@ -257,22 +271,25 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       left: left,
       top: top,
       transform: `translate(-50%, -100%)`,
+      width: 'max-content',
       maxWidth: `${TOOLTIP_WIDTH}px`,
       zIndex: 99999,
       pointerEvents: 'none'
     };
 
     return createPortal(
-      <div className="px-4 py-3 text-sm bg-card/70 backdrop-blur-sm rounded-lg shadow-xl text-foreground border" style={style}>
-        <div className="font-mono border-b border-stone-400 pb-1 mb-2 font-bold text-xs uppercase tracking-wider flex justify-between">
-          <span>Vrchol {tooltip.nodeId}</span>
-        </div>
-        <div className="font-mono wrap-break-word border border-primary/8 bg-[color-mix(in_srgb,var(--primary)_15%,white)] p-2 rounded-md">
-          <CCSViewer code={tooltip.text} />
-        </div>
-        
-        <div className={`absolute w-0 h-0 border-8 border-transparent border-t-card/90 bottom-0 translate-y-full`}
-          style={{ left: '50.25%', transform: `translateX(-50%)`}}>
+      <div style={style}>
+        <div className="animate-in fade-in-0 zoom-in-95 duration-200 px-4 py-3 text-sm bg-popover/80 text-popover-foreground border border-foreground/20 shadow-lg backdrop-blur-sm rounded-lg">
+          <div className="font-mono border-b border-stone-400 pb-1 mb-2 font-bold text-xs uppercase tracking-wider flex justify-between">
+            <span>Vrchol {tooltip.nodeId}</span>
+          </div>
+          <div className="font-mono wrap-break-word border border-primary/8 bg-[color-mix(in_srgb,var(--primary)_15%,white)] p-2 rounded-md">
+            <CCSViewer code={tooltip.text} />
+          </div>
+          
+          <div className={`absolute w-0 h-0 border-8 border-transparent border-t-popover/95 bottom-0 translate-y-full`}
+            style={{ left: '50.25%', transform: `translateX(-50%)`}}>
+          </div>
         </div>
       </div>,
       document.body

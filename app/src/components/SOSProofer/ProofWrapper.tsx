@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { ProofBuilder } from '@/components/SOSProofer/ProofBuilder';
 import type { CCSExpression, CCSAction, CCSProgram } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ChartGantt, Lightbulb, RotateCcw } from 'lucide-react';
+import { BookOpen, ChartGantt, Layers, Lightbulb, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
+import { SOSRulesHelp } from './ProofRuleHelp';
 
 
 function parseCCSAction(input: string): CCSAction|{ error: string } {
@@ -50,6 +51,17 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
     target: CCSExpression;
     action: CCSAction;
   } | null>(null);
+
+  const [useStructRed, setUseStructRed] = useState<boolean>(false);
+  useEffect(() => {
+    const saved = localStorage.getItem('sos-proof-struct-red');
+    if(saved !== null) {
+      setUseStructRed(JSON.parse(saved));
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem('sos-proof-struct-red', JSON.stringify(useStructRed));
+  }, [useStructRed]);
 
   const [showHints, setShowHints] = useState<boolean>(true);
   useEffect(() => {
@@ -122,11 +134,29 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
         <div>
           {error && <AlertBox type="error">{error}</AlertBox>}
         </div>
-        <div className="inline-flex items-center gap-2 bg-gray-100 rounded-lg border cursor-pointer hover:bg-gray-200 transition-colors px-3 py-2" onClick={() => setShowHints(!showHints)}>
-          <Lightbulb size={16} className={`${showHints ? 'text-indigo-600' : 'text-gray-400'}`} />
-          <span className={`text-xs font-medium ${showHints ? 'text-indigo-600' : 'text-gray-600'}`}>
-            Interaktivní nápověda {showHints ? '(Zap)' : '(Vyp)'}
-          </span>
+        <div className="flex items-center gap-4 mb-2">
+            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
+              <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
+              <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
+                Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
+              </span>
+            </Button>
+
+            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)}>
+              <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
+              <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
+                Nápověda {showHints ? '(Zap)' : '(Vyp)'}
+              </span>
+            </Button>
+
+            <SOSRulesHelp>
+              <Button variant="secondary" className="cursor-pointer py-5">
+                <BookOpen size={16} />
+                <span className="text-xs font-medium">
+                  Přehled pravidel SOS
+                </span>
+              </Button>
+            </SOSRulesHelp>
         </div>
       </div>
 
@@ -197,7 +227,8 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
           initialSource={proofData.source} 
           initialTarget={proofData.target} 
           initialAction={proofData.action} 
-          program={proofData.program}        
+          program={proofData.program}
+          useStructRed={useStructRed}
         /> 
       )}
     </div>

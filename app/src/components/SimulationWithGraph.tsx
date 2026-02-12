@@ -2,11 +2,12 @@ import { useMemo, useState, useEffect } from 'react';
 import LTSGraph from './LTSGraph';
 import SimulationPanel from './SimulationPanel';
 import { generateLTS } from '@/lib/ltsLogic';
-import type { CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
+import type { CCSProcessRef, CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
 import { useSimulation } from '@/utils/useSimulation';
 import { Layers, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ccsToString } from '@/lib/ccsUtils';
+import { Button } from './ui/button';
 
 function normalize(str: string) {
   return str.replace(/\s+/g, '');
@@ -118,11 +119,21 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
   };
 
   const currentCanonicalCCS = useMemo(() => {
-     if(!sim.currentExpr) {
-      return "";
-     }
-     return ccsToString(sim.currentExpr, useStructRed);
-  }, [sim.currentExpr, useStructRed]);
+    if(!sim.currentExpr) {
+    return "";
+    }
+    const exprStr = ccsToString(sim.currentExpr, useStructRed);
+
+    if(sim.currentExpr.type === 'ProcessRef') {
+      const definition = ast.find(d => d.name === (sim.currentExpr as CCSProcessRef).name);
+      
+      if(definition) {
+        const bodyStr = ccsToString(definition.process, useStructRed);
+        return `${exprStr} = ${bodyStr}`;
+      }
+    }
+    return exprStr;
+  }, [sim.currentExpr, useStructRed, ast]);
 
   let activeNodeId = ccsToIdMap.get(normalize(currentCanonicalCCS));
   if(!activeNodeId && sim.history.length === 0 && initialNodeId) {
@@ -163,8 +174,8 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
 
         <div className="flex flex-wrap gap-4 items-center mb-2 relative">
           {!propStartProcessName && (
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg border self-stretch">
-              <span className="text-xs font-bold text-gray-500 uppercase px-1">Proces:</span>
+            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 px-2 rounded-md shadow-sm">
+              <span className="text-xs font-medium uppercase text-secondary-foreground px-1">Proces:</span>
               <Select value={selectedProcessName} onValueChange={(value) => { 
                 setSelectedProcessName(value);
                 sim.reset();
@@ -186,11 +197,11 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
           )}
 
           {!initialViewMode && (
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg border self-stretch">
-              <Settings size={16} className="text-gray-500 ml-2 mr-1" />
+            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 rounded-md shadow-sm">
+              <Settings size={16} className="ml-2 mr-1" />
               {(['id', 'mixed', 'full'] as const).map((m) => (
                 <button key={m} onClick={() => changeViewMode(m)} 
-                  className={`px-3 py-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200'}`}>
+                  className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card shadow text-primary' : 'text-secondary-foreground hover:bg-card/90'}`}>
                     {m === 'id' ? 'ID' : m === 'mixed' ? 'Mix' : 'CCS'}
                 </button>
               ))}
@@ -198,13 +209,12 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
           )}
 
           {forceStructuralReduction === undefined && (
-             <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg border cursor-pointer hover:bg-gray-200 transition-colors px-3 self-stretch"
-                onClick={() => setUseStructRed(!useStructRed)}>
-                  <Layers size={16} className={`${useStructRed ? 'text-indigo-600' : 'text-gray-400'}`} />
-                  <span className={`text-xs font-medium ${useStructRed ? 'text-indigo-600' : 'text-gray-600'}`}>
-                    Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
-                  </span>
-             </div>
+            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
+              <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
+              <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
+                Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
+              </span>
+            </Button>
           )}
           
           <div className="grow"></div>
