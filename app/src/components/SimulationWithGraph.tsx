@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import LTSGraph from './LTSGraph';
 import SimulationPanel from './SimulationPanel';
 import { generateLTS } from '@/lib/ltsLogic';
-import type { CCSProcessRef, CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
+import type { CardLTS, CCSProcessRef, CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
 import { useSimulation } from '@/utils/useSimulation';
 import { Layers, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,66 +14,86 @@ function normalize(str: string) {
 }
 
 type SimulationWithGraphProps = {
-  ast: CCSProgram;
-  startProcessName?: string;
-  initialViewMode?: ViewMode;
-  forceStructuralReduction?: boolean;
+  program: CCSProgram;
+  initSettings?: CardLTS;
+  hideProcessSelector?: boolean;
+  hideViewSelector?: boolean;
+  hideStructuralReductionButton?: boolean;
+  onSettingsUpdate?: (settings: CardLTS) => void;
+  allowEdit?: boolean;
 };
 
-export default function SimulationWithGraph({ast, startProcessName: propStartProcessName, initialViewMode, forceStructuralReduction}: SimulationWithGraphProps) {
+export default function SimulationWithGraph({program, initSettings, hideProcessSelector, hideViewSelector, hideStructuralReductionButton, onSettingsUpdate, allowEdit}: SimulationWithGraphProps) {
   
-  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode || 'id');
-  const [useStructRed, setUseStructRed] = useState<boolean>(forceStructuralReduction ?? false);
+  const [viewMode, setViewMode] = useState<ViewMode>(initSettings?.style || 'id');
+  const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
   const [selectedProcessName, setSelectedProcessName] = useState<string>(
-    propStartProcessName || (ast.length > 0 ? ast[0].name : '')
+    initSettings?.process || (program.length > 0 ? program[0].name : '')
   );
 
   useEffect(() => {
-    if(propStartProcessName) {
-      setSelectedProcessName(propStartProcessName);
+    if(onSettingsUpdate) {
+      onSettingsUpdate({
+        type: 'lts',
+        name: initSettings?.name ?? 'Simulace',
+        process: selectedProcessName,
+        style: viewMode,
+        useStructRed: useStructRed
+      });
+    }
+  }, [selectedProcessName, viewMode, useStructRed]);
+
+  useEffect(() => {
+    if(initSettings?.process) {
+      setSelectedProcessName(initSettings?.process);
       return;
     }
 
-    if(ast.length > 0) {
-      const exists = ast.some(p => p.name === selectedProcessName);
+    if(program.length > 0) {
+      const exists = program.some(p => p.name === selectedProcessName);
       if(!exists) {
-        setSelectedProcessName(ast[0].name);
+        setSelectedProcessName(program[0].name);
       }
     } 
     else {
       setSelectedProcessName('');
     }
-  }, [ast, propStartProcessName]);
+  }, [program, initSettings?.process]);
 
   useEffect(() => {
-    if(propStartProcessName) {
-      setSelectedProcessName(propStartProcessName);
+    if(!initSettings?.useStructRed) {
+      const stored = localStorage.getItem('default-lts-struct-red');
+      if(stored && ['true', 'false'].includes(stored)) {
+        setUseStructRed(stored === 'true');
+      }
     }
-  }, [propStartProcessName]);
+    else {
+      setUseStructRed(initSettings?.useStructRed);
+    }
+  }, [initSettings?.useStructRed]);
 
   useEffect(() => {
-    if(!initialViewMode) {
-      const stored = localStorage.getItem('lts_view_mode');
+    if(!initSettings?.style) {
+      const stored = localStorage.getItem('default-lts-view-mode');
       if(stored && ['id', 'mixed', 'full'].includes(stored)) {
         setViewMode(stored as ViewMode);
       }
     }
-  }, [initialViewMode]);
+    else {
+      setViewMode(initSettings?.style);
+    }
+  }, [initSettings?.style]);
 
   const changeViewMode = (mode: ViewMode) => {
     setViewMode(mode);
-    if(!initialViewMode) {
-      localStorage.setItem('lts_view_mode', mode);
-    }
   };
 
-  const sim = useSimulation(ast, selectedProcessName);
-
+  const sim = useSimulation(program, selectedProcessName);
   
 
   const elements = useMemo(() => {
-    return generateLTS(ast, selectedProcessName, { maxDepth: 50, maxStates: 200, useStructuralReduction: useStructRed });
-  }, [ast, selectedProcessName, useStructRed]);
+    return generateLTS(program, selectedProcessName, { maxDepth: 50, maxStates: 200, useStructuralReduction: useStructRed });
+  }, [program, selectedProcessName, useStructRed]);
   
   const { nodeLabelMap, ccsToIdMap, initialNodeId } = useMemo(() => {
     const labelMap = new Map<string, string>();
@@ -125,7 +145,7 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
     const exprStr = ccsToString(sim.currentExpr, useStructRed);
 
     if(sim.currentExpr.type === 'ProcessRef') {
-      const definition = ast.find(d => d.name === (sim.currentExpr as CCSProcessRef).name);
+      const definition = program.find(d => d.name === (sim.currentExpr as CCSProcessRef).name);
       
       if(definition) {
         const bodyStr = ccsToString(definition.process, useStructRed);
@@ -133,7 +153,7 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
       }
     }
     return exprStr;
-  }, [sim.currentExpr, useStructRed, ast]);
+  }, [sim.currentExpr, useStructRed, program]);
 
   let activeNodeId = ccsToIdMap.get(normalize(currentCanonicalCCS));
   if(!activeNodeId && sim.history.length === 0 && initialNodeId) {
@@ -173,10 +193,10 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
       <div className="">
 
         <div className="flex flex-wrap gap-4 items-center mb-2 relative">
-          {!propStartProcessName && (
+          {!hideProcessSelector && (
             <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 px-2 rounded-md shadow-sm">
               <span className="text-xs font-medium uppercase text-secondary-foreground px-1">Proces:</span>
-              <Select value={selectedProcessName} onValueChange={(value) => { 
+              <Select value={selectedProcessName} disabled={!allowEdit} onValueChange={(value) => { 
                 setSelectedProcessName(value);
                 sim.reset();
               }}>
@@ -185,7 +205,7 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup className="max-h-64">
-                    {ast.map((def) => (
+                    {program.map((def) => (
                       <SelectItem key={def.name} value={def.name}>
                         {def.name}
                       </SelectItem>
@@ -196,25 +216,25 @@ export default function SimulationWithGraph({ast, startProcessName: propStartPro
             </div>
           )}
 
-          {!initialViewMode && (
-            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 rounded-md shadow-sm">
-              <Settings size={16} className="ml-2 mr-1" />
-              {(['id', 'mixed', 'full'] as const).map((m) => (
-                <button key={m} onClick={() => changeViewMode(m)} 
-                  className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card shadow text-primary' : 'text-secondary-foreground hover:bg-card/90'}`}>
-                    {m === 'id' ? 'ID' : m === 'mixed' ? 'Mix' : 'CCS'}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {forceStructuralReduction === undefined && (
-            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
+          {!hideStructuralReductionButton && (
+            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
                 Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
               </span>
             </Button>
+          )}
+
+          {!hideViewSelector && (
+            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 rounded-md shadow-sm">
+              <Settings size={16} className="ml-2 mr-1" />
+              {(['id', 'mixed', 'full'] as const).map((m) => (
+                <button key={m} onClick={() => changeViewMode(m)}
+                  className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card shadow text-primary' : 'text-secondary-foreground hover:bg-card/90'}`}>
+                    {m === 'id' ? 'ID' : m === 'mixed' ? 'Mix' : 'CCS'}
+                </button>
+              ))}
+            </div>
           )}
           
           <div className="grow"></div>

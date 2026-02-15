@@ -4,14 +4,17 @@ import Aboutpage from '@/pages/AboutPage';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Toaster } from 'sonner';
+import { ProgramsProvider } from './utils/ProgramsContext';
 
 function RouteList() {
   return (
     <div className='max-w-[1280px] m-auto w-full px-2 grow'>
-      <Routes>
-        <Route path='/' element={<Homepage />} />
-        <Route path='/about' element={<Aboutpage />} />
-      </Routes>
+      <ProgramsProvider>
+        <Routes>
+          <Route path='/' element={<Homepage />} />
+          <Route path='/about' element={<Aboutpage />} />
+        </Routes>
+      </ProgramsProvider>
     </div>
   );
 }

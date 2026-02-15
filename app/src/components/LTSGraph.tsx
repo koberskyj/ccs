@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 import type { ViewMode, EdgeHighlightRequest } from '@/types';
-import CCSViewer from './textEditor/CCSViewer';
+import CCSViewer from './custom/CCSViewer';
 import { createPortal } from 'react-dom';
 import { Button } from './ui/button';
 import { Download } from 'lucide-react';

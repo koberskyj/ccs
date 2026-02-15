@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { CCSExpression, CCSAction, CCSProgram, ProofStep, ProofRuleName, ProofStatus } from '@/types';
 import ProofNode from '@/components/SOSProofer/ProofNode';
-import { applySosRule, ccsToString, normalizeCCS } from '@/lib/ccsUtils';
-import CCSViewer from '../textEditor/CCSViewer';
+import { applySosRule, ccsToString } from '@/lib/ccsUtils';
+import CCSViewer from '../custom/CCSViewer';
 import { cn } from '@/lib/utils';
 import { TransitionArrow } from './ProofRuleHelp';
 
@@ -13,7 +13,7 @@ interface ProofBuilderProps {
   initialAction: CCSAction;
   program: CCSProgram;
   showHints: boolean;
-  useStructRed: boolean;
+  //useStructRed: boolean;
 }
 
 export function getStatusColor(status: ProofStatus) {
@@ -27,11 +27,11 @@ export function getStatusColor(status: ProofStatus) {
   }
 }
 
-export function ProofBuilder({ initialSource, initialTarget, initialAction, program, showHints, useStructRed }: ProofBuilderProps) {
+export function ProofBuilder({ initialSource, initialTarget, initialAction, program, showHints }: ProofBuilderProps) {
   const [rootStep, setRootStep] = useState<ProofStep>({
     id: 'root',
-    source: useStructRed ? normalizeCCS(initialSource) : initialSource,
-    target: useStructRed ? normalizeCCS(initialTarget) : initialTarget,
+    source: /*useStructRed ? normalizeCCS(initialSource) :*/ initialSource,
+    target: /*useStructRed ? normalizeCCS(initialTarget) :*/ initialTarget,
     action: initialAction,
     status: 'pending',
     children: []
@@ -40,13 +40,13 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
   useEffect(() => {
     setRootStep({
       id: 'root',
-      source: useStructRed ? normalizeCCS(initialSource) : initialSource,
-      target: useStructRed ? normalizeCCS(initialTarget) : initialTarget,
+      source: /*useStructRed ? normalizeCCS(initialSource) :*/ initialSource,
+      target: /*useStructRed ? normalizeCCS(initialTarget) :*/ initialTarget,
       action: initialAction,
       status: 'pending',
       children: []
     });
-  }, [initialSource, initialTarget, initialAction, useStructRed, showHints]);
+  }, [initialSource, initialTarget, initialAction, showHints]);
 
   const recalculateTreeStatus = (node: ProofStep): ProofStep => {
     const updatedChildren = node.children.map(recalculateTreeStatus);
@@ -85,7 +85,7 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
 
       const treeWithAppliedRule = updateStepInTree(prevRoot, stepId, (node) => {
 
-        const result = applySosRule(node.source, node.target, node.action, rule, program, useStructRed, extraData);
+        const result = applySosRule(node.source, node.target, node.action, rule, program, /*useStructRed*/ false, extraData);
         return {
           ...node,
           appliedRule: rule,
@@ -118,11 +118,11 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
         <div className='flex items-center gap-2 flex-wrap font-mono'>
           <span className="text-sm text-foreground/90 shrink-0">Dokazujete:</span> 
           <div className='flex flex-wrap items-center px-1 font-mono border border-primary/10 bg-primary/5 rounded-md'>
-            <CCSViewer code={ccsToString(useStructRed ? normalizeCCS(initialSource) : initialSource)} className='w-auto! wrap-break-word p-1' />
+            <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialSource) :*/ initialSource)} className='w-auto! wrap-break-word p-1' />
             <div className="-translate-y-1.25">
               <TransitionArrow label={<CCSViewer code={initialAction.label} />} />
             </div>
-            <CCSViewer code={ccsToString(useStructRed ? normalizeCCS(initialTarget) : initialTarget)} className='w-auto! wrap-break-word p-1' />
+            <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialTarget) :*/ initialTarget)} className='w-auto! wrap-break-word p-1' />
           </div>
         </div>
         <div className={cn('text-xs text-gray-500 p-2 rounded-md uppercase', getStatusColor(rootStep.status))}>

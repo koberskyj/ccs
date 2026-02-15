@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ProofBuilder } from '@/components/SOSProofer/ProofBuilder';
-import type { CCSExpression, CCSAction, CCSProgram } from '@/types';
+import type { CCSExpression, CCSAction, CCSProgram, CardSOS } from '@/types';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ChartGantt, Layers, Lightbulb, RotateCcw } from 'lucide-react';
+import { BookOpen, ChartGantt, Lightbulb, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
@@ -37,12 +37,17 @@ function getExpressionByName(program: CCSProgram, name: string): CCSExpression |
 
 interface ProofWrapperProps {
   program: CCSProgram;
+  initSettings?: CardSOS;
+  onSettingsUpdate?: (settings: CardSOS) => void;
+  allowEdit?: boolean;
 }
 
-export default function ProofWrapper({ program }: ProofWrapperProps) {
-  const [sourceProcessName, setSourceProcessName] = useState<string>(program[0].name);
-  const [targetProcessName, setTargetProcessName] = useState<string>(program[0].name);
-  const [actionText, setActionText] = useState<string>('a');
+export default function ProofWrapper({ program, initSettings, onSettingsUpdate, allowEdit }: ProofWrapperProps) {
+  const [sourceProcessName, setSourceProcessName] = useState<string>(initSettings?.processX ?? program[0].name);
+  const [targetProcessName, setTargetProcessName] = useState<string>(initSettings?.processY ?? program[0].name);
+  const [actionText, setActionText] = useState<string>(initSettings?.action ?? 'a');
+  //const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
+  const [showHints, setShowHints] = useState<boolean>(initSettings?.showHelp ?? true);
   
   const [error, setError] = useState<string | null>(null);
   const [proofData, setProofData] = useState<{
@@ -52,27 +57,47 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
     action: CCSAction;
   } | null>(null);
 
-  const [useStructRed, setUseStructRed] = useState<boolean>(false);
   useEffect(() => {
-    const saved = localStorage.getItem('sos-proof-struct-red');
-    if(saved !== null) {
-      setUseStructRed(JSON.parse(saved));
+    if(onSettingsUpdate) {
+      onSettingsUpdate({
+        type: 'sos',
+        name: initSettings?.name ?? 'Důkaz',
+        processX: sourceProcessName,
+        processY: targetProcessName,
+        action: actionText,
+        //useStructRed: useStructRed,
+        showHelp: showHints
+      });
     }
-  }, []);
-  useEffect(() => {
-    localStorage.setItem('sos-proof-struct-red', JSON.stringify(useStructRed));
-  }, [useStructRed]);
+  }, [sourceProcessName, targetProcessName, actionText, showHints]);
 
-  const [showHints, setShowHints] = useState<boolean>(true);
-  useEffect(() => {
-    const saved = localStorage.getItem('sos-proof-hints');
-    if(saved !== null) {
-      setShowHints(JSON.parse(saved));
+  /*useEffect(() => {
+    if(!initSettings?.useStructRed) {
+      const stored = localStorage.getItem('default-sos-struct-red');
+      if(stored && ['true', 'false'].includes(stored)) {
+        setUseStructRed(stored === 'true');
+      }
     }
-  }, []);
+    else {
+      setUseStructRed(initSettings?.useStructRed);
+    }
+  }, [initSettings?.useStructRed]);*/
+
   useEffect(() => {
-    localStorage.setItem('sos-proof-hints', JSON.stringify(showHints));
-  }, [showHints]);
+    if(!initSettings?.showHelp) {
+      const stored = localStorage.getItem('default-sos-proof-hints');
+      if(stored && ['true', 'false'].includes(stored)) {
+        setShowHints(stored === 'true');
+      }
+    }
+    else {
+      setShowHints(initSettings?.showHelp);
+    }
+  }, [initSettings?.showHelp]);
+
+  useEffect(() => {
+    handleStartProof();
+  }, [initSettings]);
 
   useEffect(() => {
     if(program.length > 0) {
@@ -135,14 +160,14 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
           {error && <AlertBox type="error">{error}</AlertBox>}
         </div>
         <div className="flex items-center gap-4 mb-2">
-            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
+            {/*<Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
                 Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
               </span>
-            </Button>
+            </Button>*/}
 
-            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)}>
+            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)} disabled={!allowEdit}>
               <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
                 Nápověda {showHints ? '(Zap)' : '(Vyp)'}
@@ -163,7 +188,7 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
       <div className="flex gap-4 items-end flex-wrap md:flex-nowrap mb-6">
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>Počáteční proces</span>
-          <Select value={sourceProcessName} onValueChange={e => setSourceProcessName(e)}>
+          <Select value={sourceProcessName} onValueChange={e => setSourceProcessName(e)} disabled={!allowEdit}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -182,11 +207,7 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
         <div className="w-48 space-y-2">
           <span className='pl-1 text-sm font-semibold'>Akce</span>
           <div className="relative">
-            <Input 
-              value={actionText} 
-              onChange={e => setActionText(e.target.value)} 
-              className="font-mono text-center pl-6 pr-6"
-            />
+            <Input value={actionText} onChange={e => setActionText(e.target.value)} className="font-mono text-center pl-6 pr-6" disabled={!allowEdit} />
             <span className="absolute left-2 top-1.5 text-muted-foreground">&mdash;</span>
             <span className="absolute right-2 top-1.5 text-muted-foreground">&rarr;</span>
           </div>
@@ -194,7 +215,7 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
 
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>Cílový proces</span>
-          <Select value={targetProcessName} onValueChange={e => setTargetProcessName(e)}>
+          <Select value={targetProcessName} onValueChange={e => setTargetProcessName(e)} disabled={!allowEdit}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -228,7 +249,7 @@ export default function ProofWrapper({ program }: ProofWrapperProps) {
           initialTarget={proofData.target} 
           initialAction={proofData.action} 
           program={proofData.program}
-          useStructRed={useStructRed}
+          //useStructRed={useStructRed}
         /> 
       )}
     </div>

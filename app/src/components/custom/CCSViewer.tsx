@@ -2,7 +2,7 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { syntaxHighlighting } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
-import { ccsHighlightStyle, ccsLanguage } from './TextEditor';
+import { ccsHighlightStyle, ccsLanguage } from '../textEditor/TextEditor';
 
 const minimalTheme = EditorView.theme({
   "&": {

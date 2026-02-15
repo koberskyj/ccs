@@ -4,7 +4,7 @@ import { ccsToString } from "@/lib/ccsUtils";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { RotateCcw, CornerDownRight } from "lucide-react";
-import CCSViewer from "../textEditor/CCSViewer";
+import CCSViewer from "../custom/CCSViewer";
 import ProofControls from "./ProofControls";
 import AlertBox from "../custom/AlertBox";
 import ButtonHover from "../custom/ButtonHover";

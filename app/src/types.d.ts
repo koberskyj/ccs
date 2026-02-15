@@ -116,3 +116,31 @@ export interface ProofStep {
   errorMessage?: string;
   syncLabel?: string; 
 }
+
+export type ProgramSave = {
+  name: string;
+  description?: string;
+  allowEdit: boolean;
+  definition: string;
+  cards: ProgramCardType[];
+}
+
+export type ProgramCardType = CardSOS | CardLTS;
+
+export type CardSOS = {
+  type: 'sos';
+  name: string;
+  processX: string;
+  processY: string;
+  action: string;
+  //useStructRed?: boolean;
+  showHelp?: boolean
+};
+
+export type CardLTS = {
+  type: 'lts';
+  name: string;
+  process: string;
+  useStructRed?: boolean;
+  style?: ViewMode;
+};

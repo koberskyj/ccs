@@ -109,9 +109,10 @@ export type TextEditorProps = {
   initValue?: string;
   onTextChange?: (text: string) => void;
   highlightRange?: { from: number; to: number } | null;
+  disabled?: boolean;
 } & React.ComponentProps<"div">;
 
-export default function TextEditor({ initValue, onTextChange, highlightRange, className, ...props }: TextEditorProps) {
+export default function TextEditor({ initValue, onTextChange, highlightRange, disabled, className, ...props }: TextEditorProps) {
   const [value, setValue] = useState(initValue ?? "");
 
   const onChange = useCallback((val: string) => {
@@ -139,6 +140,8 @@ export default function TextEditor({ initValue, onTextChange, highlightRange, cl
       <CodeMirror 
         value={value} 
         style={{ fontSize: '1.2em', flex: 1 }} 
+        readOnly={disabled}
+        editable={!disabled}
         basicSetup={{
           closeBrackets: false,
         }}

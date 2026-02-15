@@ -1,0 +1,25 @@
+[
+  {
+    "name": "Testovací program",
+    "description": "První testovací program na otestování funkčnosti.",
+    "definition": "A = a.A\nB = ((A|'a.0)|b.0)[c/a]",
+    "allowEdit": true,
+    "cards": [
+      {
+        "type": "sos",
+        "name": "SOS",
+        "processX": "B",
+        "processY": "B",
+        "action": "c",
+        "showHelp": true
+      },
+      {
+        "type": "lts",
+        "name": "LTS",
+        "process": "B",
+        "useStructRed": true,
+        "style": "mixed"
+      }
+    ]
+  }
+]
