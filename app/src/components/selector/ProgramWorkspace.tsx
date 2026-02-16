@@ -98,7 +98,7 @@ export default function ProgramWorkspace() {
   const isDirty = localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
   useEffect(() => {
     if(isDirty && activeProgram?.allowEdit) {
-      toast.info(`Program byl upraven. Změny potvrdíte uložením programu.`);
+      //toast.info(`Program byl upraven. Změny potvrdíte uložením programu.`);
     }
   }, [isDirty]);
   

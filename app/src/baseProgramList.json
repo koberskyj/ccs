@@ -2,23 +2,118 @@
   {
     "name": "Testovací program",
     "description": "První testovací program na otestování funkčnosti.",
-    "definition": "A = a.A\nB = ((A|'a.0)|b.0)[c/a]",
+    "definition": "A = a.A\nB = ((A|'a.0)|b.0)[c/a]\n\nC = (a.0 | 'b.0)[c/a, c/b]\nD = a.0[c/a] | 'b.0[c/b]\n\nE = (a.0 | b.0) \\ {b}",
     "allowEdit": true,
     "cards": [
       {
         "type": "sos",
-        "name": "SOS",
-        "processX": "B",
-        "processY": "B",
+        "name": "SOS důkaz z prezentace",
+        "processX": "A",
+        "processY": "A",
         "action": "c",
         "showHelp": true
       },
       {
         "type": "lts",
-        "name": "LTS",
+        "name": "Bez tau přechodu",
+        "process": "C",
+        "style": "mixed",
+        "useStructRed": true
+      },
+      {
+        "type": "lts",
+        "name": "S tau přechodem",
+        "process": "D",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Restrikce",
+        "process": "E",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "Tau komunikace",
+    "description": "",
+    "definition": "A = a.0 | b.0 | 'a.0\nB = 0 | b.0 | 0",
+    "allowEdit": false,
+    "cards": [
+      {
+        "type": "sos",
+        "name": "Důkaz přes SOS, bez nápovědy",
+        "processX": "A",
+        "processY": "B",
+        "action": "tau",
+        "showHelp": false
+      },
+      {
+        "type": "lts",
+        "name": "LTS s tau přechodem",
+        "process": "A",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "Zápočtový projekt",
+    "description": "",
+    "allowEdit": true,
+    "definition": "\nSpec = acc.'del.Spec\n\nImpl1 = (Sender | Receiver | Med1 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\nImpl2 = (Sender | Receiver | Med2 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\nImpl3 = (Sender | Receiver | Med3 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\n\nTimer = 'timer.Timer\n\nSender  = acc.'snd0mes.SenderWait0\nSender1 = acc.'snd1mes.SenderWait1\nSenderWait0 = rec0acc.Sender1 + rec1acc.'snd0mes.SenderWait0 + timer.('snd0mes.SenderWait0 + SenderWait0)\nSenderWait1 = rec1acc.Sender  + rec0acc.'snd1mes.SenderWait1 + timer.('snd1mes.SenderWait1 + SenderWait1)\n\nReceiver  = rec0mes.'del.'snd0acc.Receiver1 + rec1mes.'snd1acc.Receiver\nReceiver1 = rec1mes.'del.'snd1acc.Receiver  + rec0mes.'snd0acc.Receiver1\n\nMed1 = Med1Mes | Med1Acc\nMed1Mes = snd0mes.'rec0mes.Med1Mes + snd1mes.'rec1mes.Med1Mes\nMed1Acc = snd0acc.'rec0acc.Med1Acc + snd1acc.'rec1acc.Med1Acc\n\nMed2 = Med2Mes | Med2Acc\nMed2Mes = snd0mes.('rec0mes.Med2Mes + Med2Mes) + snd1mes.('rec1mes.Med2Mes + Med2Mes)\nMed2Acc = snd0acc.('rec0acc.Med2Acc + Med2Acc) + snd1acc.('rec1acc.Med2Acc + Med2Acc)\n\nMed3 = Med3Mes | Med3Acc\nMed3Mes = snd0mes.Med3Mes0 + snd1mes.Med3Mes1\nMed3Acc = snd0acc.Med3Acc0 + snd1acc.Med3Acc1\nMed3Mes0 = 'rec0mes.Med3Mes0 + Med3Mes\nMed3Mes1 = 'rec1mes.Med3Mes1 + Med3Mes\nMed3Acc0 = 'rec0acc.Med3Acc0 + Med3Acc\nMed3Acc1 = 'rec1acc.Med3Acc1 + Med3Acc\n",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Implementace 1",
+        "process": "Impl1",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Implementace 2",
+        "process": "Impl2",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Implementace 3",
+        "process": "Impl3",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "Nekonečný cyklus",
+    "description": "",
+    "allowEdit": true,
+    "definition": "A = a.A\nB = a.b.B\nC = a.C | C",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Simulace",
+        "process": "A",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Simulace",
         "process": "B",
-        "useStructRed": true,
-        "style": "mixed"
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Stavová exploze",
+        "process": "C",
+        "style": "mixed",
+        "useStructRed": false
       }
     ]
   }

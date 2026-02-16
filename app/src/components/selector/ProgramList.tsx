@@ -53,7 +53,7 @@ export default function ProgramList({ ...props }: ProgramListType) {
 
   const handleNewProgram = (program: ProgramSave) => {
     addProgram(program);
-    selectProgram(programs.length - 1);
+    selectProgram(programs.length);
     toast.info(`Program ${program.name.toLocaleLowerCase()} byl přidán.`);
   }
 
