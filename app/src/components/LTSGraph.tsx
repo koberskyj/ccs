@@ -10,6 +10,7 @@ import { Button } from './ui/button';
 import { Download } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { handleExport } from '@/lib/ccsToSyntaxTree';
+import { useTranslation } from 'react-i18next';
 
 cytoscape.use(dagre);
 
@@ -112,6 +113,7 @@ type TooltipState = {
 } | null;
 
 export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode, isCentering }: LTSGraphProps) {
+  const { t } = useTranslation();
   const cyRef = useRef<Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(null);
@@ -295,7 +297,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       <div style={style}>
         <div className="animate-in fade-in-0 zoom-in-95 duration-200 px-4 py-3 text-sm bg-popover/80 text-popover-foreground border border-foreground/20 shadow-lg backdrop-blur-sm rounded-lg">
           <div className="font-mono border-b border-stone-400 pb-1 mb-2 font-bold text-xs uppercase tracking-wider flex justify-between">
-            <span>Vrchol {tooltip.numId} <span className="text-[0.6rem] text-foreground/50">({tooltip.nodeId})</span></span>
+            <span>{t('core.node')} {tooltip.numId} <span className="text-[0.65rem] text-foreground/50">({tooltip.nodeId})</span></span>
           </div>
           <div className="font-mono wrap-break-word border border-primary/8 bg-[color-mix(in_srgb,var(--primary)_15%,white)] p-2 rounded-md">
             <CCSViewer code={tooltip.text} />
@@ -322,13 +324,13 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'png')}>
-              Stáhnout jako PNG
+              {t('core.downloadAs')} PNG
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'svg')}>
-              Stáhnout jako SVG
+              {t('core.downloadAs')} SVG
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'json')}>
-              Stáhnout jako JSON
+              {t('core.downloadAs')} JSON
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

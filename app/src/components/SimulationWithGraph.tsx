@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ccsToString } from '@/lib/ccsUtils';
 import { Button } from './ui/button';
 import ButtonHover from './custom/ButtonHover';
+import { useTranslation } from 'react-i18next';
 
 function normalize(str: string) {
   return str.replace(/\s+/g, '');
@@ -23,7 +24,7 @@ type SimulationWithGraphProps = {
 };
 
 export default function SimulationWithGraph({program, initSettings, hideSettings=true, onSettingsUpdate, allowEdit}: SimulationWithGraphProps) {
-  
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>(initSettings?.style || 'id');
   const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
   const [isDynamicMode, setIsDynamicMode] = useState<boolean>(false);
@@ -48,7 +49,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
     if(onSettingsUpdate) {
       onSettingsUpdate({
         type: 'lts',
-        name: initSettings?.name ?? 'Simulace',
+        name: initSettings?.name ?? t('core.simulation'),
         process: selectedProcessName,
         style: viewMode,
         useStructRed: useStructRed
@@ -258,7 +259,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
         {hideSettings && (
           <div className="absolute flex flex-wrap gap-4 items-center mb-2 mt-1 z-10">
             <div className="flex items-center gap-2 bg-secondary/80 backdrop-blur-sm  text-secondary-foreground/85 p-1 px-2 rounded-md shadow-sm">
-              <span className="text-xs font-medium uppercase px-1">Proces:</span>
+              <span className="text-xs font-medium uppercase px-1">{t('core.process')}:</span>
               <Select value={selectedProcessName} disabled={!allowEdit} onValueChange={(value) => { 
                 setSelectedProcessName(value);
                 handleReset();
@@ -281,7 +282,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
             <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
-                Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
+                {t('simulation.structuralReduction')} {useStructRed ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
               </span>
             </Button>
 
@@ -298,11 +299,11 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
             <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => { setIsDynamicMode(!isDynamicMode); !isDynamicMode && setIsCentering(true);}}>
               <RefreshCcw size={16} className={`${isDynamicMode ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${isDynamicMode ? 'text-primary' : ''}`}>
-                Dynamické dočítání {isDynamicMode ? '(Zap)' : '(Vyp)'}
+                {t('simulation.dynamicMode')} {isDynamicMode ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
               </span>
             </Button>
 
-            <ButtonHover hoverContent={<>Centrování grafu {isCentering ? '(Zap)' : '(Vyp)'}</>} variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setIsCentering(!isCentering)}>
+            <ButtonHover hoverContent={<>{t('simulation.centering')} {isCentering ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}</>} variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setIsCentering(!isCentering)}>
               <Locate size={16} className={`${isCentering ? 'text-primary' : ''}`} />
             </ButtonHover>
           </div>

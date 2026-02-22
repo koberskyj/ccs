@@ -8,8 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BookOpen, Check } from "lucide-react";
 import DivHover from "../custom/DivHover";
 import { InferenceRuleTooltip, RuleAct, RuleCom1, RuleCom2, RuleCom3, RuleCon, RuleRel, RuleRes, RuleSum, SOSRulesHelp } from "./ProofRuleHelp";
-
-
+import { useTranslation } from "react-i18next";
 interface ProofControlsProps {
   step: ProofStep;
   showHints: boolean;
@@ -17,7 +16,7 @@ interface ProofControlsProps {
 }
 
 export default function ProofControls({ step, onApplyRule, showHints }: ProofControlsProps) {
-
+  const { t } = useTranslation();
   const [selectedSyncLabel, setSelectedSyncLabel] = useState<string>('a');
   const [leftSends, setLeftSends] = useState<boolean>(true);
   const [relCandidate, setRelCandidate] = useState<string>('');
@@ -76,12 +75,12 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
   const needsBoolInput = manualRule === 'COM_SYNC';
   const getPlaceholder = () => {
     if(manualRule === 'COM_SYNC') {
-      return 'Sync akce';
+      return t('sos.syncAction');
     }
     if(manualRule === 'REL') {
-      return 'Původní akce';
+      return t('sos.originalAction');
     }
-    return 'Parametr';
+    return t('core.parameter');
   };
 
   const onManualApply = () => {
@@ -130,11 +129,11 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
                 <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleCom3 /></InferenceRuleTooltip>}>
                   <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">COM Sync</Badge>
                 </DivHover>
-                <span className="text-xs font-medium text-stone-800 pl-1">na:</span>
+                <span className="text-xs font-medium text-stone-800 pl-1">{t('core.onto')}:</span>
                 <Input className="h-7 w-16 text-xs font-mono bg-white" value={selectedSyncLabel} onChange={e => setSelectedSyncLabel(e.target.value)} placeholder="akce" />
                 <div className="flex items-center space-x-1">
                   <Checkbox id={`ls-${step.id}`} checked={leftSends} onCheckedChange={(c) => setLeftSends(c as boolean)} />
-                  <label htmlFor={`ls-${step.id}`} className="text-xs cursor-pointer select-none">Levá posílá</label>
+                  <label htmlFor={`ls-${step.id}`} className="text-xs cursor-pointer select-none">{t('sos.leftSends')}</label>
                 </div>
                 <Button size="icon" className="h-7 w-7" onClick={() => onApplyRule(step.id, 'COM_SYNC', { label: selectedSyncLabel, leftSends })}>
                   <Check className="h-3 w-3" />
@@ -155,8 +154,8 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
             <DivHover className="p-0" delayDuration={750} hoverContent={<InferenceRuleTooltip><RuleRel /></InferenceRuleTooltip>}>
               <Badge className="bg-white text-foreground hover:bg-accent hover:text-accent-foreground">REL</Badge>
             </DivHover>
-            <DivHover delayDuration={750} hoverContent={<span>Zde si vyberte původní akci <br /> (před přejmenováním)</span>}>
-              <span className="text-xs font-medium text-stone-800 pl-1">Původní akce:</span>
+            <DivHover delayDuration={750} hoverContent={<span>{t('sos.selectOriginalAction')} <br /> ({t('sos.beforeRelabeling')})</span>}>
+              <span className="text-xs font-medium text-stone-800 pl-1">{t('sos.originalAction')}:</span>
             </DivHover>
             {relCandidates.length > 0 ? (
               <Select value={relCandidate} onValueChange={setRelCandidate}>
@@ -168,7 +167,7 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
                 </SelectContent>
               </Select>
             ) : (
-                <span className="text-xs text-gray-600 italic px-2">Žádná shoda</span>
+                <span className="text-xs text-gray-600 italic px-2">{t('core.noMatch')}</span>
             )}
 
             <Button size="icon" className="h-7 w-7" onClick={() => onApplyRule(step.id, 'REL', { oldLabel: relCandidate })}>
@@ -199,7 +198,7 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
 
         <Select value={manualRule} onValueChange={(v) => setManualRule(v as ProofRuleName)}>
           <SelectTrigger className="h-9 w-[120px] bg-white">
-             <SelectValue placeholder="Vyberte pravidlo..." />
+             <SelectValue placeholder={t('sos.selectRule')} />
           </SelectTrigger>
           <SelectContent>
             {ALL_RULES.map(r => (
@@ -215,11 +214,11 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
         {needsBoolInput && (
           <div className="flex items-center gap-2 border px-3 h-9 rounded-md bg-white">
             <Checkbox id={`manual-ls-${step.id}`} checked={manualBool} onCheckedChange={(c) => setManualBool(c as boolean)} />
-            <label htmlFor={`manual-ls-${step.id}`} className="text-sm cursor-pointer select-none">Levá posílá</label>
+            <label htmlFor={`manual-ls-${step.id}`} className="text-sm cursor-pointer select-none">{t('sos.leftSends')}</label>
           </div>
         )}
 
-        <Button disabled={!manualRule} onClick={onManualApply}>Aplikovat</Button>
+        <Button disabled={!manualRule} onClick={onManualApply}>{t('core.apply')}</Button>
       </div>
     );
   }

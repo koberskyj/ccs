@@ -43,8 +43,8 @@ export default function ProgramWorkspace() {
     }
 
     const newCard: ProgramCardType = type === 'sos'
-      ? { type: 'sos', name: 'Důkaz', processX: '', processY: '', action: '', showHelp: true } as CardSOS
-      : { type: 'lts', name: 'Simulace', process: '', useStructRed: false, style: 'mixed' } as CardLTS;
+      ? { type: 'sos', name: t('core.proof'), processX: '', processY: '', action: '', showHelp: true } as CardSOS
+      : { type: 'lts', name: t('core.simulation'), process: '', useStructRed: false, style: 'mixed' } as CardLTS;
 
     setLocalProgram({
       ...localProgram,
@@ -73,7 +73,7 @@ export default function ProgramWorkspace() {
   const handleSave = () => {
     if(selectedProgramIndex != null && localProgram) {
       updateProgram(selectedProgramIndex, localProgram);
-      toast.info(`Změny v programu byly uloženy.`);
+      toast.info(t('selector.programSaved'));
     }
   };
 
@@ -92,7 +92,7 @@ export default function ProgramWorkspace() {
   const handleDiscard = () => {
     setLocalProgram(activeProgram);
     setChangeVersion(changeVersion + 1);
-    toast.info(`Lokální změny byly zrušeny.`);
+    toast.info(t('selector.changesDiscarded'));
   };
   
   const isDirty = localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
@@ -103,7 +103,7 @@ export default function ProgramWorkspace() {
   }, [isDirty]);
   
   if (!localProgram || !activeProgram) {
-    return <div className="text-center p-10 text-muted-foreground">Vyberte program ze seznamu.</div>;
+    return <div className="text-center p-10 text-muted-foreground">{t('selector.noActiveProgram')}</div>;
   }
 
   return (
@@ -122,10 +122,10 @@ export default function ProgramWorkspace() {
               {isDirty && activeProgram.allowEdit && (
                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
                   <Button variant="ghost" size="sm" onClick={handleDiscard} className="text-muted-foreground hover:text-red-600">
-                    <RotateCcw className="w-4 h-4 mr-2" /> Zahodit změny
+                    <RotateCcw className="w-4 h-4 mr-2" /> {t('selector.discardChanges')}
                   </Button>
                   <Button onClick={handleSave}>
-                    <Save className="w-4 h-4 mr-2" /> Uložit změny
+                    <Save className="w-4 h-4 mr-2" /> {t('selector.saveChanges')}
                   </Button>
                 </div>
               )}
@@ -148,10 +148,10 @@ export default function ProgramWorkspace() {
           {activeProgram.allowEdit && 
             <div className="pt-6">
               <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg bg-muted/60 hover:bg-muted/90 transition-colors gap-4">
-                  <p className="text-muted-foreground font-medium">Přidat novou kartu k programu</p>
+                  <p className="text-muted-foreground font-medium">{t('selector.addNewCard')}</p>
                   <div className="flex gap-4">
-                      <Button variant="outline" onClick={() => addCard('sos')} className="gap-2">Nový SOS Důkaz</Button>
-                      <Button variant="outline" onClick={() => addCard('lts')} className="gap-2">Nová LTS Simulace</Button>
+                      <Button variant="outline" onClick={() => addCard('sos')} className="gap-2">{t('selector.newSOSProof')}</Button>
+                      <Button variant="outline" onClick={() => addCard('lts')} className="gap-2">{t('selector.newLTSSimulation')}</Button>
                   </div>
               </div>
             </div>

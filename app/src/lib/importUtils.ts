@@ -1,29 +1,30 @@
 import type { ViewMode } from "@/types";
+import { t } from "i18next";
 
 
 export function validateProgramDefinition(data: any): string | true {
   if(!data || typeof data !== 'object') {
-    return "Importovaná data nemají správnou strukturu";
+    return t('selector.invalidProgramFormatError');
   }
 
   if(typeof data.name !== 'string' || data.name.trim() === '') {
-    return "Chybný název programu";
+    return t('selector.invalidProgramNameError');
   }
 
   if(data.description !== undefined && typeof data.description !== 'string') {
-    return "Popis programu musí být řetězec";
+    return t('selector.invalidProgramDescriptionError');
   }
 
   if(typeof data.definition !== 'string') {
-    return "Definice CCS musí být řetězec";
+    return t('selector.invalidProgramDefinitionError');
   }
 
   if(typeof data.allowEdit !== 'boolean') {
-    return "Povolení úprav musí být boolean";
+    return t('selector.invalidProgramAllowEditError');
   }
 
   if(!Array.isArray(data.cards)) {
-    return "Program musí obsahovat pole karet (SOS nebo LTS)";
+    return t('selector.invalidProgramCardsError');
   }
 
   for(let i = 0; i < data.cards.length; i++) {
@@ -40,15 +41,15 @@ export function validateProgramDefinition(data: any): string | true {
 
 export function validateCard(card: any): string | true {
   if(typeof card !== 'object' || card === null) {
-    return "Karta není platný objekt";
+    return t('selector.invalidCardObjectError');
   }
 
   if(typeof card.name !== 'string' || card.name.trim() === '') {
-    return "Chybí název karty";
+    return t('selector.invalidCardNameError');
   }
 
   if(!('type' in card)) {
-    return "Chybí typ karty";
+    return t('selector.missingCardTypeError');
   }
 
   if(card.type === 'sos') {
@@ -60,26 +61,26 @@ export function validateCard(card: any): string | true {
     return res;
   }
 
-  return "Neznámý typ karty '"+card.type+"'";
+  return t('selector.unknownCardTypeError', { type: card.type });
 }
 
 function validateCardSOS(card: any): string | true {
   if(typeof card.processX !== 'string' || typeof card.processY !== 'string' || 
     typeof card.action !== 'string' || /*typeof card.useStructRed !== 'boolean' || */
     typeof card.showHelp !== 'boolean') {
-    return "Karta má chybnou strukturu";
+    return t('selector.invalidCardStructureError');
   }
   return true;
 }
 
 function validateCardLTS(card: any): string | true {
   if (typeof card.process !== 'string' || typeof card.useStructRed !== 'boolean') {
-    return "Karta má chybnou strukturu";
+    return t('selector.invalidCardStructureError');
   }
   
   const validStyles: ViewMode[] = ['id', 'mixed', 'full'];
   if(!validStyles.includes(card.style)) {
-    return "Karta obsahuje neplatný styl zobrazení.";
+    return t('selector.invalidCardStyleError');
   }
 
   return true;

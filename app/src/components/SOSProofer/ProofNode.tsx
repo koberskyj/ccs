@@ -9,6 +9,7 @@ import ProofControls from "./ProofControls";
 import AlertBox from "../custom/AlertBox";
 import ButtonHover from "../custom/ButtonHover";
 import { TransitionArrow } from "./ProofRuleHelp";
+import { useTranslation } from "react-i18next";
 
 export function getStatusStyle(status: ProofStatus) {
   switch(status) {
@@ -31,10 +32,11 @@ interface ProofNodeProps {
 }
 
 export default function ProofNode({ step, program, showHints, depth, onApplyRule, onReset }: ProofNodeProps) {
+  const { t } = useTranslation();
 
   return (
     <div className="relative group">
-      {depth > 0 && <div className="absolute left-[-16px] top-6 w-[15px] h-px bg-gray-300 hidden md:block" />}
+      {depth > 0 && <div className="absolute -left-4 top-6 w-[15px] h-px bg-gray-300 hidden md:block" />}
 
       <div className={cn("mb-2 relative animate-in fade-in transition-all duration-300 z-10 shadow-xs rounded-lg overflow-hidden border-y border-r bg-card", getStatusStyle(step.status))}>
         <div className="flex items-stretch">
@@ -51,14 +53,14 @@ export default function ProofNode({ step, program, showHints, depth, onApplyRule
               </div>
 
               {step.status === 'proved' && (
-                <AlertBox type="success" className="border-none shadow-none bg-green-100">Dokázáno</AlertBox>
+                <AlertBox type="success" className="border-none shadow-none bg-green-100">{t('sos.proved')}</AlertBox>
               )}
               {step.status === 'invalid' && (
                 <AlertBox type="error" className="border-none shadow-none bg-red-100">{step.errorMessage}</AlertBox>
               )}
             </div>
 
-            <div className="min-h-[40px] flex items-center">
+            <div className="min-h-10 flex items-center">
               {step.status === 'pending' ? (
                 <div className="w-full animate-in fade-in duration-300">
                   <ProofControls step={step} onApplyRule={onApplyRule} showHints={showHints} />
@@ -66,13 +68,13 @@ export default function ProofNode({ step, program, showHints, depth, onApplyRule
               ) : (
                 <div className="flex items-center justify-between w-full animate-in slide-in-from-left-2 duration-300">
                   <div className="flex items-center gap-3 font-mono">
-                    <span className="text-sm text-foreground/90 shrink-0">Použité pravidlo:</span> 
+                    <span className="text-sm text-foreground/90 shrink-0">{t('sos.appliedRule')}:</span> 
                     <Badge variant="secondary" className="px-3 py-1 border-stone-300 bg-stone-100">
                       {step.appliedRule}
                     </Badge>
                   </div>
                   
-                  <ButtonHover variant="ghost" size="sm" onClick={() => onReset(step.id)} className="h-8 w-8 p-0 border border-stone-300 bg-stone-100 hover:bg-stone-200" hoverContent="Resetovat tento krok">
+                  <ButtonHover variant="ghost" size="sm" onClick={() => onReset(step.id)} className="h-8 w-8 p-0 border border-stone-300 bg-stone-100 hover:bg-stone-200" hoverContent={t('sos.resetStep')}>
                       <RotateCcw className="h-4 w-4" />
                   </ButtonHover>
                 </div>

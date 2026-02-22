@@ -7,13 +7,14 @@ import { ProgramCreator } from './ProgramCreator';
 import type { ProgramSave } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 type ProgramListType = { 
   
 } & React.ComponentProps<"div">;
 
 export default function ProgramList({ ...props }: ProgramListType) {
-  
+  const { t } = useTranslation();
   const { programs, activeProgram, selectProgram, addProgram, updateProgram, deleteProgram } = usePrograms();
 
   const handleDownload = (e: React.MouseEvent, program: ProgramSave) => {
@@ -25,36 +26,36 @@ export default function ProgramList({ ...props }: ProgramListType) {
     
     const link = document.createElement('a');
     link.href = url;
-    const safeName = program.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    link.download = `${safeName}.json`;
+    //const safeName = program.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.download = `program.json`;
     
     document.body.appendChild(link);
     link.click();
     
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.info(`Definice programu ${program.name.toLocaleLowerCase()} byla stažena.`);
+    toast.info(t('selector.programDownloaded', { name: program.name.toLocaleLowerCase() }));
   };
 
   const handleDelete = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     const programName = programs[index].name;
-    if (window.confirm("Opravdu chcete program '"+programName+"' odstranit? Tato akce je nevratná.")) {
+    if(window.confirm(t('selector.deleteProgramConfirm', { name: programName }))) {
       deleteProgram(index);
       selectProgram(0);
-      toast.info(`Program ${programName.toLocaleLowerCase()} byl odstraněn.`);
+      toast.info(t('selector.programDeleted', { name: programName.toLocaleLowerCase() }));
     }
   };
 
   const copyMachine = (id: number) => {
     navigator.clipboard.writeText(JSON.stringify(programs[id]));
-    toast.info(`Definice programu ${programs[id].name.toLocaleLowerCase()} byla zkopírována do schránky`);
+    toast.info(t('selector.copyProgram', { name: programs[id].name.toLocaleLowerCase() }));
   }
 
   const handleNewProgram = (program: ProgramSave) => {
     addProgram(program);
     selectProgram(programs.length);
-    toast.info(`Program ${program.name.toLocaleLowerCase()} byl přidán.`);
+    toast.info(t('selector.newProgramAdded', { name: program.name.toLocaleLowerCase() }));
   }
 
   return (
@@ -63,7 +64,7 @@ export default function ProgramList({ ...props }: ProgramListType) {
         <div className='border rounded-md mb-6 max-h-[400px] overflow-auto'>
           {programs.length === 0 && (
             <div className="p-4 text-center text-muted-foreground">
-              Nemáte uloženy žádné programy.
+              {t('selector.noPrograms')}
             </div>
           )}
           {programs.map((program, idx) => 
@@ -77,23 +78,23 @@ export default function ProgramList({ ...props }: ProgramListType) {
               
               <div className='flex justify-end grow'>
                 <ProgramCreator program={program} onUpdate={(updated) => updateProgram(idx, updated)}>
-                  <ButtonHover hoverContent={<p>Upravit název a popis programu</p>} variant="ghost" size="icon"
+                  <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon"
                       className='text-yellow-600 hover:text-yellow-600 hover:bg-yellow-600/10'>
                     <Pencil />
                   </ButtonHover>
                 </ProgramCreator>
 
-                <ButtonHover hoverContent={<p>Stáhnout program</p>} variant="ghost" size="icon" onClick={(e) => handleDownload(e, program)}
+                <ButtonHover hoverContent={<p>{t('selector.downloadProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDownload(e, program)}
                     className='text-blue-600 hover:text-blue-600 hover:bg-blue-600/10'>
                   <Download />
                 </ButtonHover>
 
-                <ButtonHover hoverContent={<p>Zkopírovat program do schránky</p>} variant="ghost" size="icon" onClick={() => copyMachine(idx)}
+                <ButtonHover hoverContent={<p>{t('selector.copyProgramToClipboard')}</p>} variant="ghost" size="icon" onClick={() => copyMachine(idx)}
                     className='text-stone-600 hover:text-stone-600 hover:bg-stone-600/10'>
                   <Copy />
                 </ButtonHover>
                 
-                <ButtonHover hoverContent={<p>Odstranit program</p>} variant="ghost" size="icon" onClick={(e) => handleDelete(e, idx)} disabled={programs.length <= 1}
+                <ButtonHover hoverContent={<p>{t('selector.deleteProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDelete(e, idx)} disabled={programs.length <= 1}
                     className='text-red-600 hover:text-red-600 hover:bg-red-600/10 disabled:opacity-30'>
                   <Trash2 />
                 </ButtonHover>
@@ -104,11 +105,11 @@ export default function ProgramList({ ...props }: ProgramListType) {
         
         <div className='flex flex-wrap justify-between gap-3'>
           <ProgramCreator onUpdate={handleNewProgram}>
-            <Button>Definovat nový program</Button>
+            <Button>{t('selector.newProgram')}</Button>
           </ProgramCreator>
           
           <ImportProgram onUpdate={handleNewProgram}>
-            <Button variant={"secondary"}>Importovat program</Button>
+            <Button variant={"secondary"}>{t('selector.importProgram')}</Button>
           </ImportProgram>
         </div>
       </div>

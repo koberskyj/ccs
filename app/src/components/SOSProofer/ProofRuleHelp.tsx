@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useTranslation } from 'react-i18next';
 
 export function TransitionArrow({ label }: { label: React.ReactNode }) {
   return (
@@ -115,6 +116,7 @@ export function RuleAct() {
 }
 
 export function RuleSum() {
+  const { t } = useTranslation();
   return (
     <InferenceRule 
       premise={<Trans p={P_j} a={alpha} q={P_j_prime} />}
@@ -125,33 +127,36 @@ export function RuleSum() {
           q={P_j_prime} 
         />
       }
-      condition={<span>kde <span>j &#8712; I</span></span>}
-      note={<span>V aplkiaci: SUM Left / SUM Right</span>}
+      condition={<span>{t('core.where')} <span>j &#8712; I</span></span>}
+      note={<span>{t('core.inApp')}: SUM Left / SUM Right</span>}
     />
   )
 }
 
 export function RuleCom1() {
+  const { t } = useTranslation();
   return (
     <InferenceRule 
       premise={<Trans p={P} a={alpha} q={P_prime} />}
       conclusion={<Trans p={<>{P} | {Q}</>} a={alpha} q={<>{P_prime} | {Q}</>} />}
-      note={<span>V aplikaci: COM Left</span>}
+      note={<span>{t('core.inApp')}: COM Left</span>}
     />
   )
 }
 
 export function RuleCom2() {
+  const { t } = useTranslation();
   return (
     <InferenceRule 
       premise={<Trans p={Q} a={alpha} q={Q_prime} />}
       conclusion={<Trans p={<>{P} | {Q}</>} a={alpha} q={<>{P} | {Q_prime}</>} />}
-      note={<span>V aplikaci: COM Right</span>}
+      note={<span>{t('core.inApp')}: COM Right</span>}
     />
   )
 }
 
 export function RuleCom3() {
+  const { t } = useTranslation();
   return (
     <InferenceRule
       premise={
@@ -161,7 +166,7 @@ export function RuleCom3() {
         </div>
       }
       conclusion={<Trans p={<>{P} | {Q}</>} a={tau} q={<>{P_prime} | {Q_prime}</>} />}
-      note={<span>V aplikaci: COM Sync</span>}
+      note={<span>{t('core.inApp')}: COM Sync</span>}
     />
   )
 }
@@ -186,16 +191,18 @@ export function RuleRel() {
 }
 
 export function RuleCon() {
+  const { t } = useTranslation();
   return (
     <InferenceRule 
       premise={<Trans p={P} a={alpha} q={P_prime} />}
       conclusion={<Trans p={<span>K</span>} a={alpha} q={P_prime} />}
-      condition={<span>kde <span>K def P</span></span>}
+      condition={<span>{t('core.where')} <span>K def P</span></span>}
     />
   )
 }
 
 export function SOSRulesHelp({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -203,21 +210,21 @@ export function SOSRulesHelp({ children }: { children: React.ReactNode }) {
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-xl">Definice strukturální operační sémantiky (SOS)</DialogTitle>
+          <DialogTitle className="text-xl">{t('sos.sosDefinition')} (SOS)</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-8 pb-4">
           
           <div>
             <h3 className="font-semibold mb-4 text-primary border-b border-foreground/20 pb-1.5">
-              Základní operátory a volba
+              {t('sos.operationalRules')}
             </h3>
             <div className="flex gap-4 justify-start flex-wrap">
-              <InferenceRuleBox name={<><b>ACT</b> (Prefix)</>}>
+              <InferenceRuleBox name={<><b>ACT</b> ({t('core.prefix')})</>}>
                 <RuleAct />
               </InferenceRuleBox>
               
-              <InferenceRuleBox name={<><b>SUM</b> (Součet)</>}>
+              <InferenceRuleBox name={<><b>SUM</b> ({t('core.sum')})</>}>
                 <RuleSum />
               </InferenceRuleBox>
             </div>
@@ -225,17 +232,17 @@ export function SOSRulesHelp({ children }: { children: React.ReactNode }) {
 
           <div>
             <h3 className="font-semibold mb-4 text-primary border-b border-foreground/20 pb-1.5">
-              Paralelní kompozice
+              {t('sos.communicationRules')}
             </h3>
             <div className="flex gap-4 justify-start flex-wrap">
-              <InferenceRuleBox name={<><b>COM1</b> (Levá větev)</>}>
+              <InferenceRuleBox name={<><b>COM1</b> ({t('core.leftBranch')})</>}>
                 <RuleCom1 />
               </InferenceRuleBox>
 
-              <InferenceRuleBox name={<><b>COM2</b> (Pravá větev)</>}>
+              <InferenceRuleBox name={<><b>COM2</b> ({t('core.rightBranch')})</>}>
                 <RuleCom2 />
               </InferenceRuleBox>
-              <InferenceRuleBox name={<><b>COM3</b> (Komunikace)</>}>
+              <InferenceRuleBox name={<><b>COM3</b> ({t('core.communication')})</>}>
                 <RuleCom3 />
               </InferenceRuleBox>
             </div>
@@ -243,16 +250,16 @@ export function SOSRulesHelp({ children }: { children: React.ReactNode }) {
 
           <div>
             <h3 className="font-semibold mb-4 text-primary border-b border-foreground/20 pb-1.5">
-              Strukturální operátory
+              {t('sos.structuralRules')}
             </h3>
             <div className="flex gap-4 justify-start flex-wrap">
-              <InferenceRuleBox name={<><b>RES</b> (Restrikce)</>}>
+              <InferenceRuleBox name={<><b>RES</b> ({t('core.restriction')})</>}>
                 <RuleRes />
               </InferenceRuleBox>
-              <InferenceRuleBox name={<><b>REL</b> (Přejmenování)</>}>
+              <InferenceRuleBox name={<><b>REL</b> ({t('core.relabeling')})</>}>
                 <RuleRel />
               </InferenceRuleBox>
-              <InferenceRuleBox name={<><b>CON</b> (Konstanta)</>}>
+              <InferenceRuleBox name={<><b>CON</b> ({t('core.constant')})</>}>
                 <RuleCon />
               </InferenceRuleBox>
             </div>

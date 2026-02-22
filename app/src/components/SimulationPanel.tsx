@@ -5,6 +5,7 @@ import CCSViewer from './custom/CCSViewer';
 import { useMemo } from 'react';
 import { ccsToString } from '@/lib/ccsUtils';
 import AlertBox from './custom/AlertBox';
+import { useTranslation } from 'react-i18next';
 
 type Transition = { action: string, id: number, target: CCSExpression };
 
@@ -22,7 +23,7 @@ type Props = {
 };
 
 export default function SimulationPanel({ currentCCS, transitions, historyLength, onStep, onBack, onReset, onTransitionHover, getTargetLabel, forceStructuralReduction, isOffGraph }: Props) {
-
+  const { t } = useTranslation();
   const uniqueTransitions = useMemo(() => {
     const uniqueMap = new Map<string, Transition>();
 
@@ -45,10 +46,10 @@ export default function SimulationPanel({ currentCCS, transitions, historyLength
 
         <div className="flex justify-between gap-2">
           <Button onClick={onBack} disabled={historyLength === 0} size="sm">
-            <ArrowLeft size={14} /> Zpět
+            <ArrowLeft size={14} /> {t('core.back')}
           </Button>
           <Button onClick={onReset} variant="destructive" size="sm">
-            <RotateCcw size={14} /> Reset
+            <RotateCcw size={14} /> {t('core.reset')}
           </Button>
         </div>
       </div>
@@ -56,22 +57,22 @@ export default function SimulationPanel({ currentCCS, transitions, historyLength
       <div className="grow overflow-y-auto pt-4 flex flex-col gap-6">
         {isOffGraph &&  
           <AlertBox type="warning" className="border-none shadow-none bg-amber-100 max-w-[210px]">
-            Další kroky se v grafu nezobrazí, stále se ale počítají.
+            {t('simulation.offGraphWarning')}
           </AlertBox>
         }
         <div>
-            <div className="text-xs px-2 uppercase tracking-wider text-foreground/90 font-bold mb-1">Aktuální proces</div>
+            <div className="text-xs px-2 uppercase tracking-wider text-foreground/90 font-bold mb-1">{t('simulation.actualProcess')}</div>
             <div className="font-mono wrap-break-word border border-primary/15 bg-primary/8 p-2 rounded-md">
               <CCSViewer code={currentCCS} />
             </div>
         </div>
 
         <div>
-            <div className="text-xs px-2 uppercase tracking-wider text-foreground/90 font-bold mb-1">Dostupné přechody</div>
+            <div className="text-xs px-2 uppercase tracking-wider text-foreground/90 font-bold mb-1">{t('simulation.availableTransitions')}</div>
             
             {uniqueTransitions.length === 0 ? (
               <div className="text-center py-8 text-foreground bg-foreground/5 border border-foreground/10 rounded font-mono uppercase">
-                  Deadlock
+                  {t('simulation.noTransitions')}
               </div>
             ) : (
               <div className="flex flex-col gap-2">

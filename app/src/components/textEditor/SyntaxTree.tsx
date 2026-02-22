@@ -10,6 +10,7 @@ import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import cysvg from 'cytoscape-svg';
+import { useTranslation } from 'react-i18next';
 
 cytoscape.use(dagre);
 cytoscape.use(cysvg);
@@ -100,6 +101,7 @@ export type SyntaxTreeProps = {
 } & React.ComponentProps<"div">;
 
 export default function SyntaxTree({ parsedAst, onHoverNode, onContentResize, className, ...props }: SyntaxTreeProps) {
+  const { t } = useTranslation();
   const cyRef = useRef<cytoscape.Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -184,13 +186,13 @@ export default function SyntaxTree({ parsedAst, onHoverNode, onContentResize, cl
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'png')}>
-              Stáhnout jako PNG
+              {t('core.downloadAs')} PNG
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'svg')}>
-              Stáhnout jako SVG
+              {t('core.downloadAs')} SVG
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'json')}>
-              Stáhnout jako JSON
+              {t('core.downloadAs')} JSON
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

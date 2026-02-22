@@ -4,6 +4,7 @@ import ccsParser, { validateCCS } from "@/lib/ccsParser";
 import type { CCSProgram } from "@/types";
 import AlertBox from "../custom/AlertBox";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type TextCCSParserProps = {
   onCCSChange?: (input: CCSProgram, codeString: string) => void;
@@ -14,13 +15,14 @@ type TextCCSParserProps = {
 } & React.ComponentProps<"div">;
 
 export default function TextCCSParser({ onCCSSubmit, onCCSChange, initValue, highlightRange, disabled, className, ...props }: TextCCSParserProps) {
+  const { t } = useTranslation();
   const [ccsCode, setCcsCode] = useState(initValue ?? "");
   const [error, setError] = useState<React.ReactNode | null>(null);
   
   const parser = useMemo(() => {
     const parser = ccsParser();
     if(parser === null) {
-      setError("CCS parser was not initialized.");
+      setError(t('textEditor.parserInitError'));
     }
     return parser;
   }, []);

@@ -7,11 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
 import { SOSRulesHelp } from './ProofRuleHelp';
+import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 
 function parseCCSAction(input: string): CCSAction|{ error: string } {
   if(!input || input.trim() === "") {
-    return { error: "Akce nesmí být prázdná" };
+    return { error: t('sos.emptyActionError') };
   }
 
   const trimmedInput = input.trim();
@@ -19,14 +21,14 @@ function parseCCSAction(input: string): CCSAction|{ error: string } {
   const rawLabel = isOutput ? trimmedInput.substring(1) : trimmedInput;
   if(rawLabel === "tau" || rawLabel === "τ") {
     if(isOutput) {
-      return { error: "Tau nemůže být výstupní akcí" };
+      return { error: t('sos.tauCannotBeOutput') };
     }
     return { label: "tau", isOutput: false };
   }
 
   const labelRegex = /^[a-z][a-z0-9_]*$/;
   if(!labelRegex.test(rawLabel)) {
-    return { error: "Neplatný název akce" };
+    return { error: t('sos.invalidActionName') };
   }
   return { label: rawLabel, isOutput };
 }
@@ -43,6 +45,7 @@ interface ProofWrapperProps {
 }
 
 export default function ProofWrapper({ program, initSettings, onSettingsUpdate, allowEdit }: ProofWrapperProps) {
+  const { t } = useTranslation();
   const [sourceProcessName, setSourceProcessName] = useState<string>(initSettings?.processX ?? program[0].name);
   const [targetProcessName, setTargetProcessName] = useState<string>(initSettings?.processY ?? program[0].name);
   const [actionText, setActionText] = useState<string>(initSettings?.action ?? 'a');
@@ -61,7 +64,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
     if(onSettingsUpdate) {
       onSettingsUpdate({
         type: 'sos',
-        name: initSettings?.name ?? 'Důkaz',
+        name: initSettings?.name ?? t('core.proof'),
         processX: sourceProcessName,
         processY: targetProcessName,
         action: actionText,
@@ -140,7 +143,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
       return;
     }
     if(!sourceAST || !targetAST) {
-      setError(`Proces ${!sourceAST ? sourceProcessName : targetProcessName} neexistuje.`);
+      setError(t('sos.invalidProcessSelection', { processName: !sourceAST ? sourceProcessName : targetProcessName }));
       return;
     }
 
@@ -170,7 +173,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
             <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)} disabled={!allowEdit}>
               <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
-                Nápověda {showHints ? '(Zap)' : '(Vyp)'}
+                {t('core.help')} {showHints ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
               </span>
             </Button>
 
@@ -178,7 +181,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
               <Button variant="secondary" className="cursor-pointer py-5">
                 <BookOpen size={16} />
                 <span className="text-xs font-medium">
-                  Přehled pravidel SOS
+                  {t('sos.ruleReference')}
                 </span>
               </Button>
             </SOSRulesHelp>
@@ -187,7 +190,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
 
       <div className="flex gap-4 items-end flex-wrap md:flex-nowrap mb-6">
         <div className="flex-1 space-y-2">
-          <span className='pl-1 text-sm font-semibold'>Počáteční proces</span>
+          <span className='pl-1 text-sm font-semibold'>{t('sos.sourceProcess')}</span>
           <Select value={sourceProcessName} onValueChange={e => setSourceProcessName(e)} disabled={!allowEdit}>
             <SelectTrigger>
               <SelectValue />
@@ -205,7 +208,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         </div>
 
         <div className="w-48 space-y-2">
-          <span className='pl-1 text-sm font-semibold'>Akce</span>
+          <span className='pl-1 text-sm font-semibold'>{t('core.action')}</span>
           <div className="relative">
             <Input value={actionText} onChange={e => setActionText(e.target.value)} className="font-mono text-center pl-6 pr-6" disabled={!allowEdit} />
             <span className="absolute left-2 top-1.5 text-muted-foreground">&mdash;</span>
@@ -214,7 +217,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         </div>
 
         <div className="flex-1 space-y-2">
-          <span className='pl-1 text-sm font-semibold'>Cílový proces</span>
+          <span className='pl-1 text-sm font-semibold'>{t('sos.targetProcess')}</span>
           <Select value={targetProcessName} onValueChange={e => setTargetProcessName(e)} disabled={!allowEdit}>
             <SelectTrigger>
               <SelectValue />
@@ -232,12 +235,12 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         </div>
 
         <div className="flex gap-2 pb-0.5">
-          <Button variant="outline" onClick={handleReset} size="icon" title="Resetovat">
+          <Button variant="outline" onClick={handleReset} size="icon" title={t('core.reset')}>
             <RotateCcw className="h-4 w-4" />
           </Button>
           <Button onClick={handleStartProof} className="w-32">
             <ChartGantt className="h-4 w-4 mr-2" />
-            Dokázat
+            {t('sos.startProof')}
           </Button>
         </div>
       </div>

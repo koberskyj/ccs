@@ -6,8 +6,10 @@ import { Textarea } from "../ui/textarea";
 import AlertBox from "../custom/AlertBox";
 import { validateProgramDefinition } from "@/lib/importUtils";
 import { Upload } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function ImportProgram({ children, onUpdate }: { children: React.ReactNode, onUpdate: (program: ProgramSave) => void }) {
+  const { t } = useTranslation();
   const [text, setText] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +30,7 @@ export function ImportProgram({ children, onUpdate }: { children: React.ReactNod
       }
     };
     reader.onerror = () => {
-      setErrorMessage("Chyba při čtení souboru.");
+      setErrorMessage(t('core.fileReadError'));
     };
     reader.readAsText(file);
     
@@ -51,7 +53,7 @@ export function ImportProgram({ children, onUpdate }: { children: React.ReactNod
       setText("");
     } 
     catch (e) {
-      setErrorMessage("Import se nezdařil.");
+      setErrorMessage(t('core.importFailed'));
       console.error(e);
     }
   }
@@ -63,7 +65,7 @@ export function ImportProgram({ children, onUpdate }: { children: React.ReactNod
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-xl">Importovat program</DialogTitle>
+          <DialogTitle className="text-xl">{t('selector.importProgram')}</DialogTitle>
         </DialogHeader>          
         
         <div className="space-y-2">
@@ -71,16 +73,16 @@ export function ImportProgram({ children, onUpdate }: { children: React.ReactNod
           <div>
             <input type="file" accept=".json" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
             <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-2">
-              <Upload size={16} /> Importovat ze souboru
+              <Upload size={16} /> {t('selector.uploadFile')}
             </Button>
           </div>
 
-          <div className="text-sm text-foreground/60 p-2">--- NEBO ---</div>
+          <div className="text-sm text-foreground/60 p-2">--- {t('core.or').toLocaleUpperCase()} ---</div>
 
-          <Textarea value={text} onChange={e => setText(e.target.value)} className="h-50 font-mono text-sm" placeholder='Zde vložte JSON definici programu...' />
+          <Textarea value={text} onChange={e => setText(e.target.value)} className="h-50 font-mono text-sm" placeholder={t('selector.pasteJson')} />
           
           <div className="flex justify-between items-end gap-2 pt-6">
-            <Button onClick={importProgram} className='w-fit'>Importovat</Button>
+            <Button onClick={importProgram} className='w-fit'>{t('core.import')}</Button>
             {errorMessage.length > 0 && <AlertBox type="error">{errorMessage}</AlertBox>}
           </div>
         </div>

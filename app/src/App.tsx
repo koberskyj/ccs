@@ -8,7 +8,7 @@ import { ProgramsProvider } from './utils/ProgramsContext';
 
 function RouteList() {
   return (
-    <div className='max-w-[1280px] m-auto w-full px-2 grow'>
+    <div className='max-w-7xl m-auto w-full px-2 grow'>
       <ProgramsProvider>
         <Routes>
           <Route path='/' element={<Homepage />} />

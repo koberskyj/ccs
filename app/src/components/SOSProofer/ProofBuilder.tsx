@@ -5,6 +5,7 @@ import { applySosRule, ccsToString } from '@/lib/ccsUtils';
 import CCSViewer from '../custom/CCSViewer';
 import { cn } from '@/lib/utils';
 import { TransitionArrow } from './ProofRuleHelp';
+import { useTranslation } from 'react-i18next';
 
 
 interface ProofBuilderProps {
@@ -28,6 +29,7 @@ export function getStatusColor(status: ProofStatus) {
 }
 
 export function ProofBuilder({ initialSource, initialTarget, initialAction, program, showHints }: ProofBuilderProps) {
+  const { t } = useTranslation();
   const [rootStep, setRootStep] = useState<ProofStep>({
     id: 'root',
     source: /*useStructRed ? normalizeCCS(initialSource) :*/ initialSource,
@@ -54,7 +56,7 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
 
     if(newNode.status == 'pending' && newNode.children.length > 0) {
       if(newNode.children.some(ch => ch.status === 'invalid')) {
-        return { ...newNode, status: 'invalid', errorMessage: 'Premisa selhala.' };
+        return { ...newNode, status: 'invalid', errorMessage: t('sos.invalidSubproof') };
       }
       if(newNode.children.every(ch => ch.status === 'proved')) {
         return { ...newNode, status: 'proved' };
@@ -116,7 +118,7 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
     <div className="md:shadow rounded-xl md:border border-stone-300 animate-in fade-in duration-300">
       <div className="p-3 px-4 mx-0 md:mx-4 mb-2 flex justify-between items-center flex-wrap gap-2 rounded-lg md:rounded-none border md:border-0 md:border-b border-stone-300">
         <div className='flex items-center gap-2 flex-wrap font-mono'>
-          <span className="text-sm text-foreground/90 shrink-0">Dokazujete:</span> 
+          <span className="text-sm text-foreground/90 shrink-0">{t('sos.proving')}:</span> 
           <div className='flex flex-wrap items-center px-1 font-mono border border-primary/10 bg-primary/5 rounded-md'>
             <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialSource) :*/ initialSource)} className='w-auto! wrap-break-word p-1' />
             <div className="-translate-y-1.25">
@@ -126,7 +128,7 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
           </div>
         </div>
         <div className={cn('text-xs text-gray-500 p-2 rounded-md uppercase', getStatusColor(rootStep.status))}>
-          {rootStep.status === 'proved' ? 'Dokázáno' : (rootStep.status === 'invalid' ? 'Chyba důkazu' : 'Probíhá')}
+          {rootStep.status === 'proved' ? t('sos.proved') : (rootStep.status === 'invalid' ? t('sos.invalidProof') : t('sos.inProgress'))}
         </div>
       </div>
       

@@ -1,6 +1,7 @@
 import peggy from "peggy";
 import grammarSource from "@/ccs_grammar.pegjs?raw";
 import type { CCSNode, CCSProgram } from "@/types";
+import { t } from "i18next";
 
 export function validateCCS(definitions: CCSProgram): string | null {
   const definedNames = new Set<string>();
@@ -8,7 +9,7 @@ export function validateCCS(definitions: CCSProgram): string | null {
 
   for(const def of definitions) {
     if(definedNames.has(def.name)) {
-      return `Process '${def.name}' is defined multiple times.`;
+      return t('textEditor.duplicateProcessError', { name: def.name });
     }
     definedNames.add(def.name);
   }
@@ -21,7 +22,7 @@ export function validateCCS(definitions: CCSProgram): string | null {
     switch(expr.type) {
       case "ProcessRef":
         if(!definedNames.has(expr.name)) {
-          error = `Used undefined process '${expr.name}'.`;
+          error = t('textEditor.undefinedProcessError', { name: expr.name });
         }
         break;
 

@@ -1,4 +1,5 @@
 import type { CCSAction, CCSDefinition, CCSExpression, CCSNode, CCSProgram, ProofRuleName, ProofStatus, ProofStep } from "@/types";
+import { t } from "i18next";
 
 
 export function getPrecedence(node: CCSNode): number {
@@ -210,10 +211,10 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // ACT
   if(rule === 'ACT') {
     if(source.type !== 'Prefix') {
-      return fail('Zdroj nemá prefix.');
+      return fail(t('sos.notPrefixError'));
     }
     if(!areActionsEqual(source.action, action)) {
-      return fail(`Akce se neshoduje (${source.action.isOutput ? "'" : ""}${source.action.label} vs ${action.isOutput ? "'" : ""}${action.label}).`);
+      return fail(`${t('sos.actionMismatchError')} (${source.action.isOutput ? "'" : ""}${source.action.label} vs ${action.isOutput ? "'" : ""}${action.label}).`);
     }
     if(!areProcessesEqual(source.next, target)) {
       return fail('Výsledný proces nesedí.');
@@ -224,13 +225,13 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // SUM
   if(rule === 'SUM_LEFT') {
     if(source.type !== 'Summation') {
-      return fail('Nejedná se o sumu.');
+      return fail(t('sos.notSumError'));
     }
     return addPremise(source.left, target, action);
   }
   if(rule === 'SUM_RIGHT') {
     if(source.type !== 'Summation') {
-      return fail('Nejedná se o sumu.');
+      return fail(t('sos.notSumError'));
     }
     return addPremise(source.right, target, action);
   }
@@ -238,35 +239,35 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // COM (Parallel)
   if(rule === 'COM_LEFT') {
       if(source.type !== 'Parallel' || target.type !== 'Parallel') {
-      return fail('Nejedná se o paralelní proces.');
+      return fail(t('sos.notParallelError'));
       }
       if(!areProcessesEqual(source.right, target.right)) {
-      return fail('Pravá strana se změnila.');
+      return fail(t('sos.rightSideChangedError'));
       }
 
       return addPremise(source.left, target.left, action);
   }
   if(rule === 'COM_RIGHT') {
       if(source.type !== 'Parallel' || target.type !== 'Parallel') {
-      return fail('Nejedná se o paralelní proces.');
+      return fail(t('sos.notParallelError'));
       }
       if(!areProcessesEqual(source.left, target.left)) {
-      return fail('Levá strana se změnila.');
+      return fail(t('sos.leftSideChangedError'));
       }
       return addPremise(source.right, target.right, action);
   }
   if(rule === 'COM_SYNC') {
       if(source.type !== 'Parallel' || target.type !== 'Parallel') {
-        return fail('Nejedná se o paralelní proces.');
+        return fail(t('sos.notParallelError'));
       }
       if(action.label !== 'tau') {
-        return fail('Synchronizace musí vést na tau akci.');
+        return fail(t('sos.syncMustBeTau'));
       }
       
       const syncLabel = extraData?.label;
       const leftSends = extraData?.leftSends;
       if(!syncLabel) {
-        return fail('Chybí synchronizační akce.');
+        return fail(t('sos.syncLabelRequired'));
       }
 
       return {
@@ -281,12 +282,12 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // CON
   if(rule === 'CON') {
     if(source.type !== 'ProcessRef') {
-      return fail('Nejedná se o odkaz na proces.');
+      return fail(t('sos.notProcessRefError'));
     }
 
     const def = findDefinition(source.name, program);
     if(!def) {
-      return fail(`Definice ${source.name} nenalezena.`);
+      return fail(t('sos.undefinedProcessRefError', { name: source.name }));
     }
 
     return addPremise(def, target, action);
@@ -295,17 +296,17 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // RES
   if(rule === 'RES') {
       if(source.type !== 'Restriction' || target.type !== 'Restriction') {
-      return fail('Neshoda v restrikci.');
+      return fail(t('sos.restrictionMismatchError'));
       }
 
       if(source.labels.includes(action.label)) {
-      return fail(`Akce '${action.label}' je restrikcí zakázána.`);
+      return fail(t('sos.restrictionForbiddenActionError', { label: action.label }));
       }
 
       const set1 = [...source.labels].sort();
       const set2 = [...target.labels].sort();
       if(set1.join(',') !== set2.join(',')) {
-      return fail('Restrikční množina se nesmí měnit.');
+      return fail(t('sos.restrictionLabelsChangedError'));
       }
       
       return addPremise(source.process, target.process, action);
@@ -314,18 +315,18 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
   // REL
   if(rule === 'REL') {
     if(source.type !== 'Relabeling' || target.type !== 'Relabeling') {
-      return fail('Nejedná se o přejmenování.');
+      return fail(t('sos.notRelabelingError'));
     }
     
     const oldLabelName = extraData?.oldLabel;
     if(!oldLabelName && action.label !== 'tau') {
-      return fail('Nebyla vybrána původní akce.');
+      return fail(t('sos.noOldLabelError'));
     }
 
     const set1 = [...source.relabels].sort();
     const set2 = [...target.relabels].sort();
     if(set1.map(s => s.old+'/'+s.new).join(',') !== set2.map(s => s.old+'/'+s.new).join(',')) {
-      return fail('Sada přejmenování se nesmí měnit.');
+      return fail(t('sos.relabelingLabelsChangedError'));
     }
 
     let innerAction: CCSAction;
@@ -338,14 +339,14 @@ export function applySosRule(source: CCSExpression, target: CCSExpression, actio
       const expectedOuter = mapping ? mapping.new : oldLabelName;
       
       if(expectedOuter !== action.label) {
-        return fail(`Neplatné přejmenování (${oldLabelName} -> ${expectedOuter}).`);
+        return fail(t('sos.invalidRelabelingError', { old: oldLabelName, expected: expectedOuter }));
       }
     }
 
     return addPremise(source.process, target.process, innerAction);
   }
 
-  return fail('Neznámé pravidlo.');
+  return fail(t('sos.unknownRuleError'));
 }
 
 
