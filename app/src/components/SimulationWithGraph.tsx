@@ -1,13 +1,14 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import LTSGraph from './LTSGraph';
 import SimulationPanel from './SimulationPanel';
 import { generateLTS } from '@/lib/ltsLogic';
-import type { CardLTS, CCSProcessRef, CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
+import type { CardLTS, CCSExpression, CCSProcessRef, CCSProgram, EdgeHighlightRequest, ViewMode } from '@/types';
 import { useSimulation } from '@/utils/useSimulation';
-import { Layers, Settings } from 'lucide-react';
+import { Layers, Locate, RefreshCcw, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ccsToString } from '@/lib/ccsUtils';
 import { Button } from './ui/button';
+import ButtonHover from './custom/ButtonHover';
 
 function normalize(str: string) {
   return str.replace(/\s+/g, '');
@@ -16,20 +17,32 @@ function normalize(str: string) {
 type SimulationWithGraphProps = {
   program: CCSProgram;
   initSettings?: CardLTS;
-  hideProcessSelector?: boolean;
-  hideViewSelector?: boolean;
-  hideStructuralReductionButton?: boolean;
+  hideSettings?: boolean;
   onSettingsUpdate?: (settings: CardLTS) => void;
   allowEdit?: boolean;
 };
 
-export default function SimulationWithGraph({program, initSettings, hideProcessSelector, hideViewSelector, hideStructuralReductionButton, onSettingsUpdate, allowEdit}: SimulationWithGraphProps) {
+export default function SimulationWithGraph({program, initSettings, hideSettings=true, onSettingsUpdate, allowEdit}: SimulationWithGraphProps) {
   
   const [viewMode, setViewMode] = useState<ViewMode>(initSettings?.style || 'id');
   const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
+  const [isDynamicMode, setIsDynamicMode] = useState<boolean>(false);
+  const [isCentering, setIsCentering] = useState<boolean>(false);
   const [selectedProcessName, setSelectedProcessName] = useState<string>(
     initSettings?.process || (program.length > 0 ? program[0].name : '')
   );
+
+  const numIdMap = useRef<Map<string, string>>(new Map());
+  const nextIdCounter = useRef<number>(1);
+  const [exploredStates, setExploredStates] = useState<Map<string, CCSExpression>>(new Map());
+  const [activeNodeId, setActiveNodeId] = useState<string|undefined>(undefined);
+
+  const handleReset = () => {
+    sim.reset();
+    setExploredStates(new Map());
+    numIdMap.current.clear();
+    nextIdCounter.current = 1;
+  };
 
   useEffect(() => {
     if(onSettingsUpdate) {
@@ -89,11 +102,51 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
   };
 
   const sim = useSimulation(program, selectedProcessName);
-  
+
+  const rawCurrentCCS = useMemo(() => {
+    return sim.currentExpr ? ccsToString(sim.currentExpr, useStructRed) : "";
+  }, [sim.currentExpr, useStructRed]);
+
 
   const elements = useMemo(() => {
-    return generateLTS(program, selectedProcessName, { maxDepth: 50, maxStates: 200, useStructuralReduction: useStructRed });
-  }, [program, selectedProcessName, useStructRed]);
+    let rawElements = [];
+    
+    if(isDynamicMode) {
+      const exploredExprs = Array.from(exploredStates.values());
+      const safeExplored = exploredExprs.length > 0 ? exploredExprs : (sim.currentExpr ? [sim.currentExpr] : []);
+      rawElements = generateLTS(program, selectedProcessName, { 
+        maxDepth: 50, 
+        maxStates: 200, 
+        useStructuralReduction: useStructRed,
+        isExplorationMode: true,
+        exploredStates: safeExplored,
+        keepForwardSteps: 2
+      });
+    } 
+    else {
+      rawElements = generateLTS(program, selectedProcessName, { maxDepth: 50, maxStates: 200, useStructuralReduction: useStructRed, isExplorationMode: false });
+    }
+
+    return rawElements.map(el => {
+      if(el.data.source) {
+        return el;
+      }
+      
+      const originalId = el.data.id!;
+      if(!numIdMap.current.has(originalId)) {
+        numIdMap.current.set(originalId, String(nextIdCounter.current++));
+      }
+      
+      const numId = numIdMap.current.get(originalId);
+      return {
+        ...el,
+        data: {
+          ...el.data,
+          numId: numId
+        }
+      };
+    });
+  }, [program, selectedProcessName, useStructRed, isDynamicMode, exploredStates]);
   
   const { nodeLabelMap, ccsToIdMap, initialNodeId } = useMemo(() => {
     const labelMap = new Map<string, string>();
@@ -121,7 +174,7 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
         label = ccs;
       }
       else if(viewMode === 'mixed') {
-        label = ccs.length < 15 ? ccs : id; 
+        label = ccs.length < 5 ? ccs : id; 
       }
       
       labelMap.set(ccs, label);
@@ -133,6 +186,9 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
 
   const getTargetLabel = (targetCCS: string) => {
     if(nodeLabelMap.has(targetCCS)) {
+      if(numIdMap.current.has(nodeLabelMap.get(targetCCS)!)) {
+        return numIdMap.current.get(nodeLabelMap.get(targetCCS)!)!;
+      }
       return nodeLabelMap.get(targetCCS)!;
     }
     return viewMode === 'id' ? '?' : targetCCS;
@@ -155,11 +211,6 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
     return exprStr;
   }, [sim.currentExpr, useStructRed, program]);
 
-  let activeNodeId = ccsToIdMap.get(normalize(currentCanonicalCCS));
-  if(!activeNodeId && sim.history.length === 0 && initialNodeId) {
-    activeNodeId = initialNodeId;
-  }
-
   const [hoveredTransId, setHoveredTransId] = useState<number | null>(null);
   const edgeHighlightRequest = useMemo<EdgeHighlightRequest | null>(() => {
     if(hoveredTransId === null) {
@@ -171,8 +222,7 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
     }
 
     const targetCCS = ccsToString(transition.target, useStructRed);
-    const sourceCCS = sim.currentExpr ? ccsToString(sim.currentExpr, useStructRed) : "";
-    let sourceId = ccsToIdMap.get(normalize(sourceCCS));
+    let sourceId = ccsToIdMap.get(normalize(rawCurrentCCS)); 
     if(!sourceId && sim.history.length === 0 && initialNodeId) {
       sourceId = initialNodeId;
     }
@@ -184,7 +234,20 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
 
     return { sourceId, targetId, action: transition.action };
 
-  }, [hoveredTransId, sim.availableTransitions, sim.currentExpr, useStructRed, ccsToIdMap, initialNodeId, sim.history.length])
+  }, [hoveredTransId, sim.availableTransitions, rawCurrentCCS, useStructRed, ccsToIdMap, initialNodeId, sim.history.length]);
+
+  useEffect(() => {
+    setActiveNodeId(ccsToIdMap.get(normalize(rawCurrentCCS)));
+    if(!activeNodeId && sim.history.length === 0 && initialNodeId) {
+      setActiveNodeId(initialNodeId);
+    }
+  }, [rawCurrentCCS, sim.history.length, initialNodeId, ccsToIdMap]);
+
+  if(isDynamicMode && sim.currentExpr && rawCurrentCCS && !exploredStates.has(rawCurrentCCS)) {
+    const newMap = new Map(exploredStates);
+    newMap.set(rawCurrentCCS, sim.currentExpr);
+    setExploredStates(newMap); 
+  }
 
   const isOffGraph = !activeNodeId && (sim.history.length > 0 || !initialNodeId);
 
@@ -192,15 +255,15 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
     <div className="relative">
       <div className="">
 
-        <div className="flex flex-wrap gap-4 items-center mb-2 relative">
-          {!hideProcessSelector && (
-            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 px-2 rounded-md shadow-sm">
-              <span className="text-xs font-medium uppercase text-secondary-foreground px-1">Proces:</span>
+        {hideSettings && (
+          <div className="absolute flex flex-wrap gap-4 items-center mb-2 mt-1 z-10">
+            <div className="flex items-center gap-2 bg-secondary/80 backdrop-blur-sm  text-secondary-foreground/85 p-1 px-2 rounded-md shadow-sm">
+              <span className="text-xs font-medium uppercase px-1">Proces:</span>
               <Select value={selectedProcessName} disabled={!allowEdit} onValueChange={(value) => { 
                 setSelectedProcessName(value);
-                sim.reset();
+                handleReset();
               }}>
-                <SelectTrigger className="w-[180px] max-w-64 bg-white h-8 text-sm">
+                <SelectTrigger className="w-[120px] max-w-64 bg-white/80 h-8 text-sm">
                   <SelectValue placeholder="Proces" />
                 </SelectTrigger>
                 <SelectContent>
@@ -214,41 +277,44 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
                 </SelectContent>
               </Select>
             </div>
-          )}
 
-          {!hideStructuralReductionButton && (
-            <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit}>
+            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
                 Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
               </span>
             </Button>
-          )}
 
-          {!hideViewSelector && (
-            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground p-1 rounded-md shadow-sm">
+            <div className="flex items-center gap-2 bg-secondary/80 backdrop-blur-sm  p-1 rounded-md shadow-sm">
               <Settings size={16} className="ml-2 mr-1" />
               {(['id', 'mixed', 'full'] as const).map((m) => (
                 <button key={m} onClick={() => changeViewMode(m)}
-                  className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card shadow text-primary' : 'text-secondary-foreground hover:bg-card/90'}`}>
+                  className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card/80 shadow text-primary/80' : 'text-secondary-foreground/80 hover:bg-card/90'}`}>
                     {m === 'id' ? 'ID' : m === 'mixed' ? 'Mix' : 'CCS'}
                 </button>
               ))}
             </div>
-          )}
-          
-          <div className="grow"></div>
-          <div className="text-xs text-gray-400">
-            Stavů: {elements.filter(e => !e.data.source).length}
-          </div>
-        </div>
 
-        <div className='h-[600px]'>
+            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => { setIsDynamicMode(!isDynamicMode); !isDynamicMode && setIsCentering(true);}}>
+              <RefreshCcw size={16} className={`${isDynamicMode ? 'text-primary' : ''}`} />
+              <span className={`text-xs font-medium ${isDynamicMode ? 'text-primary' : ''}`}>
+                Dynamické dočítání {isDynamicMode ? '(Zap)' : '(Vyp)'}
+              </span>
+            </Button>
+
+            <ButtonHover hoverContent={<>Centrování grafu {isCentering ? '(Zap)' : '(Vyp)'}</>} variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setIsCentering(!isCentering)}>
+              <Locate size={16} className={`${isCentering ? 'text-primary' : ''}`} />
+            </ButtonHover>
+          </div>
+        )}
+
+        <div className='h-[700px]'>
           <LTSGraph 
             elements={elements} 
             activeNodeId={activeNodeId || null} 
             edgeHighlight={edgeHighlightRequest}
             viewMode={viewMode}
+            isCentering={isCentering}
           />
         </div>
 
@@ -259,7 +325,7 @@ export default function SimulationWithGraph({program, initSettings, hideProcessS
             historyLength={sim.history.length}
             onStep={sim.step}
             onBack={sim.back}
-            onReset={sim.reset}
+            onReset={handleReset}
             onTransitionHover={setHoveredTransId}
             getTargetLabel={getTargetLabel}
             forceStructuralReduction={useStructRed}

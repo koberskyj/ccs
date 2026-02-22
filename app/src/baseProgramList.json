@@ -1,98 +1,39 @@
 [
   {
-    "name": "Testovací program",
-    "description": "První testovací program na otestování funkčnosti.",
-    "definition": "A = a.A\nB = ((A|'a.0)|b.0)[c/a]\n\nC = (a.0 | 'b.0)[c/a, c/b]\nD = a.0[c/a] | 'b.0[c/b]\n\nE = (a.0 | b.0) \\ {b}",
+    "name": "Sumace a Paralelizace (SUM, COM)",
+    "description": "",
     "allowEdit": true,
+    "definition": "Sum = a.b.0 + b.a.0\n\nCom = a.0 | 'a.0\nComn = 0 | 0",
     "cards": [
       {
-        "type": "sos",
-        "name": "SOS důkaz z prezentace",
-        "processX": "A",
-        "processY": "A",
-        "action": "c",
-        "showHelp": true
+        "type": "lts",
+        "name": "Sumace",
+        "process": "Sum",
+        "style": "mixed",
+        "useStructRed": false
       },
       {
         "type": "lts",
-        "name": "Bez tau přechodu",
-        "process": "C",
+        "name": "Paralelizace",
+        "process": "Com",
         "style": "mixed",
         "useStructRed": true
       },
       {
-        "type": "lts",
-        "name": "S tau přechodem",
-        "process": "D",
-        "style": "mixed",
-        "useStructRed": false
-      },
-      {
-        "type": "lts",
-        "name": "Restrikce",
-        "process": "E",
-        "style": "mixed",
-        "useStructRed": false
-      }
-    ]
-  },
-  {
-    "name": "Tau komunikace",
-    "description": "",
-    "definition": "A = a.0 | b.0 | 'a.0\nB = 0 | b.0 | 0",
-    "allowEdit": false,
-    "cards": [
-      {
         "type": "sos",
-        "name": "Důkaz přes SOS, bez nápovědy",
-        "processX": "A",
-        "processY": "B",
+        "name": "Proč je u paralelizace tau přechod?",
+        "processX": "Com",
+        "processY": "Comn",
         "action": "tau",
-        "showHelp": false
-      },
-      {
-        "type": "lts",
-        "name": "LTS s tau přechodem",
-        "process": "A",
-        "style": "mixed",
-        "useStructRed": false
+        "showHelp": true
       }
     ]
   },
   {
-    "name": "Zápočtový projekt",
-    "description": "",
+    "name": "Přejmenování a Restrikce (REL, RES)",
+    "description": "Základy",
     "allowEdit": true,
-    "definition": "\nSpec = acc.'del.Spec\n\nImpl1 = (Sender | Receiver | Med1 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\nImpl2 = (Sender | Receiver | Med2 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\nImpl3 = (Sender | Receiver | Med3 | Timer) \\ {snd0mes, snd0acc, snd1mes, snd1acc, rec0mes, rec0acc, rec1mes, rec1acc, timer}\n\nTimer = 'timer.Timer\n\nSender  = acc.'snd0mes.SenderWait0\nSender1 = acc.'snd1mes.SenderWait1\nSenderWait0 = rec0acc.Sender1 + rec1acc.'snd0mes.SenderWait0 + timer.('snd0mes.SenderWait0 + SenderWait0)\nSenderWait1 = rec1acc.Sender  + rec0acc.'snd1mes.SenderWait1 + timer.('snd1mes.SenderWait1 + SenderWait1)\n\nReceiver  = rec0mes.'del.'snd0acc.Receiver1 + rec1mes.'snd1acc.Receiver\nReceiver1 = rec1mes.'del.'snd1acc.Receiver  + rec0mes.'snd0acc.Receiver1\n\nMed1 = Med1Mes | Med1Acc\nMed1Mes = snd0mes.'rec0mes.Med1Mes + snd1mes.'rec1mes.Med1Mes\nMed1Acc = snd0acc.'rec0acc.Med1Acc + snd1acc.'rec1acc.Med1Acc\n\nMed2 = Med2Mes | Med2Acc\nMed2Mes = snd0mes.('rec0mes.Med2Mes + Med2Mes) + snd1mes.('rec1mes.Med2Mes + Med2Mes)\nMed2Acc = snd0acc.('rec0acc.Med2Acc + Med2Acc) + snd1acc.('rec1acc.Med2Acc + Med2Acc)\n\nMed3 = Med3Mes | Med3Acc\nMed3Mes = snd0mes.Med3Mes0 + snd1mes.Med3Mes1\nMed3Acc = snd0acc.Med3Acc0 + snd1acc.Med3Acc1\nMed3Mes0 = 'rec0mes.Med3Mes0 + Med3Mes\nMed3Mes1 = 'rec1mes.Med3Mes1 + Med3Mes\nMed3Acc0 = 'rec0acc.Med3Acc0 + Med3Acc\nMed3Acc1 = 'rec1acc.Med3Acc1 + Med3Acc\n",
-    "cards": [
-      {
-        "type": "lts",
-        "name": "Implementace 1",
-        "process": "Impl1",
-        "style": "mixed",
-        "useStructRed": false
-      },
-      {
-        "type": "lts",
-        "name": "Implementace 2",
-        "process": "Impl2",
-        "style": "mixed",
-        "useStructRed": false
-      },
-      {
-        "type": "lts",
-        "name": "Implementace 3",
-        "process": "Impl3",
-        "style": "mixed",
-        "useStructRed": false
-      }
-    ]
-  },
-  {
-    "name": "Nekonečný cyklus",
-    "description": "",
-    "allowEdit": true,
-    "definition": "A = a.A\nB = a.b.B\nC = a.C | C",
+    "definition": "A = a.A \\ {a}\nB = b.B[c/b]\n\nC = b.B[c/b] \\ {c}\nCn = B[c/b] \\ {c}",
     "cards": [
       {
         "type": "lts",
@@ -110,8 +51,138 @@
       },
       {
         "type": "lts",
-        "name": "Stavová exploze",
+        "name": "Simulace",
         "process": "C",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "sos",
+        "name": "Důkaz - nelze použít žádnou akci",
+        "processX": "C",
+        "processY": "Cn",
+        "action": "b",
+        "showHelp": true
+      }
+    ]
+  },
+  {
+    "name": "SOS Pravidla",
+    "description": "Ukázkový příklad z prezentace",
+    "allowEdit": true,
+    "definition": "A = a.A\nIn = ((A | 'a.0) | b.0)[c/a]",
+    "cards": [
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "In",
+        "processY": "In",
+        "action": "c",
+        "showHelp": true
+      },
+      {
+        "type": "lts",
+        "name": "Simulace",
+        "process": "In",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "SOS a LTS Příklady",
+    "description": "Příklady na procvičení pravidel, ne všechny mohou mít řešení",
+    "allowEdit": true,
+    "definition": "A = b.a.B\nB = B\n\n// Exercise 1 - action tau\nE1 = (A | 'b.0) \\ {b}\nE1n = (a.B | 0) \\ {b}\n\n// Exercise 2 - action 'b\nE2 = (A | 'b.a.B) + ('b.A)[a/b]\nE2n = (A | a.B)\n\n// Exercise 3 - action 'a\nE3 = (A | 'b.a.B) + ('b.A)[a/b]\nE3n = A[a/b]\n\n// LTS Exercise - try to draw transition graph for process Mutex1\nMutex1 = (User | Sem) \\ {p,v}\nUser = 'p.enter.exit.'v.User\nSem = p.v.Sem",
+    "cards": [
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "E1",
+        "processY": "E1n",
+        "action": "tau",
+        "showHelp": true
+      },
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "E2",
+        "processY": "E2n",
+        "action": "'b",
+        "showHelp": true
+      },
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "E3",
+        "processY": "E3n",
+        "action": "'a",
+        "showHelp": false
+      },
+      {
+        "type": "lts",
+        "name": "Simulace",
+        "process": "Mutex1",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "Přejmenování (REL)",
+    "description": "Priorita operátorů",
+    "allowEdit": false,
+    "definition": "A = (a.0 | 'b.0)[c/a, c/b]\nAk = (0 | 0)[c/a, c/b]\n\nB = a.0[c/a] | 'b.0[c/b]\nBk = 0[c/a]|0[c/b]",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Proběhne zde synchronizace?",
+        "process": "A",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "sos",
+        "name": "Proč ne?",
+        "processX": "A",
+        "processY": "Ak",
+        "action": "tau",
+        "showHelp": true
+      },
+      {
+        "type": "sos",
+        "name": "Šlo by to tady?",
+        "processX": "B",
+        "processY": "Bk",
+        "action": "tau",
+        "showHelp": true
+      },
+      {
+        "type": "lts",
+        "name": "Simulace",
+        "process": "B",
+        "style": "mixed",
+        "useStructRed": false
+      }
+    ]
+  },
+  {
+    "name": "Ekvivalence chování",
+    "description": "Chovají se 2 procesy \"stejně\"? Je jejich chování ekvivalentní?",
+    "allowEdit": false,
+    "definition": "CM = coin.'coffee.CM\nCS = 'pub.'coin.coffee.CS\n\nUni = (CM | CS) \\ { coin, coffee }\nSpec = 'pub.Spec",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Uni",
+        "process": "Uni",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "lts",
+        "name": "Spec",
+        "process": "Spec",
         "style": "mixed",
         "useStructRed": false
       }

@@ -25,6 +25,19 @@ function areComplementary(a1: string, a2: string): boolean {
   return base1 === base2 && isOut1 !== isOut2;
 }
 
+function hashString(str: string): string {
+  let hash = 0;
+  for(let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function getStableNodeId(ccsStr: string): string {
+  return `n_${hashString(ccsStr)}`;
+}
+
 type Transition = {
   action: string;
   targetExpr: CCSExpression;
@@ -163,41 +176,57 @@ interface LTSConfig {
   maxDepth: number;
   maxStates: number;
   useStructuralReduction?: boolean;
+  isExplorationMode?: boolean;
+  exploredStates?: CCSExpression[];
+  keepForwardSteps?: number;
 }
 
-export function generateLTS(ast: CCSProgram, startProcessName: string, config: LTSConfig = { maxDepth: 20, maxStates: 150, useStructuralReduction: false }): ElementDefinition[] {
+export function generateLTS(ast: CCSProgram, startProcessName: string, config: LTSConfig = { maxDepth: 20, maxStates: 150 }): ElementDefinition[] {
   const nodes: ElementDefinition[] = [];
   const edgeMap = new Map<string, { source: string, target: string, actions: Set<string> }>();
+  const visited = new Set<string>();
   
   const defs = new Map<string, CCSExpression>();
   ast.forEach(def => defs.set(def.name, def.process));
 
-  const startExpr = defs.get(startProcessName);
-  if(!startExpr) {
-    return [];
-  }
+  const addNode = (expr: CCSExpression, isInit: boolean) => {
+    const str = ccsToString(expr, config.useStructuralReduction);
+    const id = getStableNodeId(str);
+    const isNew = !visited.has(id);
+    
+    if(isNew) {
+      visited.add(id);
+      nodes.push({ data: { id, label: id, ccs: str, isInitial: isInit } });
+    }
+    return { id, isNew };
+  };
 
   const queue: { expr: CCSExpression, depth: number }[] = [];
-  const visited = new Set<string>();
-  const stateIdMap = new Map<string, string>();
-  const rootCCS = ccsToString({ type: 'ProcessRef', name: startProcessName } as any, config.useStructuralReduction);
-  
-  queue.push({ expr: { type: 'ProcessRef', name: startProcessName } as any, depth: 0 });
-  
-  const startNodeId = '1';
-  stateIdMap.set(rootCCS, startNodeId);
-  visited.add(rootCCS);
 
-  nodes.push({
-    data: { 
-      id: startNodeId, 
-      label: startNodeId,
-      ccs: rootCCS,
-      isInitial: true
+  if(config.isExplorationMode && config.exploredStates && config.exploredStates.length > 0) {
+    config.exploredStates.forEach((expr, index) => {
+      if(!expr) {
+        return;
+      }
+      
+      const { isNew } = addNode(expr, index === 0);
+      if(isNew) {
+        queue.push({ expr, depth: 0 });
+      }
+    });
+  } 
+  else {  
+    const startExpr = { type: 'ProcessRef', name: startProcessName } as CCSExpression;
+    
+    if(defs.has(startProcessName)) {
+      const { isNew } = addNode(startExpr, true);
+      if(isNew) {
+        queue.push({ expr: startExpr, depth: 0 });
+      }
     }
-  });
+  }
 
-  let stateCounter = 1;
+  const targetDepth = config.isExplorationMode ? (config.keepForwardSteps ?? 1) : config.maxDepth;
   while(queue.length > 0) {
     if(nodes.length >= config.maxStates) {
       break;
@@ -205,48 +234,29 @@ export function generateLTS(ast: CCSProgram, startProcessName: string, config: L
 
     const { expr, depth } = queue.shift()!;
     const currentStr = ccsToString(expr, config.useStructuralReduction);
-    const currentId = stateIdMap.get(currentStr)!;
+    const currentId = getStableNodeId(currentStr);
 
-    if(depth >= config.maxDepth) {
+    if(depth >= targetDepth) {
       continue;
     }
 
     const transitions = getPossibleTransitions(expr, defs);
 
     for(const t of transitions) {
-      const targetStr = ccsToString(t.targetExpr, config.useStructuralReduction);
-      let targetId = stateIdMap.get(targetStr);
+      const { id: targetId, isNew } = addNode(t.targetExpr, false);
 
-      if(!targetId) {
-        if(!visited.has(targetStr)) {
-          stateCounter++;
-          targetId = `${stateCounter}`;
-          stateIdMap.set(targetStr, targetId);
-          visited.add(targetStr);
-
-          nodes.push({
-            data: { 
-              id: targetId, 
-              label: targetId,
-              ccs: targetStr,
-              isInitial: false
-            }
-          });
-          queue.push({ expr: t.targetExpr, depth: depth + 1 });
-        }
+      const edgeKey = `${currentId}_${targetId}`;
+      if(!edgeMap.has(edgeKey)) {
+        edgeMap.set(edgeKey, {
+          source: currentId,
+          target: targetId,
+          actions: new Set()
+        });
       }
 
-      if(targetId) {
-        const edgeKey = `${currentId}_${targetId}`;
-        if(!edgeMap.has(edgeKey)) {
-          edgeMap.set(edgeKey, {
-            source: currentId,
-            target: targetId,
-            actions: new Set()
-          });
-        }
-
-        edgeMap.get(edgeKey)!.actions.add(t.action);
+      edgeMap.get(edgeKey)!.actions.add(t.action);
+      if(isNew) {
+        queue.push({ expr: t.targetExpr, depth: depth + 1 });
       }
     }
   }

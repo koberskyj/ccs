@@ -89,7 +89,7 @@ const stylesheetDef: StylesheetStyle[] = [
     style: {
       'line-color': '#2563eb',
       'target-arrow-color': '#2563eb',
-      'width': 4,
+      'width': 3,
       'z-index': 999
     }
   }
@@ -100,6 +100,7 @@ type LTSGraphProps = {
   activeNodeId: string | null;
   edgeHighlight?: EdgeHighlightRequest;
   viewMode: ViewMode;
+  isCentering?: boolean;
 }
 
 type TooltipState = {
@@ -107,9 +108,10 @@ type TooltipState = {
   y: number;
   text: string;
   nodeId: string;
+  numId: string;
 } | null;
 
-export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode }: LTSGraphProps) {
+export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode, isCentering }: LTSGraphProps) {
   const cyRef = useRef<Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(null);
@@ -138,15 +140,15 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
 
     cy.batch(() => {
       cy.nodes().forEach(node => {
-        const id = node.data('id');
+        const displayId = node.data('numId') || node.data('id');
         const ccs = node.data('ccs') || "";
         
-        let label = id;
+        let label = displayId;
         if(viewMode === 'full') {
           label = ccs;
         }
         else if(viewMode === 'mixed') {
-          label = ccs.length <= 5 ? ccs : id;
+          label = ccs.length <= 5 ? ccs : displayId;
         }
 
         let fontSize = 15;
@@ -187,11 +189,12 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     }
     const cy = cyRef.current;
 
-    cy.style().update();
+    cy.style().update();    
     const layout = cy.layout({
       name: 'dagre',
       rankDir: 'LR',
       animate: false,
+      fit: false,
       nodeSep: viewMode === 'full' ? 40 : 40, 
       rankSep: viewMode === 'full' ? 60 : 60,
       align: 'UL', 
@@ -199,14 +202,24 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     } as any);
 
     layout.on('layoutstop', () => { 
-      if(cy.zoom() > 1.15) {
-        cy.zoom(1.15);
-        cy.center();
+      if(isCentering && activeNodeId) {
+        const activeNode = cy.$id(activeNodeId);
+        if(activeNode.length > 0) {
+          //cy.stop(true, true);
+          cy.animate({ center: { eles: activeNode }, zoom: 1.15, duration: 250, easing: 'ease-in-out' });
+        }
+      } 
+      else {
+        cy.fit(cy.elements(), 30);
+        if(cy.zoom() > 1.15) {
+          cy.zoom(1.15);
+          cy.center();
+        }
       }
     });
 
     layout.run();
-  }, [viewMode, elements]);
+  }, [viewMode, elements, isCentering, activeNodeId]);
 
 
 
@@ -235,6 +248,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
         y: absoluteY,
         text: node.data('ccs'),
         nodeId: node.data('id'),
+        numId: node.data('numId'),
       });
     }, 250);
   }, []);
@@ -281,7 +295,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       <div style={style}>
         <div className="animate-in fade-in-0 zoom-in-95 duration-200 px-4 py-3 text-sm bg-popover/80 text-popover-foreground border border-foreground/20 shadow-lg backdrop-blur-sm rounded-lg">
           <div className="font-mono border-b border-stone-400 pb-1 mb-2 font-bold text-xs uppercase tracking-wider flex justify-between">
-            <span>Vrchol {tooltip.nodeId}</span>
+            <span>Vrchol {tooltip.numId} <span className="text-[0.6rem] text-foreground/50">({tooltip.nodeId})</span></span>
           </div>
           <div className="font-mono wrap-break-word border border-primary/8 bg-[color-mix(in_srgb,var(--primary)_15%,white)] p-2 rounded-md">
             <CCSViewer code={tooltip.text} />
