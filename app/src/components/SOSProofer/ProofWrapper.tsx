@@ -173,7 +173,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
             <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)} disabled={!allowEdit}>
               <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
-                {t('core.help')} {showHints ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
+                {t('core.hint')} {showHints ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
               </span>
             </Button>
 
