@@ -108,6 +108,30 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
     return sim.currentExpr ? ccsToString(sim.currentExpr, useStructRed) : "";
   }, [sim.currentExpr, useStructRed]);
 
+  useEffect(() => {
+    if(!program || program.length === 0 || !selectedProcessName) {
+      return;
+    }
+
+    const probeElements = generateLTS(program, selectedProcessName, {
+      maxDepth: 100,
+      maxStates: 51,
+      useStructuralReduction: useStructRed,
+      isExplorationMode: false
+    });
+
+    const nodeCount = probeElements.filter(el => !el.data.source).length;
+    if(nodeCount >= 50) {
+      setIsDynamicMode(true);
+      setIsCentering(true); 
+    } 
+    else {
+      setIsDynamicMode(false);
+    }
+    setExploredStates(new Map());
+    
+  }, [program, selectedProcessName, useStructRed]);
+
 
   const elements = useMemo(() => {
     let rawElements = [];

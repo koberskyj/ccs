@@ -265,10 +265,12 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     cy.on('mouseover', 'node', handleMouseOver);
     cy.on('mouseout', 'node', handleMouseOut);
     cy.on('pan zoom', handleMouseOut);
+    cy.on('grab drag', 'node', handleMouseOut);
     return () => {
       cy.off('mouseover', 'node', handleMouseOver);
       cy.off('mouseout', 'node', handleMouseOut);
       cy.off('pan zoom', handleMouseOut);
+      cy.off('grab drag', 'node', handleMouseOut);
     };
   }, [handleMouseOver, handleMouseOut]);
 

@@ -31,14 +31,12 @@
 
 \EnglishKeywords{typography; \LaTeX; master thesis}
 
-\AddAcronym{DVD}{Digital Versatile Disc}
-\AddAcronym{TNT}{Trinitrotoluen}
-\AddAcronym{UML}{Unified Modeling Language}
-\AddAcronym{HTML}{Hyper Text Markup Language}
-\AddAcronym{TUG}{\TeX{} Users Group}
+\AddAcronym{CCS}{Calculus of Communicating Systems, kalkulus komunikujících systémů}
+\AddAcronym{SOS}{Structural Operational Semantics, strukturální operační sémantika}
+\AddAcronym{LTS}{Labelled Transition System, ohodnocený přechodový systém}
+\AddAcronym{AST}{Abstract Syntax Tree, abstraktní syntaktický strom}
 
-\addbibresource{biblatex-examples.bib}
-\addbibresource{coffee.bib}
+\addbibresource{citation.bib}
 
 % Novy druh tabulkoveho sloupce, ve kterem jsou cisla zarovnana podle desetinne carky
 \newcolumntype{d}[1]{D{,}{,}{#1}}
@@ -61,22 +59,21 @@
 \clearpage
 
 % A nasleduje text zaverecne prace.
-\input{Chapters/Introduction.tex}
-\input{Chapters/SampleChapter1.tex}
-\input{Chapters/SampleChapter2.tex}
-\input{Chapters/TechnicalDetails.tex}
-\input{Chapters/Conclusion.tex}
+\input{Chapters/C1-Introduction.tex}
+
+\input{Chapters/C2-theory.tex}
+\input{Chapters/C3-task.tex}
+\input{Chapters/C4-technologies.tex}
+\input{Chapters/C5-draft.tex}
+
+\input{Chapters/C6-implementation.tex}
+\input{Chapters/C7-Conclusion.tex}
 
 % Seznam literatury
 \printbibliography[title={Literatura}, heading=bibintoc]
 
 % Prilohy
 \appendix
-\input{Chapters/Appendix1.tex}
-\input{Chapters/Appendix2.tex}
-
-% Priloha vlozena primo do hlavniho LaTeX souboru. Ne vsechny prilohy je nutne mit ve zvlastnich souborech.
-\chapter{Dlouhý zdrojový kód}
-\lstinputlisting[label=src:CppExternal,caption={Dlouhý zdrojový kód v jazyce C++ načtený s externího souboru}]{SourceCodes/ArraySortingAlgorithms.cpp}
+\input{Chapters/End1.tex}
 
 \end{document}

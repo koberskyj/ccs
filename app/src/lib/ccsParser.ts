@@ -57,7 +57,7 @@ export default function ccsParser() {
   try {
     return peggy.generate(grammarSource);
   } catch (e) {
-    console.error("Chyba při generování parseru: ", e);
+    console.error("Error while generating parser: ", e);
     return null;
   }
 }

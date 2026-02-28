@@ -71,7 +71,6 @@ export function ProgramCreator({ children, onUpdate, program }: { children: Reac
           <div className="flex items-center gap-2">
             <Checkbox id="allowEdit" checked={allowEditInput} onCheckedChange={(e: boolean) => setAllowEditInput(e)} className="inline" />
             <label htmlFor="allowEdit" className="text-sm font-semibold leading-none">{t('selector.allowEdit')} <span className="text-muted-foreground text-sm font-normal">- {t('selector.allowEditDescription')}</span></label>
-
           </div>
           <div className="flex justify-between items-end gap-2 pt-2">
             <Button onClick={createProgram} className='w-fit'>{t('core.save')}</Button>

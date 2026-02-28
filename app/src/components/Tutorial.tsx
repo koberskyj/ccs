@@ -12,7 +12,7 @@ const tutorialTranslations = {
     basicInfoLi2: "<b>Simulace procesů:</b> Slouží k vizualizaci grafu LTS jednotlivých procesů.",
     
     syntax: "Syntaxe jazyka CCS",
-    syntaxP1: "Vstupní syntaxe vychází z klasické formální definice CCS. <b>Procesní konstanty</b> musí začínat velkým písmenem (např. <span class=\"font-mono\">Spec,Pub,CS</span>), <b>akční prefixy</b> začínají malým písmenem. <b>Výstupní akce</b> obsahuje před tímto písmenem apostrof (např. <span class=\"font-mono\">'out</span>).",
+    syntaxP1: "Vstupní syntaxe vychází z klasické formální definice CCS. <b>Procesní konstanty</b> musí začínat velkým písmenem (např. <span class=\"font-mono\">Spec,Pub,CS</span>), <b>akční prefixy</b> začínají malým písmenem. <b>Výstupní akce</b> navíc obsahuje před tímto písmenem apostrof (např. <span class=\"font-mono\">'out</span>).",
     syntaxP2: "Jednotlivé řádky nevyžadují ukončení středníkem. Jednořádkové komentáře lze do kódu vložit pomocí prefixu '<span class=\"font-mono\">//</span>'. V případě nalezení syntaktické nebo sémantické chyby v definici programu se pod textovým editorem automaticky zobrazí chybová hláška.",
     syntaxP3: "Při zadání korektního výrazu CCS se vedle editoru zobrazí <b>syntaktický strom (AST)</b>, který je možné exportovat do formátů PNG, SVG nebo JSON. Po najetí kurzorem na jednotlivé uzly stromu dojde k vizuálnímu zvýraznění příslušné části kódu v textovém editoru.",
     
