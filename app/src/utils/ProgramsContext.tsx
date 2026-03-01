@@ -12,6 +12,8 @@ export interface ProgramsContextType {
   programs: ProgramSave[];
   activeProgram: ProgramSave | null;
   selectedProgramIndex: number | null;
+  isDirty: boolean;
+  setIsDirty: (val: boolean) => void;
   addProgram: (program: ProgramSave) => void;
   updateProgram: (index: number, updatedProgram: ProgramSave) => void;
   deleteProgram: (index: number) => void;
@@ -23,6 +25,7 @@ export const ProgramsContext = createContext<ProgramsContextType | undefined>(un
 export function ProgramsProvider({ children }: { children: React.ReactNode }) {
   const [programs, setPrograms] = useState<ProgramSave[]>([]);
   const [selectedProgramIndex, setSelectedProgramIndex] = useState<number | null>(null);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
 
   const loadFromStorage = (initial: boolean) => {
     const storedData = localStorage.getItem(STORAGE_KEY);
@@ -95,6 +98,8 @@ export function ProgramsProvider({ children }: { children: React.ReactNode }) {
       programs,
       activeProgram,
       selectedProgramIndex,
+      isDirty,
+      setIsDirty,
       addProgram,
       updateProgram,
       deleteProgram,

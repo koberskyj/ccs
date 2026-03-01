@@ -103,26 +103,14 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
   }, [initSettings]);
 
   useEffect(() => {
-    if(program.length > 0) {
-      const exists = program.some(p => p.name === sourceProcessName);
-      if(!exists) {
-        setSourceProcessName(program[0].name);
-      }
-    } 
-    else {
-      setSourceProcessName('');
+    if(program.length > 0 && !sourceProcessName) {
+      setSourceProcessName(program[0].name);
     }
   }, [program, sourceProcessName]);
 
   useEffect(() => {
-    if(program.length > 0) {
-      const exists = program.some(p => p.name === targetProcessName);
-      if(!exists) {
-        setTargetProcessName(program[0].name);
-      }
-    } 
-    else {
-      setTargetProcessName('');
+    if(program.length > 0 && !targetProcessName) {
+      setTargetProcessName(program[0].name);
     }
   }, [program, targetProcessName]);
 

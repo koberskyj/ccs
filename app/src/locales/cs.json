@@ -37,7 +37,9 @@
     "copyright": "Jakub Koběrský - Diplomová práce - Kalkulus komunikujících systémů",
     "node": "Vrchol",
     "back": "Zpět",
-    "process": "Proces"
+    "process": "Proces",
+    "confirm": "Potvrdit",
+    "cancel": "Zrušit"
   },
   "selector": {
     "renameCard": "Přejmenovat kartu",
@@ -69,6 +71,9 @@
     "changesDiscarded": "Lokální změny byly zrušeny.",
     "noActiveProgram": "Vyberte program ze seznamu.",
     "discardChanges": "Zahodit změny",
+    "reallyDiscardChanges": "Opravdu chcete zahodit změny?",
+    "unsavedChanges": "Máte neuložené změny",
+    "reallyContinue": "Opravdu chcete pokračovat?",
     "saveChanges": "Uložit změny",
     "addNewCard": "Přidat novou kartu k programu",
     "newSOSProof": "Nový SOS Důkaz",

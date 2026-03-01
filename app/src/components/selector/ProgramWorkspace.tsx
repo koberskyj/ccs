@@ -7,22 +7,41 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePrograms } from "@/utils/usePrograms";
 import ProgramCard from "./ProgramCard";
-import { RotateCcw, Save } from "lucide-react";
+import { Pencil, RotateCcw, Save } from "lucide-react";
 import { toast } from "sonner";
+import { ProgramCreator } from "./ProgramCreator";
+import ButtonHover from "../custom/ButtonHover";
+import { ConfirmModal } from "../custom/ConfirmModal";
 
 export default function ProgramWorkspace() {
   const { t } = useTranslation();
-  const { activeProgram, selectedProgramIndex, updateProgram } = usePrograms();
+  const { activeProgram, selectedProgramIndex, isDirty, updateProgram, setIsDirty } = usePrograms();
   const [changeVersion, setChangeVersion] = useState<number>(0);
   const [localProgram, setLocalProgram] = useState<ProgramSave | null>(null);
   const [ccsAst, setCcsAst] = useState<CCSProgram | null>(null);
-  
 
   useEffect(() => {
-    setLocalProgram(activeProgram);
-    if(activeProgram?.definition !== localProgram?.definition) {
-      // setCcsAst(null); 
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if(isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; 
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty]);
+
+  useEffect(() => {
+    if(activeProgram) {
+      setLocalProgram(structuredClone(activeProgram));
+    } 
+    else {
+      setLocalProgram(null);
     }
+
     setChangeVersion(changeVersion + 1);
   }, [activeProgram]);
 
@@ -35,6 +54,18 @@ export default function ProgramWorkspace() {
         definition: codeString
       });
     }
+  };
+
+  const handleNameChange = (updated: ProgramSave) => {
+    if(!localProgram) {
+      return;
+    }
+    
+    setLocalProgram({
+      ...localProgram,
+      name: updated.name,
+      description: updated.description
+    });
   };
 
   const addCard = (type: 'sos' | 'lts') => {
@@ -95,12 +126,12 @@ export default function ProgramWorkspace() {
     toast.info(t('selector.changesDiscarded'));
   };
   
-  const isDirty = localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
+  const isDirtyLocal = activeProgram?.allowEdit && localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
   useEffect(() => {
-    if(isDirty && activeProgram?.allowEdit) {
-      //toast.info(`Program byl upraven. Změny potvrdíte uložením programu.`);
-    }
-  }, [isDirty]);
+    setIsDirty(isDirtyLocal ?? false);
+
+    return () => setIsDirty(false);
+  }, [isDirtyLocal, setIsDirty]);
   
   if (!localProgram || !activeProgram) {
     return <div className="text-center p-10 text-muted-foreground">{t('selector.noActiveProgram')}</div>;
@@ -119,16 +150,29 @@ export default function ProgramWorkspace() {
                 <p className="text-sm text-muted-foreground">{localProgram.description}</p>
               </div>
 
-              {isDirty && activeProgram.allowEdit && (
-                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                  <Button variant="ghost" size="sm" onClick={handleDiscard} className="text-muted-foreground hover:text-red-600">
-                    <RotateCcw className="w-4 h-4 mr-2" /> {t('selector.discardChanges')}
-                  </Button>
-                  <Button onClick={handleSave}>
-                    <Save className="w-4 h-4 mr-2" /> {t('selector.saveChanges')}
-                  </Button>
+              {activeProgram.allowEdit &&
+                <div className="flex gap-2 items-center">
+                  <ProgramCreator program={localProgram} onUpdate={handleNameChange}>
+                    <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon"
+                        className='h-8 w-8 text-muted-foreground/50 hover:text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity'>
+                      <Pencil className="w-4 h-4" />
+                    </ButtonHover>
+                  </ProgramCreator>
+
+                  {isDirtyLocal && (
+                    <>
+                      <ConfirmModal title={t('selector.reallyDiscardChanges')} confirmText={t('selector.discardChanges')} onConfirm={handleDiscard} destructive={true}>
+                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600">
+                          <RotateCcw className="w-4 h-4 mr-2" /> {t('selector.discardChanges')}
+                        </Button>
+                      </ConfirmModal>
+                      <Button onClick={handleSave}>
+                        <Save className="w-4 h-4 mr-2" /> {t('selector.saveChanges')}
+                      </Button>
+                    </>
+                  )}
                 </div>
-              )}
+              }
             </div>
           </CardHeader>
           <CardContent>

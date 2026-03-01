@@ -37,7 +37,9 @@
     "copyright": "Jakub Kobersky - Master's Thesis - Calculus of Communicating Systems",
     "node": "Node",
     "back": "Back",
-    "process": "Process"
+    "process": "Process",
+    "confirm": "Potvrdit",
+    "cancel": "Zrušit"
   },
   "selector": {
     "renameCard": "Rename card",
@@ -69,6 +71,9 @@
     "changesDiscarded": "Local changes have been discarded.",
     "noActiveProgram": "Select a program from the list.",
     "discardChanges": "Discard changes",
+    "reallyDiscardChanges": "Are you sure you want to discard changes?",
+    "unsavedChanges": "You have unsaved changes",
+    "reallyContinue": "Are you sure you want to continue?",
     "saveChanges": "Save changes",
     "addNewCard": "Add new card to program",
     "newSOSProof": "New SOS Proof",

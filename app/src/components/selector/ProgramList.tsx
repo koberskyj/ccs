@@ -1,6 +1,6 @@
 import { usePrograms } from '@/utils/usePrograms';
 import ButtonHover from '../custom/ButtonHover';
-import { Copy, Download, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Download, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { ImportProgram } from './ImportProgram';
 import { ProgramCreator } from './ProgramCreator';
@@ -8,6 +8,8 @@ import type { ProgramSave } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { ConfirmModal } from '../custom/ConfirmModal';
+import { useState } from 'react';
 
 type ProgramListType = { 
   
@@ -15,7 +17,8 @@ type ProgramListType = {
 
 export default function ProgramList({ ...props }: ProgramListType) {
   const { t } = useTranslation();
-  const { programs, activeProgram, selectProgram, addProgram, updateProgram, deleteProgram } = usePrograms();
+  const { programs, activeProgram, isDirty, selectProgram, addProgram, updateProgram, deleteProgram } = usePrograms();
+  const [pendingSelect, setPendingSelect] = useState<number | null>(null);
 
   const handleDownload = (e: React.MouseEvent, program: ProgramSave) => {
     e.stopPropagation();
@@ -58,8 +61,31 @@ export default function ProgramList({ ...props }: ProgramListType) {
     toast.info(t('selector.newProgramAdded', { name: program.name.toLocaleLowerCase() }));
   }
 
+  const confirmSelectProgramModal = (index: number) => {
+    if(isDirty) {
+      setPendingSelect(index);
+    }
+    else {
+      selectProgram(index);
+    }
+  }
+  const confirmedSelectProgram = () => {
+    if(pendingSelect !== null) {
+      selectProgram(pendingSelect);
+      setPendingSelect(null);
+    }
+  }
+
   return (
     <div {...props}>
+      <ConfirmModal 
+        title={t('selector.unsavedChanges')}
+        description={t('selector.reallyContinue')}
+        isOpen={pendingSelect !== null} 
+        onConfirm={confirmedSelectProgram} 
+        onOpenChange={() => setPendingSelect(null)} 
+        onCancel={() => setPendingSelect(null)} 
+      />
       <div>
         <div className='border rounded-md mb-6 max-h-[400px] overflow-auto'>
           {programs.length === 0 && (
@@ -68,7 +94,7 @@ export default function ProgramList({ ...props }: ProgramListType) {
             </div>
           )}
           {programs.map((program, idx) => 
-            <div key={idx} onClick={() => selectProgram(idx)} 
+            <div key={idx} onClick={() => confirmSelectProgramModal(idx)} 
                 className={cn('flex justify-between items-center flex-wrap pl-4 pr-2 border-b last:border-0 cursor-pointer transition-colors', 
                 (activeProgram === program ? 'bg-primary/10 hover:bg-primary/15' : 'hover:bg-primary/5'))}>
               <span className="font-semibold grow-10 select-none">
@@ -77,13 +103,6 @@ export default function ProgramList({ ...props }: ProgramListType) {
               </span>
               
               <div className='flex justify-end grow'>
-                <ProgramCreator program={program} onUpdate={(updated) => updateProgram(idx, updated)}>
-                  <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon"
-                      className='text-yellow-600 hover:text-yellow-600 hover:bg-yellow-600/10'>
-                    <Pencil />
-                  </ButtonHover>
-                </ProgramCreator>
-
                 <ButtonHover hoverContent={<p>{t('selector.downloadProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDownload(e, program)}
                     className='text-blue-600 hover:text-blue-600 hover:bg-blue-600/10'>
                   <Download />
