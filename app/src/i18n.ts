@@ -20,7 +20,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'cs',
-    debug: true,
+    debug: false,
     detection: {
       order: ['localStorage', 'navigator'],
       lookupLocalStorage: 'i18nextLng',

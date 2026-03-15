@@ -1,3 +1,248 @@
-\chapter{Kalkulus komunikujících systémů}
+\chapter{Reaktivní systémy}
+Tradiční pohled na počítačové programy je často zjednodušován na představu černé skříňky, která transformuje zadaný vstup na odpovídající výstup.
+Takovýto pohled na systém odpovídá popisu algoritmického problému. 
+V praxi se však setkáváme s celou řadou počítačových systémů a aplikací, pro které tento zjednodušený pohled na jednorázovou transformaci není možný \cite{aceto2007reactive}.
+Typickými příklady jsou operační systémy, řídicí jednotky v automobilech, webové servery či běžné bankomaty a nápojové automaty. 
+Tyto systémy, na rozdíl od tradičních algoritmů, nejsou navrženy tak, aby po zpracování dat svůj výpočet ukončily.
+Jejich primárním účelem je naopak průběžná a nepřetržitá interakce s okolním prostředím.
+
+Tímto prostředím může být uživatel, další softwarové procesy, nebo přímo fyzický svět, ze kterého systém data čte pomocí senzorů.
+U reaktivních systémů se obecně předpokládá, že mohou teoreticky běžet do nekonečna a že jsou neustále připraveny reagovat na nové události, signály či požadavky pocházející zvenčí.
+Z tohoto důvodu je nekonečný běh u reaktivních systémů, na rozdíl od klasických programů, zcela přirozený a z hlediska jejich funkce často nezbytný \cite{baier2008principles}.
+
+\section{Rozdíl mezi klasickými a reaktivními systémy}
+Základní rozdíl mezi klasickými (transformačními) a reaktivními systémy spočívá v samotné definici jejich korektního chování.
+U klasických programů, jako jsou například kompilátory, se zaměřujeme primárně na to, 
+aby program pro korektní vstup po konečném počtu kroků skončil a vrátil správný výsledek \cite{presentation1}.
+Tyto programy lze poměrně dobře modelovat jako matematickou funkci či relaci, která mapuje množinu povolených vstupů na množinu výstupů.
+Během samotného výpočtu většinou není možné s těmito programy jakkoli interagovat a tím měnit jejich stav.
+Důkaz korektnosti je zde poměrně jednoduchý, protože často stačí dokázat, že pro každý platný vstup existuje konečný počet kroků, po kterých program skončí a vygeneruje správný výstup \cite{aceto2007reactive}.
+
+Naproti tomu reaktivní systémy jsou chápány jako nepřetržitě běžící celky.
+Jelikož u nich nelze snadno definovat konečné stavy značící úspěšný konec výpočtu, nelze je jednoduše zredukovat na funkci či relaci \cite{aceto2007reactive}.
+Správnost reaktivního systému se nehodnotí jen podle finálního výsledku, ale zejména podle průběhu samotného výpočtu a vzájemné komunikace v čase.
+Při jejich verifikaci nás proto zajímají, oproti klasickým systémům, zcela jiné vlastnosti.
+Patří mezi ně bezpečnostní vlastnosti (\textit{safety properties}), které zaručují, že v systému nikdy nenastane nežádoucí stav, 
+jako je například uváznutí (\textit{deadlock}) či porušení vzájemného vyloučení.
+Dále zkoumáme vlastnosti živosti (\textit{liveness properties}), jež garantují, že se systém nezastaví a dříve či později obslouží každý požadavek \cite{baier2008principles}.
+
+Dalším velkým rozdílem těchto systémů je přítomnost paralelismu, asynchronního chování a s tím spojeného nedeterminismu.
+Zatímco klasický sekvenční program se pro stejná vstupní data chová vždy deterministicky, reaktivní systémy se typicky skládají z několika nezávislých komponent.
+Tyto procesy běží souběžně, sdílejí prostředky a reagují na externí události, jejichž přesné načasování nelze předvídat.
+Právě kvůli tomuto zabudovanému nedeterminismu u nich běžné metody testování často selhávají.
+Programátor pro ně může vytvořit sadu automatizovaných testů, které pokryjí většinu běžných scénářů, ale to nám nijak nezaručuje, že je systém opravdu bez chyb.
+Chyby v návrhu, jakými jsou například souběhy (\textit{race conditions}), se často projeví až při velmi specifickém načasování událostí, které se často obtížně odhaluje a replikuje.
+
+Právě tato nepřetržitost, složitá interakce a nedeterminismus jsou hlavními důvody, proč se pro návrh, analýzu a výuku reaktivních systémů používají specializované formální nástroje.
+Patří mezi ně zejména ohodnocené přechodové systémy (LTS), kterým se detailněji věnuje sekce \ref{sec:lts}, a procesní algebry, kam spadá i kalkulus komunikujících systémů (CCS), popsaný v sekci \ref{sec:ccs}, jenž tvoří hlavní náplň praktické části této práce.
+
+\section{Ohodnocené přechodové systémy}
+\label{sec:lts}
+Ohodnocené přechodové systémy (anglicky \textit{Labelled Transition Systems}, zkráceně LTS) představují jeden ze základních formálních modelů pro popis chování reaktivních systémů. 
+Díky této abstrakci můžeme modelovat celý systém jednoduše jako množinu stavů a možných přechodů mezi nimi. 
+Každý z těchto přechodů je navíc ohodnocen určitou akcí, která daný krok popisuje. 
+Tyto akce mohou reprezentovat události, ke kterým v systému dochází, jako je například přijetí vstupu od uživatele, odeslání zprávy po síti, nebo jen interní krok výpočtu. 
+Velkou výhodou tohoto modelu je to, že jej můžeme intuitivně vizualizovat pomocí orientovaných grafů, kde uzly představují jednotlivé stavy systému a hrany značí přechody označené příslušnými akcemi \cite{aceto2007reactive}.
+
+Výhodou LTS je zejména jeho flexibilita a schopnost zachytit komplexní jevy.
+Snadno v něm můžeme modelovat jak běžné sekvenční chování, tak i nedeterminismus, kdy z jednoho stavu vede více přechodů se stejnou akcí do různých cílových stavů.
+Podobně lze pomocí LTS také odhalit stavy uváznutí, ze kterých už nevede žádná další cesta. 
+Díky těmto vlastnostem můžeme přesně definovat a zkoumat vlastnosti systémů, včetně toho, 
+za jakých podmínek považujeme chování dvou systémů za ekvivalentní, například pomocí silné a slabé bisimulace, popsané v sekci \ref{sec:equivalence}.
+
+\subsection{Formální definice LTS}
+Z matematického hlediska můžeme ohodnocený přechodový systém popsat jako trojici, případně čtveřici, pokud počítáme explicitně i s počátečním stavem \cite{presentation1}.
+Ohodnocený přechodový systém je definován jako trojice $(Proc, Act, \{\xrightarrow{\alpha} |\ \alpha \in Act\})$, kde:
+\begin{itemize}
+    \item $Proc$ je množina stavů (procesů), která může být i nekonečná.
+    \item $Act$ je množina akcí (návěští neboli \textit{labels}).
+    \item $\xrightarrow{\alpha}\ \subseteq Proc \times Proc$ je binární přechodová relace pro každé $\alpha \in Act$.
+\end{itemize}
+
+Přechod $(s, s') \in\ \xrightarrow{\alpha}$ lze také chápat jako $(s, \alpha, s') \in\ \rightarrow$, obvykle se ale značí intuitivnějším zápisem $s \xrightarrow{\alpha} s'$. 
+Tento zápis můžeme číst tak, že systém, který se momentálně nachází ve stavu $s$, může vykonat akci $\alpha$ a tím přejít do nového stavu $s'$. 
+
+V kontextu modelování pomocí kalkulu komunikujících systémů (CCS) se množina akcí $Act$ rozděluje na dvě hlavní části.
+První část jsou viditelné akce, které reprezentují přímou komunikaci s okolím (vstupy a výstupy).
+Druhou částí je speciální neviditelná akce, značená řeckým písmenem $\tau$ (tau). 
+Tato neviditelná akce reprezentuje buď interní krok systému, nebo výsledek synchronizace dvou běžících procesů, který zvenčí nelze pozorovat. 
+
+\section{Kalkulus komunikujících systémů}
+\label{sec:ccs}
+Přestože ohodnocené přechodové systémy poskytují solidní matematický základ pro modelování, jejich přímé využití pro návrh rozsáhlých systémů naráží na limity. 
+V praxi je modelování složitých systémů přímo pomocí LTS velmi zdlouhavé, nepřehledné a náchylné k chybám. 
+Hlavní nevýhodou čistého LTS je nutnost popsat celý zkoumaný systém jako jeden velký a nedělitelný celek. 
+Chybí nám tedy možnost při návrhu poskládat systém z menších nezávislých podsystémů \cite{aceto2007reactive}.
+
+Tento problém pomáhají řešit procesní algebry, z nichž jednou z nejvýznamnějších je Kalkulus komunikujících systémů (anglicky \textit{Calculus of Communicating Systems}, zkráceně CCS). 
+Tento formální jazyk, jehož autorem je držitel Turingovy ceny Robin Milner, 
+si lze představit jako soubor výpočetních agentů komunikujících s okolím prostřednictvím svého definovaného rozhraní \cite{milner1989communication}.
+Hlavní výhoda CCS spočívá právě v jeho kompozičnosti. 
+Umožňuje nám definovat chování malých komponent a pomocí sady operátorů je skládat do složitějších celků.
+V plné šíři své syntaxe (například i při využití operátorů restrikce či přejmenování uvnitř rekurze) je jazyk turingovsky úplný a dokáže tedy simulovat libovolný Turingův stroj.
+Jeho účel však nespočívá v provádění klasických algoritmických výpočtů, ale především v modelování a analýze chování interaktivních systémů \cite{presentation1}.
+
+\subsection{Rozhraní a komunikace v CCS}
+Rozhraní libovolného procesu v CCS si můžeme představit jako sadu komunikačních portů (akcí), přes které proces interaguje se svým okolím, přičemž každý port slouží buď pro vstup, nebo výstup.
+Komunikace v CCS je založena na principu vzájemné synchronizace dvou procesů (tzv. \textit{handshake} komunikace). 
+Abychom tuto komunikaci mohli modelovat, definuje CCS množinu akcí. Mějme $\mathcal{A}$ jako množinu jmen (reprezentujících například přijetí vstupní hodnoty na portu). 
+Ke každému jménu $a \in \mathcal{A}$ existuje komplementární (opačné) jméno $\overline{a}$ (reprezentující odeslání hodnoty na daném portu). 
+Množinu všech komplementárních jmen označíme jako $\overline{\mathcal{A}}$. 
+
+Vedle těchto běžných, navenek viditelných akcí zavádí CCS také již zmíněnou speciální tichou akci $\tau$. 
+Jelikož $\tau$ reprezentuje vnitřní krok, o kterém okolí neví, neexistuje k ní žádný komplement.
+Celková množina všech možných akcí $Act$ v CCS je tedy sjednocením jmen, komplementů a tiché akce: $Act = \mathcal{A} \cup \overline{\mathcal{A}} \cup \{\tau\}$ \cite{aceto2007reactive}.
+
+\subsection{Syntaxe CCS}
+\label{sec:ccs_syntax}
+Syntaxe CCS je definována induktivně pomocí relativně malého množství operátorů, které přesto poskytují obrovskou vyjadřovací sílu \cite{aceto2007reactive}. 
+Nechť $\alpha \in Act$ je libovolná akce, $K$ je procesní konstanta (jméno procesu) a $P$ je proces. 
+Základní gramatiku jazyka lze poté definovat následovně:
+
+\[ P := K \mid \alpha.P \mid P_{1} + P_{2} \mid P_{1}|P_{2} \mid P \setminus L \mid P[f] \mid 0 \]
+
+\begin{itemize}
+    \item \textbf{Procesní konstanta ($K \stackrel{\text{def}}{=} P$):} Umožňuje pojmenovávat procesy a odkazovat se na ně, díky čemuž dosahujeme rekurze.
+    \item \textbf{Akční prefix ($\alpha.P$):} Proces, který nejdříve vykoná akci $\alpha$ a následně se začne chovat jako proces $P$, což si můžeme představit jako základní sekvenční operátor.
+    \item \textbf{Nedeterministický výběr, suma ($P_{1} + P_{2}$):} Představuje proces, který se může chovat buď jako proces $P_{1}$, nebo jako proces $P_{2}$. Výběr větve je závislý na tom, která akce je vybrána (ať už interně nebo okolím). Vykonáním akce z jedné větve se druhá alternativa trvale zahodí. Operátor lze také zapsat obecnou sumou $\sum_{i \in I}^{} P_{i}$, kde $I$ je libovolná množina indexů.
+    \item \textbf{Paralelní kompozice ($P_{1}\ |\ P_{2}$):} Umožňuje procesům $P_{1}$ a $P_{2}$ běžet souběžně. Procesy mohou vykonávat své akce nezávisle na sobě, nebo se mohou synchronizovat a společně vykonat interní akci $\tau$, pokud je jeden připraven provést akci $a$ a druhý její komplement $\overline{a}$. Tato kompozice je znázorněna na obrázku \ref{fig:ccs_parallel}.
+    \item \textbf{Restrikce ($P \setminus L$):} Kde $L \subseteq \mathcal{A}$. Tento operátor zakazuje (skrývá) vykonání akcí z množiny $L$ a jejich komplementů. Běžně se využívá ve spojení s paralelní kompozicí k vynucení synchronizace mezi dvěma procesy tak, aby akce nebyly dostupné vnějšímu prostředí. Toto chování je znázorněno na obrázku \ref{fig:ccs_sync_restricted}, kde proces $P' = (a.0 \mid \overline{a}.0) \setminus \{a\}$ může vykonat pouze synchronizaci.
+    \item \textbf{Přejmenování ($P[f]$):} Kde $f: Act \to Act$ je funkce s omezeními $f(\tau) = \tau$ a $f(\overline{a}) = \overline{f(a)}$. Tento operátor nám umožňuje znovu použít definované procesy v různých kontextech (např. obecný automat $VM \stackrel{\text{def}}{=} coin.\overline{item}.VM$ můžeme přejmenovat na automat na kávu: $CM \stackrel{\text{def}}{=} VM[coffee / item]$) \cite{aceto2007reactive}.
+    \item \textbf{Prázdný proces ($0$ nebo \textit{Nil}):} Značí stav, ve kterém proces nemůže vykonat žádnou další akci, a představuje tak korektní ukončení nebo uváznutí (\textit{deadlock}).
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.25\textheight]{Figures/ccs_parallel.pdf}
+        \caption{LTS graf paralelní kompozice \\ $P = a.0 \mid \overline{a}.0$}
+        \label{fig:ccs_parallel}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.25\textheight]{Figures/ccs_synchronization.pdf}
+        \caption{LTS graf vynucené synchronizace $Q = (a.0 \mid \overline{a}.0) \setminus \{a\}$}
+        \label{fig:ccs_sync_restricted}
+    \end{minipage}
+\end{figure}
+
+\subsection{Vztah mezi CCS a LTS}
+\label{sec:ccs_lts_vztah}
+I když nám syntaxe udává přesná pravidla pro zápis platných výrazů, k pochopení toho, co tyto výrazy skutečně znamenají a jak se chovají v čase, potřebujeme definovat jejich sémantiku. 
+V případě CCS je sémantika formálně určena pomocí Strukturální operační sémantiky (SOS), která je popsána v následující kapitole \ref{sec:sos}. 
+V principu ale platí, že každý syntakticky správný CCS výraz můžeme použít jako definici ohodnoceného přechodového systému.
+Díky tomuto propojení můžeme modely zapsané v CCS analyzovat pomocí algoritmů vytvořených primárně pro LTS a tyto modely graficky vizualizovat (např. s využitím nástroje implementovaného v rámci praktické části této práce).
+Při návrhu systémů tak můžeme využít modulárního přístupu procesní algebry provázaného s přechodovými systémy.
+
+\section{Strukturální operační sémantika}
+\label{sec:sos}
+Jak již bylo řečeno v sekci \ref{sec:ccs_lts_vztah}, samotná syntaxe jazyka CCS pouze určuje, jak procesy správně zapisovat, neříká nám ale nic o tom, jaký význam tyto zápisy mají a jak se bude popsaný systém reálně chovat.
+Odvodit odpovídající stavy v modelu LTS je možné i intuitivně, tento postup je však velmi náchylný k chybám a u rozsáhlých systémů jej nelze spolehlivě automatizovat. Právě proto se k tomuto odvození využívá Strukturální operační sémantika (SOS), která definuje sadu formálních odvozovacích pravidel \cite{aceto2007reactive}.
+Jejím autorem je Gordon Plotkin a poskytuje exaktní postup, jak z chování jednotlivých malých podkomponent krok za krokem logicky odvodit chování celého komplexního systému.
+
+\subsection{Odvozovací pravidla}
+Základním stavebním kamenem Strukturální operační sémantiky je systém odvozovacích pravidel (\textit{inference rules}). 
+Tato pravidla nám formálně říkají, za jakých podmínek může náš CCS proces provést určitou akci a přejít do nového stavu. 
+Odvozovací pravidlo se standardně zapisuje ve tvaru zlomku \cite{presentation1}:
+\[ \text{PRAVIDLO} \quad \frac{\text{premisy}}{\text{závěr}} \quad \text{dodatečná podmínka} \]
+
+Tento zápis čteme tak, že pokud platí všechny předpoklady (premisy) nad zlomkovou čarou a je i splněna případná dodatečná podmínka vedle zlomku, pak z toho logicky vyplývá platnost závěru pod čarou. 
+Pravidlům bez premis říkáme axiomy, jejich závěr totiž platí automaticky za všech okolností.
+
+Pro jazyk CCS máme k dispozici ucelenou sadu těchto pravidel pro každý z operátorů. 
+Nechť $\alpha \in Act$ je libovolná akce (viditelná či neviditelná $\tau$) a $a \in \mathcal{A}$ je viditelné jméno akce. Sémantiku operátorů pak můžeme definovat následovně:
+
+\begin{itemize}
+    \item \textbf{Akční prefix (ACT):} Toto pravidlo je axiomem a tvoří úplný základ výpočtu, neboť říká, že proces $\alpha.P$ může provést akci $\alpha$ a následně pokračovat jako proces $P$.
+    $$ \text{ACT} \quad \frac{}{\alpha.P \xrightarrow{\alpha} P} $$
+
+    \item \textbf{Nedeterministický výběr (SUM):} Pravidla definují, že proces poskládaný ze součtu $P_1 + P_2$ může provést buď krok procesu $P_1$, nebo krok procesu $P_2$. Provedením vybrané akce druhá větev zcela zaniká. Pravidlo lze také zapsat obecnou sumou.
+    $$ \text{SUM}_1 \quad \frac{P \xrightarrow{\alpha} P'}{P + Q \xrightarrow{\alpha} P'} \qquad \text{SUM}_2 \quad \frac{Q \xrightarrow{\alpha} Q'}{P + Q \xrightarrow{\alpha} Q'} $$
+
+    \item \textbf{Paralelní kompozice (COM):} Paralelní běh modelujeme pomocí tří pravidel. První dvě (\text{COM}$_1$ a \text{COM}$_2$) umožňují takzvané asynchronní prokládání (interleaving), kdy jeden z procesů vykoná svůj krok a druhý zůstává ve svém aktuálním stavu. Třetí pravidlo (\text{COM}$_3$) popisuje synchronizaci, ke které dochází, když jeden proces umí vyslat $\overline{a}$ a druhý přijmout $a$. Výsledkem této synchronizace je tichá akce $\tau$.
+    $$ \text{COM}_1 \quad \frac{P \xrightarrow{\alpha} P'}{P \mid Q \xrightarrow{\alpha} P' \mid Q} \qquad \text{COM}_2 \quad \frac{Q \xrightarrow{\alpha} Q'}{P \mid Q \xrightarrow{\alpha} P \mid Q'} $$
+    $$ \text{COM}_3 \quad \frac{P \xrightarrow{a} P' \quad Q \xrightarrow{\overline{a}} Q'}{P \mid Q \xrightarrow{\tau} P' \mid Q'} $$
+
+    \item \textbf{Restrikce (RES):} Proces obalený restrikcí se může nadále chovat stejně jako proces původní, avšak s tím rozdílem, že má zakázáno provést jakoukoli akci z množiny zakázaných akcí $L$, včetně jejího komplementu.
+    $$ \text{RES} \quad \frac{P \xrightarrow{\alpha} P'}{P \setminus L \xrightarrow{\alpha} P' \setminus L} \quad \alpha, \overline{\alpha} \notin L $$
+
+    \item \textbf{Přejmenování (REL):} Pokud vykoná proces nějakou akci $\alpha$, proces obalený funkcí přejmenování vykoná akci $f(\alpha)$.
+    $$ \text{REL} \quad \frac{P \xrightarrow{\alpha} P'}{P[f] \xrightarrow{f(\alpha)} P'[f]} $$
+
+    \item \textbf{Procesní konstanta (CON):} Toto pravidlo umožňuje nahradit jméno definovaného procesu za jeho vnitřní tělo (proces $P$) a vykonat krok, který toto tělo nabízí.
+    $$ \text{CON} \quad \frac{P \xrightarrow{\alpha} P'}{K \xrightarrow{\alpha} P'} \quad K \stackrel{\text{def}}{=} P $$
+\end{itemize}
+
+\subsection{Důkazové stromy (Derivační stromy)}
+Pomocí výše zmíněných SOS pravidel jsme schopni pro jakýkoli zadaný CCS výraz formálně dokázat, zda je z něj možné provést přechod do jiného stavu přes danou akci \cite{aceto2007reactive}. 
+Tento proces dokazování probíhá iterativním aplikováním pravidel, většinou „odspodu nahoru“, čímž postupně budujeme strukturu zvanou odvozovací či důkazový strom (\textit{derivation tree}).
+Důkazový strom je také možné sestrojit opačným směrem, kdy začínáme axiomem a aplikujeme pravidla do té doby, než dosáhneme požadovaného výrazu.
+
+Kořenem takového stromu je tvrzení o přechodu, jehož existenci chceme ověřit, a jednotlivá zanoření a větvení představují pravidla, která jsme v daném kroku použili. 
+Aby byl důkaz považován za platný, musí listy stromu tvořit výhradně axiomy (většinou se jedná o pravidlo ACT), u kterých již není třeba nic dalšího dokazovat. 
+Pokud se nám pro testovaný přechod podaří zkonstruovat validní konečný strom zakončený platnými axiomy, včetně splnění všech dodatečných podmínek u zlomků, tak dostaneme matematický důkaz, že přechod skutečně existuje.
+
+\section{Ekvivalence chování a logické vlastnosti}
+Při navrhování systémů a tvoření modelů velmi často narazíme na potřebu porovnat dva nezávislé procesy a dokázat, že dělají „to samé“. 
+Zatímco u běžných sekvenčních programů bychom pouze srovnali výstupní data pro stejné vstupy, v prostředí neustále interagujících procesů toto neplatí. 
+Nástrojem pro posuzování takové shody u reaktivních systémů je zkoumání takzvané ekvivalence chování a dokazování vlastností pomocí modálních logik \cite{aceto2007reactive}.
+
+\subsection{Ekvivalence chování}
+\label{sec:equivalence}
+Klíčovým konceptem pro určení ekvivalence v LTS a CCS je bisimulace. 
+Její hlavní myšlenka spočívá v tom, že systémy považujeme za ekvivalentní ve chvíli, kdy dokážou vzájemně napodobovat své přechody do nekonečna.
+Základní a nejpřísnější formou je silná bisimulace (\textit{strong bisimulation}), značená operátorem $\sim$. 
+Dva procesy jsou silně bisimulární právě tehdy, když na každý krok prvního procesu umí druhý proces odpovědět naprosto identickým krokem pod stejnou akcí, a to včetně skrytých tichých akcí $\tau$. 
+Stavy, do kterých se oba procesy přesunou, musí toto pravidlo opět obousměrně splňovat. 
+Silnou bisimulaci lze formálně dokázat například přes hru útočníka a obránce. Pro reálné systémy je tento způsob často příliš striktní. 
+
+Pro nasazení v reálných aplikacích se spíše používá slabá bisimulace (\textit{weak bisimulation}), značená symbolem $\approx$. 
+Při ní nás zajímá pouze viditelné chování (vstupy a výstupy), zatímco interní výpočty můžeme ignorovat \cite{aceto2007reactive}. 
+Slabá bisimulace systémům dává větší volnost a umožňuje jim před nebo po provedení viditelné akce vykonat libovolný počet neviditelných $\tau$ přechodů. 
+Lépe odráží perspektivu vnějšího pozorovatele, protože abstrahuje od vnitřního fungování komponent.
+
+\subsection{Hennessy-Milner logika}
+Kromě ověřování ekvivalence dvou celých systémů (\textit{Equivalence Checking}) využíváme ve formální verifikaci také techniku ověřování modelů (\textit{Model Checking}). 
+Při ní testujeme, jestli konkrétní systém splňuje námi požadovanou vlastnost.
+Touto vlastností může být například podmínka, že se automat po stisknutí tlačítka dříve nebo později vrátí do výchozího stavu.
+Hlavním nástrojem pro formulaci těchto lokálních vlastností reaktivních systémů je Hennessy-Milner logika (HML).
+
+Jedná se o modální logiku, která rozšiřuje klasickou výrokovou logiku o dva speciální operátory, kterými jsou možnost ($\langle a \rangle F$) a nutnost ($[a]F$) \cite{presentation1}:
+\begin{itemize}
+    \item Formule $\langle a \rangle F$ je splněna ve stavu $s$, pokud z tohoto stavu existuje \textit{alespoň jeden} přechod přes akci $a$ do stavu, který splňuje formuli $F$.
+    \item Formule $[a]F$ je splněna ve stavu $s$, pokud \textit{všechny} možné přechody přes akci $a$ vedou do stavů, které splňují formuli $F$. Tuto formuli triviálně splňuje i jakýkoliv stav, ze kterého pod akcí $a$ žádný přechod vůbec nevede.
+\end{itemize}
+O dvou procesech, které mají konečné větvení (\textit{image-finite} LTS), platí tvrzení, že jsou silně bisimulární právě tehdy, když splňují stejnou množinu formulí v HML \cite{aceto2007reactive}.
+
+\section{Rozšíření a další alternativy}
+Kalkulus komunikujících systémů (CCS) byl jednou z prvních procesních algeber a položil teoretické základy verifikace. 
+S postupným rozvojem teoretické informatiky však vznikaly i další rozšíření nebo úplně nové matematické formalismy, které na CCS navazují.
+
+\subsection{CCS s předáváním hodnot}
+Základní verze CCS, jak byla představena v předchozích kapitolách, modeluje komunikaci pouze jako vzájemné odeslání signálu na určitém kanálu (tzv. handshake synchronizace), aniž by při této události docházelo k výměně jakýchkoli stavových dat. 
+V reálném světě si však procesy mezi sebou potřebují vyměňovat konkrétní datové hodnoty, jako jsou například celá čísla, stavová data či textové řetězce.
+Pro tyto účely existuje rozšíření zvané CCS s předáváním hodnot (\textit{Value-passing CCS}), ve kterém se komunikace obohacuje o parametry \cite{presentation1}. 
+
+Přijetí hodnoty $x$ na portu $in$ se modeluje jako $in(x).P$, zatímco odeslání konkrétní hodnoty $v$ (či výrazu) na portu $out$ se zapisuje jako $\overline{out}(v).P$. 
+Důležitým bodem je, že pokud v modelu pracujeme pouze s omezeným konečným počtem hodnot datového typu, nepřináší nám toto rozšíření z teoretického hlediska žádnou novou expresivitu.
+Každý takový proces lze totiž přeložit do standardního CCS tak, že se příjem hodnot nahradí velkou sadou nedeterministických výběrů pro každou možnou hodnotu datového typu a 
+odeslání by se mapovalo na staticky definovaný specifický název akce (např. odeslání čísla 2 jako akce $\overline{out(2)}$).
+
+\subsection{Alternativy pro reaktivní systémy}
+Paralelně s vývojem CCS vznikala i procesní algebra CSP (\textit{Communicating Sequential Processes}), jejímž autorem je sir C. A. R. Hoare \cite{graham_1978_programming}. 
+Zatímco v CCS je komunikace založena primárně na komplementárních zprávách synchronizovaných přes neviditelnou akci $\tau$, 
+CSP vnímá komunikaci jako sdílení událostí, do kterých se může synchronně zapojit i více paralelních procesů současně (tzv. \textit{multi-way synchronization}). 
+Abstrakce, kterou algebra CSP zavedla, se v softwarovém inženýrství ujala a výrazně ovlivnila návrh moderních programovacích jazyků. Příkladem je jazyk Go, který se z CSP přímo inspiroval při návrhu svých \texttt{goroutines} a komunikačních kanálů.
+
+Dalším významným pohledem na modelování komunikujících systémů je algebraický přístup, reprezentovaný formalismem ACP (\textit{Algebra of Communicating Processes}), který vytvořili Jan Bergstra a Jan Willem Klop \cite{bergstra_1985_algebra}. 
+Ten, na rozdíl od CCS, které zakládá svou sémantiku zespodu (\textit{bottom-up}) induktivně pomocí Strukturální operační sémantiky (SOS) a důkazových stromů, 
+popisuje chování systémů primárně axiomaticky shora (\textit{top-down}). Chování systému a ekvivalence procesů jsou v ACP formálně odvozovány převážně dedukcí ze sady definovaných rovnic tvořících danou algebru.
+
+Snad nejvýznamnějším pokročilým formalismem, zavedeným autorem CCS Robinem Milnerem na začátku devadesátých let, je $\pi$-kalkul (\textit{Pi-calculus}) \cite{kobayashi_1999_linearity}. 
+Tento kalkul byl vyvinut jako odpověď na nutnost modelovat takzvané mobilní procesy, tedy systémy, u kterých se může dynamicky za běhu měnit síťová a komunikační topologie. 
+Zatímco v klasickém CCS jsou komunikační kanály (jména akcí) staticky svázané s architekturou systému, $\pi$-kalkul umožňuje předávat samotná jména kanálů jako komunikační data skrze jiné kanály (tzv. \textit{link passing} či \textit{name passing}). 
+Tento mechanismus dynamického vytváření, delegování a sdílení nových referencí v čase z něj dělá ultimátní a vysoce expresivní nástroj pro modelování moderních distribuovaných internetových architektur, mikroservis a bezdrátových sítí s proměnlivým připojením klientů.
 
 \endinput

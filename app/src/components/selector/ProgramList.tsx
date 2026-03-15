@@ -17,7 +17,7 @@ type ProgramListType = {
 
 export default function ProgramList({ ...props }: ProgramListType) {
   const { t } = useTranslation();
-  const { programs, activeProgram, isDirty, selectProgram, addProgram, updateProgram, deleteProgram } = usePrograms();
+  const { programs, activeProgram, isDirty, selectProgram, addProgram, deleteProgram } = usePrograms();
   const [pendingSelect, setPendingSelect] = useState<number | null>(null);
 
   const handleDownload = (e: React.MouseEvent, program: ProgramSave) => {
