@@ -13,7 +13,7 @@ function Header() {
       <h1 className="text-2xl font-semibold">{t('core.ccs')}</h1>
       <div className="flex gap-2 items-center justify-end flex-1">
         <Tutorial>
-          <Button className="border-none shadow-none bg-transparent hover:bg-slate-100 rounded-md transition-colors text-foreground gap-1 px-2">
+          <Button className="border-none shadow-none bg-transparent hover:bg-slate-100 rounded-md transition-colors text-foreground gap-1 px-2" aria-label={t('core.help')}>
             <BookOpenText className="h-5! w-5!" />
             <span className="text-foreground font-semibold opacity-80">{t('core.help')}</span>
           </Button>

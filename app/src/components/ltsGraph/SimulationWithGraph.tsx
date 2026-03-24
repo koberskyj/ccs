@@ -7,8 +7,8 @@ import { useSimulation } from '@/utils/useSimulation';
 import { Layers, Locate, RefreshCcw, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ccsToString } from '@/lib/ccsUtils';
-import { Button } from './ui/button';
-import ButtonHover from './custom/ButtonHover';
+import { Button } from '../ui/button';
+import ButtonHover from '../custom/ButtonHover';
 import { useTranslation } from 'react-i18next';
 
 function normalize(str: string) {
@@ -288,7 +288,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
                 setSelectedProcessName(value);
                 handleReset();
               }}>
-                <SelectTrigger className="w-[120px] max-w-64 bg-white/80 h-8 text-sm">
+                <SelectTrigger className="w-[120px] max-w-64 bg-white/80 h-8 text-sm" aria-label={'Process'}>
                   <SelectValue placeholder="Proces" />
                 </SelectTrigger>
                 <SelectContent>
@@ -303,7 +303,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
               </Select>
             </div>
 
-            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit}>
+            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)} disabled={!allowEdit} aria-label={t('simulation.structuralReduction')}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
                 {t('simulation.structuralReduction')} {useStructRed ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
@@ -311,7 +311,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
             </Button>
 
             <div className="flex items-center gap-2 bg-secondary/80 backdrop-blur-sm  p-1 rounded-md shadow-sm">
-              <Settings size={16} className="ml-2 mr-1" />
+              <Settings size={16} className="ml-2 mr-1" aria-label={"Layout"} />
               {(['id', 'mixed', 'full'] as const).map((m) => (
                 <button key={m} onClick={() => changeViewMode(m)}
                   className={`px-3 py-1 my-1 text-xs rounded-md transition-colors font-medium ${viewMode === m ? 'bg-card/80 shadow text-primary/80' : 'text-secondary-foreground/80 hover:bg-card/90'}`}>
@@ -320,14 +320,14 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
               ))}
             </div>
 
-            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => { setIsDynamicMode(!isDynamicMode); !isDynamicMode && setIsCentering(true);}}>
+            <Button variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => { setIsDynamicMode(!isDynamicMode); !isDynamicMode && setIsCentering(true);}} aria-label={t('simulation.dynamicMode')}>
               <RefreshCcw size={16} className={`${isDynamicMode ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${isDynamicMode ? 'text-primary' : ''}`}>
                 {t('simulation.dynamicMode')} {isDynamicMode ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
               </span>
             </Button>
 
-            <ButtonHover hoverContent={<>{t('simulation.centering')} {isCentering ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}</>} variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setIsCentering(!isCentering)}>
+            <ButtonHover hoverContent={<>{t('simulation.centering')} {isCentering ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}</>} variant="secondary" className="bg-secondary/80 backdrop-blur-sm  cursor-pointer py-5" onClick={() => setIsCentering(!isCentering)} aria-label={t('simulation.centering')}>
               <Locate size={16} className={`${isCentering ? 'text-primary' : ''}`} />
             </ButtonHover>
           </div>

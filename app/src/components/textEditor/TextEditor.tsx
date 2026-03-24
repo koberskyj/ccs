@@ -17,11 +17,11 @@ export const ccsHighlightStyle = HighlightStyle.define([
   },
   {
     tag: t.variableName, // Vstupní akce
-    color: "#1976d2"
+    color: "#1060a0" // #1976d2
   },
   {
     tag: t.labelName, // Výstupní akce
-    color: "#1976d2", // #d32f2f
+    color: "#1060a0", // #d32f2f
     textDecoration: "overline",
     textDecorationThickness: "1px"
   },
@@ -35,7 +35,7 @@ export const ccsHighlightStyle = HighlightStyle.define([
   },
   {
     tag: t.lineComment,
-    color: "#90a4ae",
+    color: "#60747e",
     fontStyle: "italic"
   },
   {
@@ -142,6 +142,7 @@ export default function TextEditor({ initValue, onTextChange, highlightRange, di
         style={{ fontSize: '1.2em', flex: 1 }} 
         readOnly={disabled}
         editable={!disabled}
+        aria-label={'Program Code'}
         basicSetup={{
           closeBrackets: false,
         }}
@@ -152,7 +153,8 @@ export default function TextEditor({ initValue, onTextChange, highlightRange, di
           highlightExtension,
           EditorView.theme({
             "&": { height: "100%", maxHeight: "500px" }
-          })
+          }),
+          EditorView.contentAttributes.of({ "aria-label": "Program Code" })
         ]} 
         onChange={onChange} 
       />

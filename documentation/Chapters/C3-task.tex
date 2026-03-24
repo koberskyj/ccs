@@ -1,13 +1,13 @@
 \chapter{Analýza požadavků}
-\label{chap:analyza_pozadavku}
+\label{sec:analyza_pozadavku}
 
-Tato kapitola se věnuje analýze požadavků na vyvíjenou webovou aplikaci, jejímž cílem je podpora výuky vybraných problémů z oblasti formální verifikace systémů. 
+Tato kapitola se věnuje analýze požadavků vyvíjené aplikace, jejímž cílem je podpora výuky vybraných problémů z oblasti formální verifikace systémů. 
 V následujících sekcích je specifikován primární účel aplikace, zhodnocení existujících nástrojů a podrobná specifikace funkčních i nefunkčních požadavků definovaných na základě zadání.
 
 \section{Účel aplikace}
 \label{sec:ucel_aplikace}
-Primárním účelem vyvíjené aplikace je sloužit jako interaktivní vizuální pomůcka pro studenty předmětu Modelování a verifikace (MaV), případně obdobných kurzů zaměřených na formální metody. 
-Teorie formální verifikace a modelování konkurentních systémů pomocí kalkulu komunikujících systémů (CCS) může být pro studenty zpočátku složitější na pochopení, zejména pokud nemají k dispozici adekvátní nástroj pro vizualizaci chování těchto systémů. 
+Primárním účelem vyvíjené aplikace je sloužit jako interaktivní vizuální pomůcka pro studenty předmětu Modelování a verifikace (MaV), případně pro studenty připravovaného předmětu Formální Verifikace Systémů. 
+Teorie formální verifikace a modelování konkurentních systémů pomocí kalkulu komunikujících systémů (CCS) může být pro studenty zpočátku náročnější na pochopení, zejména pokud nemají k dispozici adekvátní nástroj pro vizualizaci chování těchto systémů. 
 
 Hlavním přínosem aplikace je provedení studenta prvními fázemi studia problematiky. 
 Uživatel si může interaktivně vyzkoušet sestrojení ohodnoceného přechodového systému (LTS) na základě definovaných CCS výrazů, případně krok za krokem dokazovat platnost přechodů za užití pravidel strukturální operační sémantiky (SOS).
@@ -20,12 +20,12 @@ Díky tomu si mohou uživatelé lépe představit abstraktní principy synchroni
 \label{sec:analyza_existujicich_reseni}
 Oblast formální verifikace a analýzy systémů popsaných pomocí CCS již disponuje řadou aplikací. 
 Většina z nich však byla navržena primárně pro výzkumné nebo průmyslové účely, nikoliv explicitně jako pomůcky pro začátečníky. 
-Mezi nejvýznamější programy v kontextu existujícího softwaru je vhodné zmínit následující aplikace.
+Mezi nejvýznamnější programy v kontextu existujícího softwaru je vhodné zmínit následující aplikace.
 
 \subsection{Concurrency Workbench Aalborg (CAAL)}
 Jako nejvýznamnější moderní nástroj lze uvést CAAL (Concurrency Workbench Aalborg) \cite{caal}. 
 Jedná se o komplexní webovou aplikaci umožňující specifikaci procesů v CCS, generování LTS, ověřování bisimulačních ekvivalencí a model checking pomocí modální logiky.
-Je to poměrně intuitivní nástroj, který se i během výuky předměnu používá, obsahuje však i určité limity. 
+Je to poměrně intuitivní nástroj, který se i během výuky předmětu používá, obsahuje však i určité limity. 
 Hlavní nevýhodou je absence podpory pro dokazování přechodů pomocí jednotlivých SOS pravidel, což omezuje jeho využití v úvodních fázích výuky.
 Při generování LTS grafů navíc CAAL využívá algoritmy optimalizované spíše pro rozsáhlé stavové prostory, což má za následek horší přehlednost u menších výukových příkladů. 
 Nástroj rovněž neposkytuje vizualizaci abstraktního syntaktického stromu (AST), která je pro pochopení sémantiky a priorit operátorů klíčová.
@@ -33,57 +33,57 @@ Nástroj rovněž neposkytuje vizualizaci abstraktního syntaktického stromu (A
 \subsection{Edinburgh Concurrency Workbench (CWB)}
 Historicky důležitým nástrojem, který definoval standard pro automatizovanou analýzu CCS, je CWB \cite{CWB}. 
 Ačkoliv se jedná o spolehlivý software s vysokým výkonem, v dnešní době již není dále vyvíjen.
-Jeho zásadním nedostatkem pro účely moderní výuky je zastaralé uživatelské rozhraní založené výhradně na příkazové řádce. 
-Neposkytuje žádnou formu interaktivní vizualizace grafů či syntaktických stromů, což jej činí pro podporu výuky těžko přístupným.
+Na tento nástroj později navázal projekt Concurrency Workbench of the New Century (CWB-NC), který přinesl další rošíření a vylepšení architektury, avšak i jeho vývoj byl nakonec opuštěn.
+Zásadním nedostatkem obou těchto nástrojů pro účely moderní výuky je zastaralé uživatelské rozhraní založené výhradně na příkazové řádce. 
+Neposkytují žádnou formu interaktivní vizualizace grafů či syntaktických stromů, nejsou tedy pro výuku a vizualizaci příliš v vhodné.
 
-\subsection{Zhodnocení a přínos nové aplikace}
-Z analýzy existujících řešení vyplývá, že hlavním nedostatkem je přílišná komplexita uživatelského rozhraní a absence nástrojů zaměřených čistě na pochopení základních principů (např. krokové budování SOS důkazů a vizualizace AST).
-Hlavním přínosem nového řešení je tak primárně zaměření na výuku. 
+\subsection{Zhodnocení a opodstatnění nového řešení}
+Z analýzy existujících řešení vyplývá, že jejich hlavním nedostatkem je složitost uživatelského rozhraní a absence nástrojů zaměřených čistě na pochopení základních principů (např. krokové budování SOS důkazů a vizualizace AST).
+Hlavním opodstatněním vývoje nového řešení je tak primárně zaměření na výuku. 
 Aplikace nabídne validaci syntaxe v reálném čase, možnost vizuální nápovědy při volbě SOS pravidel a moderní, čisté prostředí. 
-Stává se tak vhodným doplňkem (zejména pro úvodní přednášky a cvičení) k robustnějším nástrojům, nikoliv však jejich náhradou.
+Stane se tak vhodným doplňkem (zejména pro úvodní přednášky a cvičení) k robustnějším nástrojům, nikoliv však jejich plnohodnotnou náhradou.
 
 \section{Funkční požadavky}
 \label{sec:funkcni_pozadavky}
-
 Funkční požadavky přímo definují chování a možnosti vyvíjené aplikace. Vycházejí z oficiálního zadání diplomové práce a jsou rozšířeny o potřeby nezbytné pro reálné nasazení ve výuce:
 
 \begin{enumerate}
     \item \textbf{Zadávání a syntaktická analýza CCS výrazů}
     \begin{itemize}
-        \item Systém musí obsahovat textový editor pro zápis zdrojového kódu (procesních definic) v syntaxi jazyka CCS.
-        \item Aplikace musí v reálném čase provádět syntaktickou analýzu vstupu a vizuálně upozorňovat uživatele na případné chyby (např. chybějící závorky, nepovolené znaky, nedefinované procesy).
-        \item K zadanému a syntakticky korektnímu výrazu musí systém umožnit vygenerování a zobrazení syntaktického stromu (AST), reprezentujícího hierarchickou strukturu výrazu a prioritu operátorů.
+        \item Systém bude obsahovat textový editor pro zápis zdrojového kódu (procesních definic) v syntaxi jazyka CCS.
+        \item Aplikace zajistí v reálném čase syntaktickou analýzu vstupu a vizuálně upozorní uživatele na případné chyby (např. chybějící závorky, nepovolené znaky, nedefinované procesy).
+        \item K zadanému a syntakticky korektnímu výrazu systém umožní vygenerování a zobrazení syntaktického stromu (AST), reprezentujícího hierarchickou strukturu výrazu a prioritu operátorů.
     \end{itemize}
     
     \item \textbf{Interaktivní konstrukce odvozovacího stromu (SOS)}
     \begin{itemize}
-        \item Pro uživatelem zvolené procesy $X$ a $Y$ a akci $\alpha$ musí systém umožnit uživateli sestavit formální důkaz přechodu $X \xrightarrow{\alpha} Y$ na základě axiomů a odvozovacích pravidel strukturální operační sémantiky.
-        \item Tento proces musí probíhat interaktivně: uživatel postupně vybírá pravidla aplikovatelná na daný podvýraz, včetně jejich příslušných parametrů.
-        \item Aplikace musí nabízet dva režimy podpory výuky:
+        \item Pro uživatelem zvolené procesy $X$ a $Y$ a akci $\alpha$ systém uživateli poskytne nástroje pro sestavení formálního důkazu přechodu $X \xrightarrow{\alpha} Y$ na základě axiomů a odvozovacích pravidel strukturální operační sémantiky.
+        \item Tento proces musí probíhat interaktivně: uživatel bude postupně vybírat pravidla aplikovatelná na daný podvýraz, včetně jejich příslušných parametrů.
+        \item Aplikace nabídne dva režimy podpory výuky:
         \begin{enumerate}
-            \item \textit{Režim bez nápovědy:} Uživatel provádí volbu pravidel samostatně. V případě chybného kroku jej aplikace pouze upozorní,  že dané pravidlo s příslušnými parametry nelze použít.
-            \item \textit{Režim s nápovědou:} Systém na základě aktuálního stavu výrazu interaktivně filtruje a zvýrazňuje pouze ta SOS pravidla, která jsou syntakticky aplikovatelná, a omezuje výběr parametrů na validní možnosti.
+            \item \textit{Režim bez nápovědy:} Uživatel provádí volbu pravidel samostatně. V případě chybného kroku jej aplikace pouze upozorní, že dané pravidlo s příslušnými parametry nelze použít.
+            \item \textit{Režim s nápovědou:} Systém na základě aktuálního stavu výrazu interaktivně filtruje a zvýrazní pouze ta SOS pravidla, která jsou syntakticky aplikovatelná, a omezí výběr parametrů na validní možnosti.
         \end{enumerate}
     \end{itemize}
     
     \item \textbf{Generování a vizualizace ohodnoceného přechodového systému (LTS)}
     \begin{itemize}
-        \item Na základě zadaného CCS výrazu musí systém vygenerovat odpovídající stavový prostor a zobrazit jej jako orientovaný graf, kde vrcholy reprezentují stavy prostoru a orientované hrany jednotlivé akce.
-        \item Systém musí být odolný vůči zacyklení v případech, kdy je generovaný LTS nekonečný (např. vlivem neomezeného vytváření nových paralelních komponent nebo nezastavené rekurze). Generování musí být omezeno či přizpůsobeno tak, aby nedošlo k zamrznutí uživatelského rozhraní.
+        \item Na základě zadaného CCS výrazu systém vygeneruje odpovídající stavový prostor a zobrazí jej jako orientovaný graf, kde vrcholy reprezentují stavy prostoru a orientované hrany jednotlivé akce.
+        \item Systém musí být odolný vůči zacyklení v případech, kdy je generovaný LTS nekonečný (např. vlivem neomezeného vytváření nových paralelních komponent nebo nezastavené rekurze). Generování bude omezeno vhodným limitem hloubky či počtu stavů tak, aby se předešlo zamrznutí uživatelského rozhraní.
     \end{itemize}
     
     \item \textbf{Simulace běhu procesů}
     \begin{itemize}
         \item Aplikace musí obsahovat interaktivní simulátor umožňující manuální krokování běhu procesu napříč vygenerovaným LTS grafem.
-        \item Uživatel musí mít možnost v každém stavu zvolit, kterou z dostupných akcí chce provést.
-        \item Simulátor musí umožňovat návrat o krok zpět, případně celou simulaci vrátit do výchozího stavu.
+        \item Uživatel bude mít možnost v každém stavu zvolit, kterou z dostupných akcí chce provést.
+        \item Simulátor dovolí návrat o krok zpět, případně vrácení celé simulace do výchozího stavu.
         \item Při analýze paralelních procesů (využívajících operátor $|$) simulátor vizuálně demonstruje nezávislé provádění akcí i interní komunikaci (handshake) přes komplementární porty (např. $\alpha$ a $\overline{\alpha}$), vedoucí ke vzniku tiché akce $\tau$.
     \end{itemize}
     
     \item \textbf{Předdefinované ukázkové vstupy}
     \begin{itemize}
-        \item Systém musí obsahovat sadu předpřipravených příkladů demonstrujících použití jednotlivých operátorů CCS a typických situací ve formální verifikaci.
-        \item Tyto ukázky musí být možné načíst na jedno kliknutí bez nutnosti psaní kódu, což urychlí seznámení uživatele s aplikací.
+        \item Součástí systému bude sada předpřipravených příkladů demonstrujících použití jednotlivých operátorů CCS a typických situací ve formální verifikaci.
+        \item Tyto ukázky musí být možné načíst na jedno kliknutí bez nutnosti psaní kódu, což výrazně urychlí seznámení uživatele s aplikací.
     \end{itemize}
 \end{enumerate}
 
@@ -94,42 +94,42 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
 
 \begin{enumerate}
     \item \textbf{Podpora offline režimu a PWA architektura:} 
-    Aplikace by měla být navržena jako progresivní webová aplikace (PWA). 
-    Logika výpočtů a zpracování CCS by mělo probíhat primárně na straně klienta, což umožní plnohodnotné využití nástroje i bez stabilního připojení k internetu. 
-    Ukládání rozpracovaných příkladů by mělo být řešeno pomocí lokálního úložiště prohlížeče, aby bylo možné uchovat rozpracovaný stav přímo v prohlížeči i bez přístupu k internetu.
+    Aplikace bude navržena jako progresivní webová aplikace (PWA). 
+    Logika výpočtů a zpracování CCS poběží primárně na straně klienta, což umožní plnohodnotné využití nástroje i bez stabilního připojení k internetu. 
+    Ukládání rozpracovaných příkladů zajistí lokální úložiště prohlížeče, aby bylo možné uchovat rozpracovaný stav přímo v zařízení i bez nutnosti přístupu k internetu.
     
     \item \textbf{Lokalizace uživatelského rozhraní (i18n):} 
-    Aplikace by měla podporovat minimálně češtinu a angličtinu. 
-    Přepnutí jazyka musí proběhnout plynule bez nutnosti opětovného načtení celé stránky. 
-    Architektura aplikace by měla umožňovat snadné přidání dalších jazyků v budoucnosti.
+    Aplikace nabídne podporu lokalizace minimálně pro češtinu a angličtinu. 
+    Přepnutí jazyka proběhne plynule bez nutnosti opětovného načtení celé stránky. 
+    Architektura aplikace by měla umožnit snadné přidání dalších jazyků v budoucnosti.
     
     \item \textbf{Export a vizualizace dat:} 
-    Aplikace musí umožnit export vygenerovaných syntaktických stromů a LTS grafů. 
-    Ideální je i podpora exportu do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
-    Vhodný je i export struktury do strojově čitelného formátu (např. JSON).
+    Aplikace umožní export vygenerovaných syntaktických stromů a LTS grafů. 
+    Podporován bude export do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
+    Vhodný bude i export struktury do strojově čitelného formátu (např. JSON).
     
     \item \textbf{Sdílení programů:} 
-    Systém musí poskytovat mechanismus pro snadné sdílení vytvořených procesů. 
-    Uživatel by měl mít možnost jednoduše zkopírovat kód nebo sdílet rozpracované řešení, což zefektivní komunikaci mezi uživateli.
+    Systém poskytne mechanismus pro snadné sdílení vytvořených procesů. 
+    Uživatel získá možnost jednoduše zkopírovat kód nebo sdílet rozpracované řešení, což zefektivní komunikaci mezi uživateli.
     
     \item \textbf{Přístupnost a responsivní design:} 
-    Přestože se předpokládá primární využití na desktopových zařízeních, rozhraní musí být responsivní a funkční i na mobilních telefonech a tabletech. 
-    Aplikace by měla být také přístupná podle zákonu o přístupnosti, platném od roku 2025. I přesto, že se na tuto aplikaci zákon momentálně nevztahuje, měla by respkeptovat metodiku WCAG 2.2. \cite{pristupnostWebu}
+    Přestože se předpokládá primární využití na desktopových zařízeních, rozhraní bude responsivní a funkční i na mobilních telefonech a tabletech. 
+    Aplikace by měla být také přístupná v souladu se zákonem o přístupnosti, platným od roku 2025. I přesto, že se na tuto aplikaci zákon momentálně nevztahuje, měla aspoň částečně respektovat metodiku WCAG 2.2. \cite{pristupnostWebu}
     
     \item \textbf{Integrovaná nápověda a dokumentace:} 
-    Součástí uživatelského rozhraní musí být kontextová nápověda (např. tooltipy vysvětlující jednotlivá SOS pravidla) a centrální dokumentace, která stručně objasní jak ovládání samotné aplikace, tak základní pojmy.
+    Součástí uživatelského rozhraní bude kontextová nápověda (např. tooltipy vysvětlující jednotlivá SOS pravidla) a centrální dokumentace, která stručně objasní jak ovládání samotné aplikace, tak i základní pojmy.
     
     \item \textbf{Moderní UI/UX s využitím animací:} 
-    Vizuální stránka by měla působit čistě a moderně. 
-    Přechody stavů a úpravy grafů by měly být podpořeny plynulými animacemi. 
-    Tyto animace nemají plnit pouze estetickou funkci, ale také sloužit ke snížení kognitivní zátěže uživatele (např. plynulé zobrazení kroků při animaci průchodu grafem).
+    Vizuálně by stránka měla působit čistě a moderně. 
+    Přechody stavů a úpravy grafů budou podpořeny plynulými animacemi. 
+    Tyto animace nebudou plnit pouze estetickou funkci, ale poslouží především ke snížení kognitivní zátěže uživatele (např. plynulé zobrazení kroků při animaci průchodu grafem).
 
     \item \textbf{Možnost uzamknutí programu:}
-    Rozhraní by mělo umožnit uzamčení textového editoru, zadání SOS důkazů a dalších prvků aplikace. 
-    Toto uzamčení bude sloužit zejména jen jako ochrana proti nechtěným změnám, uživatel si ji může libovolně u programů aktivovat či deaktivovat.
+    Rozhraní umožní dočasné uzamčení textového editoru, zadání SOS důkazů a dalších prvků aplikace. 
+    Toto uzamčení bude sloužit zejména jen jako ochrana proti nechtěným změnám, uživatel si jej bude moci u programů libovolně aktivovat či deaktivovat.
 
     \item \textbf{Strukturální redukce LTS grafu:}
-    Systém by měl uživateli nabídnout možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či aplikací základních pravidel strukturální kongruence.
+    Systém uživateli nabídne možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či aplikací základních pravidel strukturální kongruence.
 
 \end{enumerate}
 

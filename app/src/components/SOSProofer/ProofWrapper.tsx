@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { ProofBuilder } from '@/components/SOSProofer/ProofBuilder';
 import type { CCSExpression, CCSAction, CCSProgram, CardSOS } from '@/types';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChartGantt, Lightbulb, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
-import { SOSRulesHelp } from './ProofRuleHelp';
 import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { SOSRulesHelp } from './ProofRuleHelp';
+import ProofBuilder from './ProofBuilder';
 
 
 function parseCCSAction(input: string): CCSAction|{ error: string } {
@@ -180,7 +180,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>{t('sos.sourceProcess')}</span>
           <Select value={sourceProcessName} onValueChange={e => setSourceProcessName(e)} disabled={!allowEdit}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={t('sos.sourceProcess')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +198,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         <div className="w-48 space-y-2">
           <span className='pl-1 text-sm font-semibold'>{t('core.action')}</span>
           <div className="relative">
-            <Input value={actionText} onChange={e => setActionText(e.target.value)} className="font-mono text-center pl-6 pr-6" disabled={!allowEdit} />
+            <Input value={actionText} onChange={e => setActionText(e.target.value)} className="font-mono text-center pl-6 pr-6" disabled={!allowEdit} aria-label={t('core.action')} />
             <span className="absolute left-2 top-1.5 text-muted-foreground">&mdash;</span>
             <span className="absolute right-2 top-1.5 text-muted-foreground">&rarr;</span>
           </div>
@@ -207,7 +207,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>{t('sos.targetProcess')}</span>
           <Select value={targetProcessName} onValueChange={e => setTargetProcessName(e)} disabled={!allowEdit}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={t('sos.sourceProcess')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

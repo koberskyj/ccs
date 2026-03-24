@@ -12,7 +12,7 @@ export default function LanguageSwitcher({ children }: { children: React.ReactNo
 
   return (
     <Select value={currentLang} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-auto border-none shadow-none bg-transparent px-2 focus:ring-0 hover:bg-slate-100 rounded-md transition-colors [&>.lucide-chevron-down]:hidden">
+      <SelectTrigger className="w-auto border-none shadow-none bg-transparent px-2 hover:bg-slate-100 rounded-md transition-colors [&>.lucide-chevron-down]:hidden" aria-label='Jazyk'>
         {children}
       </SelectTrigger>
 

@@ -1,3 +1,161 @@
 \chapter{Použité technologie}
+\label{sec:technologie}
 
-\endinput
+V této kapitole jsou popsány softwarové nástroje, knihovny a technologie, které byly využity při návrhu a implementaci praktické části této diplomové práce. 
+Vzhledem k požadavkům na interaktivitu a vizualizaci formálních modelů byly zvoleny moderní webové technologie, které zajistí vysokou modularitu a přívětivé uživatelské rozhraní.
+
+\section{Vývojové prostředí a sestavení aplikace}
+
+\subsection{Visual Studio Code}
+Jako primární vývojové prostředí byl zvolen editor Visual Studio Code (VS Code) od společnosti Microsoft. 
+Jedná se o open-source editor, který se stal standardem pro vývoj webových aplikací. 
+Jeho hlavní výhodou v kontextu této práce je nativní podpora jazyka TypeScript a Node.js. 
+Editor nabízí zabudovanou spolupráci s verzovacím nástrojem Git a integrovaný terminál, přes který je pak možné spouštět lokální vývojový server nebo skripty pro sestavení aplikace, bez nutnosti opouštět okno editoru.
+
+\subsection{GitHub}
+Pro verzování zdrojových kódů a zálohování projektu byl využit systém Git v kombinaci s platformou GitHub. 
+Využití repozitáře na této platformě zajistilo nejen transparentní historii vývoje pro vedoucího práce, ale také bezpečné a snadno dostupné úložiště pro zdrojové kódy. 
+
+Platforma GitHub nabízí také spoustu rozšíření, příkladem může být služba GitHub Pages, která byla v této práci využita pro kontinuální nasazení (Continuous Deployment) webové aplikace. 
+Pro usnadnění přístupu k aplikaci byla k repozitáři připojena vlastní doména. 
+Aktuální verze aplikace je tedy dostupná na adrese \texttt{ccs.koberskyj.cz}. 
+Využití služby GitHub Pages poskytuje stabilní a ověřené hostingové řešení, které garantuje vysokou dostupnost aplikace pro uživatele.
+
+\subsection{Node.js a npm}
+Node.js je běhové prostředí (runtime environment) postavené na enginu V8 z prohlížeče Google Chrome, které umožňuje spouštět JavaScript kód mimo webový prohlížeč. 
+V tomto projektu neslouží Node.js pro běh serverové části (backendu), jelikož je aplikace navržena jako čistě klientská, ale poskytuje infrastrukturu pro běh vývojových a sestavovacích nástrojů. 
+
+Společně s Node.js byl využit balíčkovací systém \texttt{npm} (Node Package Manager), který spravuje všechny externí závislosti projektu. 
+Pomocí \texttt{npm} byly do projektu integrovány veškeré knihovny zmiňované v této kapitole. 
+Správa verzí v souboru \texttt{package.json} navíc zajišťuje deterministická sestavení aplikace na různých počítačích s různým operačním systémem.
+
+\subsection{Vite}
+Pro samotné sestavení a běh vývojového serveru byl použit nástroj Vite. 
+Oproti starším bundlerům, jako je například Webpack, přináší Vite značné zrychlení vývojového procesu. 
+Využívá nativních ES modulů v prohlížeči, což znamená, že při úpravě kódu není nutné překompilovávat celou aplikaci. 
+
+Změny provedené ve zdrojovém kódu se díky funkci Hot Module Replacement (HMR) projevují v prohlížeči téměř okamžitě.
+Ve fázi produkčního sestavení pak Vite využívá nástroj Rollup, který kód optimalizuje, minifikuje a připraví pro statické nasazení, například právě na službu GitHub Pages.
+
+\section{Základní webové technologie a uživatelské rozhraní}
+Klientská část aplikace musí být, podle požadavků specifikovaných v předchozí kapitole, dynamická a schopná okamžitě reagovat na vstupy uživatele. 
+To je klíčové například při interaktivní konstrukci SOS důkazů, kdy je nezbytné okamžitě validovat aplikovatelnost sémantických pravidel. 
+Z tohoto důvodu byla zvolena architektura Single Page Application (SPA). 
+V tomto modelu se veškeré HTML, JavaScript a CSS načtou pouze jednou a obsah stránky je dynamicky přepisován na základě interakce uživatele bez nutnosti znovunačtení celé webové stránky ze serveru.
+
+\subsection{React.js a TypeScript}
+Pro vývoj uživatelského rozhraní byla použita JavaScript knihovna React.js, vyvinutá společností Meta. 
+React umožňuje tvorbu komplexních uživatelských rozhraní skládáním malých, znovupoužitelných a izolovaných komponent. 
+Deklarativní přístup Reactu výrazně usnadňuje synchronizaci vnitřního stavu aplikace (například informace o aktuálním kroku v SOS důkazu nebo vizuálním stavu LTS grafu) s tím, co uživatel vidí na obrazovce.
+
+Knihovna React byla také doplněna o jazyk TypeScript, který obohacuje standardní JavaScript o statické typování. 
+
+Při návrhu React komponent byly navíc uplatňovány principy metodiky SOLID, což je sada doporučení pro psaní znovupoužitelných komponent. 
+Jedná se například o jasné vymezení odpovědnosti komponenty nebo aby byly komponenty otevřené pro vnější rozšíření.
+Příkladem takovéto komponenty může být \texttt{CCSViewer}, který umožňuje zvýraznit syntaxi vloženého CCS výrazu a zobrazit jej jako klasický textový element, jakým je například značka \texttt{span}.
+
+\subsection{Tailwind CSS}
+Pro stylování aplikace byl využit framework Tailwind CSS. 
+Na rozdíl od tradičních CSS frameworků (jako je např. Bootstrap), které poskytují předpřipravené komponenty, je Tailwind \enquote{utility-first} framework. 
+Poskytuje nízkoúrovňové třídy (např. pro nastavení okrajů, barev či flexboxu), které se aplikují přímo do HTML/JSX kódu komponent. 
+
+Tento přístup eliminuje nutnost neustálého přepínání mezi oddělenými soubory se styly a aplikační logikou.
+Vývojář si tak může při pohledu na zdrojový kód komponenty rovnou představit její rozvržení. 
+Zásadní výhodou Tailwindu je přítomnost \enquote{Just-In-Time} kompilátoru, který při sestavování aplikace prohledá kód a do výsledného generovaného CSS souboru zahrne výhradně ty styly, které byly skutečně použity. 
+Tím je zajištěna minimální výsledná velikost aplikace. 
+
+\subsection{Shadcn}
+Zatímco Tailwind poskytuje nástroje pro základní formátování, pro komplexnější interaktivní prvky uživatelského rozhraní byla využita kolekce komponent Shadcn/ui. 
+Nejedná se o tradiční knihovnu, která se instaluje přes \texttt{npm}, ale spíše o sadu přizpůsobitelných komponent generovaných přímo do zdrojového kódu projektu, nad kterými má vývojář plnou kontrolu. 
+
+Komponenty z rodiny Shadcn jsou postavené na knihovně Radix UI, což garantuje jejich vysokou přístupnost (accessibility) pro uživatele s omezením, včetně podpory pro ovládání z klávesnice a čtečky obrazovky. 
+V aplikaci byly tyto prvky využity pro tvorbu rozbalovacích nabídek, tlačítek, modálních oken a vyskakovacích upozornění. 
+
+\section{Zpracování a vizualizace formálních modelů}
+Hlavní cíl této práce spočívá ve schopnosti aplikace syntakticky analyzovat uživatelem zadané CCS procesy a vizualizovat odpovídající datové struktury. 
+K tomuto účelu byly využity specifické knihovny pro zpracování textu a interaktivní vykreslení grafů.
+
+\subsection{Peggy.js}
+Pro zpracování zadaných programů v kalkulu komunikujících systémů (CCS) byl využit generátor syntaktických analyzátorů Peggy.js. 
+Tento nástroj umožňuje definovat formální gramatiku jazyka pomocí zápisu PEG (Parsing Expression Grammar). 
+Z této deklarativní definice Peggy.js následně vygeneruje deterministický a vysoce efektivní parser přímo v jazyce JavaScript.
+
+V aplikaci je tento parser zodpovědný za prvotní kontrolu syntaktické správnosti zadaných CCS výrazů (validace závorek, prefixů, operátorů apod.). 
+V případě chybného vstupu dokáže vygenerovat detailní chybová hlášení identifikující řádek a sloupec chyby, čímž uživateli poskytuje okamžitou zpětnou vazbu srovnatelnou s moderními vývojovými prostředími. 
+
+Při úspěšném zpracování transformuje Peggy.js vstupní text do struktury abstraktního syntaktického stromu (AST). 
+Tento strom je následně zkontrolován dodatečnými sémantickými kontrolami (např. kontrola existence deklarací všech volaných procesních konstant). 
+Po úspěšné validaci tvoří AST základní datovou strukturu pro generování LTS grafu a pro konstruování jednotlivých kroků strukturální operační sémantiky.
+
+\subsection{CodeMirror}
+O zadávání a zobrazování zdrojových kódů CCS programů se stará editorová komponenta CodeMirror. 
+Jedná se o flexibilní webový textový editor navržený pro implementaci vývojářských nástrojů přímo v prohlížeči. 
+
+Pro potřeby této práce byl vytvořen vlastní režim lexikální analýzy (syntax highlighting) specifický pro jazyk CCS, jehož pravidla odpovídají gramatice použité v Peggy.js. 
+Díky tomu jsou vizuálně odděleny akce, operátory, závorky, názvy procesů a speciální tichá akce $\tau$. 
+Kromě hlavního okna pro zápis kódu je CodeMirror v aplikaci využit i v režimu pouze pro čtení (read-only) k formátování kratších úseků textu. 
+To umožňuje zachovat konzistentní zvýraznění syntaxe v celém uživatelském rozhraní, od instrukcí a nápověd až po samotný text interaktivních SOS důkazů.
+
+\subsection{Cytoscape.js a doplňky}
+Pro vizualizaci ohodnocených přechodových systémů a syntaktických stromů, z nichž mohou vzniknout rozsáhlé orientované grafy, byla použita knihovna Cytoscape.js. 
+Jedná se o vysoce optimalizovanou JavaScriptovou knihovnu určenou primárně pro modelování a interaktivní vizualizaci komplexních síťových struktur.
+
+V rámci aplikace Cytoscape vykresluje stavy reprezentované jako vrcholy grafu a přechody definované akcemi ve formě orientovaných hran. 
+Knihovna poskytuje uživateli možnost graf volně přibližovat, oddalovat a posouvat. Dále umožňuje pokročilou interaktivitu, jako je dynamické propojení syntaktického stromu s textovým editorem CodeMirror, kdy se při najetí myší na vrchol grafu zvýrazní odpovídající část kódu. 
+
+Pro rozšíření možností vizualizace byly využity následující doplňky (pluginy) knihovny:
+\begin{itemize}
+    \item \textbf{cytoscape-dagre:} Rozšíření, které integruje algoritmus Dagre pro hierarchické a deterministické rozvržení grafu. Tento algoritmus je využit při vizualizaci postupně rozvíjených stavových prostorů LTS.
+    \item \textbf{cytoscape-svg (cysvg):} Tento doplněk doplňuje aplikaci o funkcionalitu exportu vykresleného grafu do bezztrátového vektorového formátu SVG.
+\end{itemize}
+
+\section{Správa dat}
+Jelikož je aplikace z architektonického hlediska navržena bez serveru (serverless klient), neobsahuje tradiční backendovou relační databázi. 
+Veškerá data, nastavení i modely jsou ukládány a spravovány výhradně na straně klientského prohlížeče.
+
+\subsection{Formát JSON}
+Základním formátem pro strukturu a přenos všech dat v aplikaci je formát JSON (JavaScript Object Notation). 
+Tento datový formát je nativně podporován jazykem JavaScript a je jednoduše čitelný jak pro stroj, tak pro člověka. 
+V architektuře projektu je použit na několika místech:
+\begin{itemize}
+    \item Slouží jako základní formát pro ukládání všech vytvořených CCS programů, což umožňuje jejich snadné zálohování či sdílení mezi uživateli.
+    \item Využívá se i pro uložení předpřipravených ukázkových vstupů (soubor \texttt{baseProgramList.json}), kde je definována sada validních CCS programů demonstrujících různé příklady z oblasti paralelních systémů.
+    \item Poskytuje strukturu pro správu lokalizace v rámci uživatelského rozhraní.
+    \item Nabízí dodatečnou možnost strojového exportu vygenerovaných grafů z knihovny Cytoscape, díky čemuž lze s těmito daty dále pracovat v externích analytických nástrojích.
+\end{itemize}
+
+\subsection{LocalStorage}
+Pro persistenci dat mezi jednotlivými relacemi uživatele (např. po zavření nebo obnovení stránky) je využíváno webové rozhraní \texttt{localStorage}, které je součástí Web Storage API. 
+Jedná se o lokální \enquote{key-value} úložiště alokované prohlížečem a izolované čistě pro danou webovou doménu.
+
+Prostřednictvím \texttt{localStorage} aplikace uchovává veškerá uživatelská data, včetně seznamu vytvořených CCS programů, aktuálního nastavení lokalizace nebo preferencí zobrazení. 
+
+\section{Doplňkové nástroje}
+
+\subsection{Lokalizace}
+Jelikož se problematika formální verifikace a kalkulu komunikujících systémů může vyučovat v českém i anglickém jazyce, byla aplikace od začátku navržena s podporou pro internacionalizaci (i18n). 
+Textové řetězce nejsou pevně zakomponovány v logice komponent, ale jsou externě a dynamicky načítány pomocí lokalizačního frameworku \texttt{i18next}. 
+Tato architektura zajišťuje spolehlivý překlad veškerých prvků uživatelského rozhraní, chybových zpráv i nápověd do češtiny a angličtiny, a to se schopností okamžitého přepnutí jazyka za běhu aplikace, bez nutnosti obnovení stránky.
+
+\subsection{Progresivní webová aplikace}
+S cílem maximalizovat dostupnost nástroje byla celá aplikace navržena jako progresivní webová aplikace (PWA). 
+Tohoto konceptu bylo dosaženo integrací modulu \texttt{vite-plugin-pwa}. 
+
+Architektura PWA využívá Service Workerů, což jsou skripty běžící odděleně na pozadí prohlížeče, které se starají o proaktivní ukládání (caching) statických souborů, knihoven i lokalizačních dat do mezipaměti. 
+Aplikace tak po prvním načtení plnohodnotně funguje i bez připojení k internetu, a to včetně kompilace výrazů, tvorby grafů a ukládání programů. 
+Součástí konfigurace je i webový manifest, který uživatelům dává možnost \enquote{nainstalovat} si aplikaci přímo do jakéhokoli operačního systému svého zařízení. 
+Aplikace se následně spouští ve vlastním vyhrazeném okně bez prvků internetového prohlížeče.
+
+\subsection{ESLint}
+Kvalitu, čistotu a jednotnost zdrojového kódu během vývoje pomáhal udržovat nástroj pro statickou analýzu ESLint. 
+Tento linter v reálném čase analyzuje napsaný kód a detekuje potenciální syntaktické nedostatky, sémantické chyby či antivzory ještě před samotným sestavením aplikace. 
+V kombinaci se striktními konfiguračními pravidly pro TypeScript a knihovnu React tento nástroj průběžně vynucuje osvědčené postupy a omezuje tím vznik běžných programátorských chyb, což v důsledku zvyšuje stabilitu aplikace.
+
+\subsection{Lighthouse}
+Při ladění aplikace a přípravě na odevzdání byl pravidelně využíván analytický nástroj Google Lighthouse. 
+Jedná se o automatizovaný open-source nástroj určený pro auditování a vylepšování kvality webových stránek. 
+
+Lighthouse simuluje průchod aplikací a generuje detailní metriky pokrývající výkon, SEO a dodržení standardů webových stránek. 
+V rámci této práce byl nástroj primárně využit také k identifikaci slabých míst v oblasti přístupnosti (accessibility). 
+Na základě vygenerovaných reportů byly v aplikaci provedeny úpravy týkající se barevného kontrastu, sémantiky HTML značek a dostupnosti formulářových prvků pro čtečky obrazovky. 
+Cílem bylo maximalizovat skóre v těchto metrikách a zajistit, aby byla aplikace připravená na případné produkční nasazení, kde by již musela splňovat zákon o přístupnosti, již zmíněný v kapitole \ref{sec:funkcni_pozadavky}.

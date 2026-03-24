@@ -153,7 +153,7 @@ export default function ProgramWorkspace() {
               {activeProgram.allowEdit &&
                 <div className="flex gap-2 items-center">
                   <ProgramCreator program={localProgram} onUpdate={handleNameChange}>
-                    <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon"
+                    <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon" aria-label={t('selector.renameProgram')}
                         className='h-8 w-8 text-muted-foreground/50 hover:text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity'>
                       <Pencil className="w-4 h-4" />
                     </ButtonHover>
@@ -162,11 +162,11 @@ export default function ProgramWorkspace() {
                   {isDirtyLocal && (
                     <>
                       <ConfirmModal title={t('selector.reallyDiscardChanges')} confirmText={t('selector.discardChanges')} onConfirm={handleDiscard} destructive={true}>
-                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600">
+                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600" aria-label={t('selector.discardChanges')}>
                           <RotateCcw className="w-4 h-4 mr-2" /> {t('selector.discardChanges')}
                         </Button>
                       </ConfirmModal>
-                      <Button onClick={handleSave}>
+                      <Button onClick={handleSave} aria-label={t('selector.saveChanges')}>
                         <Save className="w-4 h-4 mr-2" /> {t('selector.saveChanges')}
                       </Button>
                     </>
@@ -192,7 +192,7 @@ export default function ProgramWorkspace() {
           {activeProgram.allowEdit && 
             <div className="pt-6">
               <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg bg-muted/60 hover:bg-muted/90 transition-colors gap-4">
-                  <p className="text-muted-foreground font-medium">{t('selector.addNewCard')}</p>
+                  <p className="text-stone-700 font-medium">{t('selector.addNewCard')}</p>
                   <div className="flex gap-4">
                       <Button variant="outline" onClick={() => addCard('sos')} className="gap-2">{t('selector.newSOSProof')}</Button>
                       <Button variant="outline" onClick={() => addCard('lts')} className="gap-2">{t('selector.newLTSSimulation')}</Button>

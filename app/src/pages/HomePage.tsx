@@ -9,7 +9,7 @@ function Homepage() {
   const { t } = useTranslation();
 
   return (
-    <div className='p-4 pt-0'>
+    <main className='p-4 pt-0'>
       <div className="mb-6">
         <Card className="relative group transition-transform animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
           <CardHeader>
@@ -22,7 +22,7 @@ function Homepage() {
       </div>
       
       <ProgramWorkspace />
-    </div>
+    </main>
   );
 }
 

@@ -180,7 +180,7 @@ export default function SyntaxTree({ parsedAst, onHoverNode, onContentResize, cl
       <div className="absolute top-4 right-0 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="bg-stone-100/50 backdrop-blur-sm shadow-sm hover:bg-stone-50 cursor-pointer">
+            <Button variant="outline" size="icon" className="bg-stone-100/50 backdrop-blur-sm shadow-sm hover:bg-stone-50 cursor-pointer" aria-label={t('core.downloadAs')}>
               <Download className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

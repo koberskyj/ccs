@@ -4,9 +4,9 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 import type { ViewMode, EdgeHighlightRequest } from '@/types';
-import CCSViewer from './custom/CCSViewer';
+import CCSViewer from '../custom/CCSViewer';
 import { createPortal } from 'react-dom';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { Download } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { handleExport } from '@/lib/ccsToSyntaxTree';
@@ -320,7 +320,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       <div className="absolute top-0 right-0 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="bg-stone-100/50 backdrop-blur-sm shadow-sm hover:bg-stone-50 cursor-pointer">
+            <Button variant="outline" size="icon" className="bg-stone-100/50 backdrop-blur-sm shadow-sm hover:bg-stone-50 cursor-pointer" aria-label={t('core.downloadAs')}>
               <Download className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

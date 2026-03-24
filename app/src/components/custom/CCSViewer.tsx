@@ -51,7 +51,8 @@ export default function CCSViewer({ code, className }: CCSViewerProps) {
           ccsLanguage, 
           syntaxHighlighting(ccsHighlightStyle),
           minimalTheme,
-          EditorView.lineWrapping
+          EditorView.lineWrapping,
+          EditorView.contentAttributes.of({ "aria-label": code })
         ]}
       />
     </div>

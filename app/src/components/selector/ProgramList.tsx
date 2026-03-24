@@ -94,26 +94,26 @@ export default function ProgramList({ ...props }: ProgramListType) {
             </div>
           )}
           {programs.map((program, idx) => 
-            <div key={idx} onClick={() => confirmSelectProgramModal(idx)} 
+            <div key={idx} onClick={() => confirmSelectProgramModal(idx)} tabIndex={0}
                 className={cn('flex justify-between items-center flex-wrap pl-4 pr-2 border-b last:border-0 cursor-pointer transition-colors', 
                 (activeProgram === program ? 'bg-primary/10 hover:bg-primary/15' : 'hover:bg-primary/5'))}>
               <span className="font-semibold grow-10 select-none">
                 {program.name} 
-                {program.description ? <span className="text-muted-foreground text-sm font-normal ml-1">- {program.description}</span> : ''}
+                {program.description ? <span className="text-stone-700 text-sm font-normal ml-1">- {program.description}</span> : ''}
               </span>
               
               <div className='flex justify-end grow'>
-                <ButtonHover hoverContent={<p>{t('selector.downloadProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDownload(e, program)}
+                <ButtonHover hoverContent={<p>{t('selector.downloadProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDownload(e, program)} aria-label={t('selector.downloadProgram')}
                     className='text-blue-600 hover:text-blue-600 hover:bg-blue-600/10'>
                   <Download />
                 </ButtonHover>
 
-                <ButtonHover hoverContent={<p>{t('selector.copyProgramToClipboard')}</p>} variant="ghost" size="icon" onClick={() => copyMachine(idx)}
+                <ButtonHover hoverContent={<p>{t('selector.copyProgramToClipboard')}</p>} variant="ghost" size="icon" onClick={() => copyMachine(idx)} aria-label={t('selector.copyProgramToClipboard')}
                     className='text-stone-600 hover:text-stone-600 hover:bg-stone-600/10'>
                   <Copy />
                 </ButtonHover>
                 
-                <ButtonHover hoverContent={<p>{t('selector.deleteProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDelete(e, idx)} disabled={programs.length <= 1}
+                <ButtonHover hoverContent={<p>{t('selector.deleteProgram')}</p>} variant="ghost" size="icon" onClick={(e) => handleDelete(e, idx)} disabled={programs.length <= 1} aria-label={t('selector.deleteProgram')}
                     className='text-red-600 hover:text-red-600 hover:bg-red-600/10 disabled:opacity-30'>
                   <Trash2 />
                 </ButtonHover>

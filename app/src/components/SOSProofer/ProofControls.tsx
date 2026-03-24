@@ -132,7 +132,7 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
                 <span className="text-xs font-medium text-stone-800 pl-1">{t('core.onto')}:</span>
                 <Input className="h-7 w-16 text-xs font-mono bg-white" value={selectedSyncLabel} onChange={e => setSelectedSyncLabel(e.target.value)} placeholder="akce" />
                 <div className="flex items-center space-x-1">
-                  <Checkbox id={`ls-${step.id}`} checked={leftSends} onCheckedChange={(c) => setLeftSends(c as boolean)} />
+                  <Checkbox id={`ls-${step.id}`} checked={leftSends} onCheckedChange={(c) => setLeftSends(c as boolean)} aria-label={t('sos.leftSends')} />
                   <label htmlFor={`ls-${step.id}`} className="text-xs cursor-pointer select-none">{t('sos.leftSends')}</label>
                 </div>
                 <Button size="icon" className="h-7 w-7" onClick={() => onApplyRule(step.id, 'COM_SYNC', { label: selectedSyncLabel, leftSends })}>
@@ -191,13 +191,13 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
     return (
       <div className="flex flex-wrap items-center gap-2 w-full">
         <SOSRulesHelp>
-          <Button variant="secondary" size="icon" className="cursor-pointer">
+          <Button variant="secondary" size="icon" className="cursor-pointer" aria-label={"Nápověda"}>
             <BookOpen size={16} />
           </Button>
         </SOSRulesHelp>
 
         <Select value={manualRule} onValueChange={(v) => setManualRule(v as ProofRuleName)}>
-          <SelectTrigger className="h-9 w-[120px] bg-white">
+          <SelectTrigger className="h-9 w-[120px] bg-white" aria-label={t('sos.selectRule')}>
              <SelectValue placeholder={t('sos.selectRule')} />
           </SelectTrigger>
           <SelectContent>

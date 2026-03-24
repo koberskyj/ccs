@@ -1,10 +1,10 @@
 import { ArrowRight, RotateCcw, ArrowLeft, Target } from 'lucide-react';
 import type { CCSExpression } from '@/types';
-import { Button } from './ui/button';
-import CCSViewer from './custom/CCSViewer';
+import { Button } from '../ui/button';
+import CCSViewer from '../custom/CCSViewer';
 import { useMemo } from 'react';
 import { ccsToString } from '@/lib/ccsUtils';
-import AlertBox from './custom/AlertBox';
+import AlertBox from '../custom/AlertBox';
 import { useTranslation } from 'react-i18next';
 
 type Transition = { action: string, id: number, target: CCSExpression };

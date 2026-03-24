@@ -2,7 +2,7 @@ import type { CCSProgram, ProgramCardType } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Trash2 } from "lucide-react";
 import ProofWrapper from "../SOSProofer/ProofWrapper";
-import SimulationWithGraph from "../SimulationWithGraph";
+import SimulationWithGraph from "../ltsGraph/SimulationWithGraph";
 import ButtonHover from "../custom/ButtonHover";
 import { usePrograms } from "@/utils/usePrograms";
 import CardEditBox from "./CardEditBox";
@@ -37,12 +37,12 @@ export default function ProgramCard({ card, index, ccsAst, onUpdate, onDelete }:
         <div className="flex items-center gap-2">
           {activeProgram?.allowEdit && (<>
             <CardEditBox currentName={card.name} onUpdate={handleRename}>
-              <ButtonHover variant="ghost" size="icon" hoverContent={<p>{t('selector.renameCard')}</p>}
+              <ButtonHover variant="ghost" size="icon" hoverContent={<p>{t('selector.renameCard')}</p>} aria-label={t('selector.renameCard')}
                 className="h-8 w-8 text-muted-foreground/50 hover:text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Pencil className="w-4 h-4" />
               </ButtonHover>
             </CardEditBox>
-            <ButtonHover variant="ghost" size="icon" onClick={onDelete} hoverContent={<p>{t('selector.deleteCard')}</p>}
+            <ButtonHover variant="ghost" size="icon" onClick={onDelete} hoverContent={<p>{t('selector.deleteCard')}</p>} aria-label={t('selector.deleteCard')}
               className="h-8 w-8 text-muted-foreground/50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
               <Trash2 className="w-4 h-4" />
             </ButtonHover>

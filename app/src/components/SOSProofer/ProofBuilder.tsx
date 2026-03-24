@@ -24,7 +24,7 @@ export function getStatusColor(status: ProofStatus) {
     case 'invalid': 
       return 'bg-red-50 text-red-600 font-bold';
     default: 
-      return 'bg-stone-100';
+      return 'bg-stone-100 text-stone-800';
   }
 }
 
