@@ -122,6 +122,7 @@ export type ProgramSave = {
   description?: string;
   allowEdit: boolean;
   definition: string;
+  dateFrom?: string;
   cards: ProgramCardType[];
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CCSExpression, CCSAction, CCSProgram, CardSOS } from '@/types';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ChartGantt, Lightbulb, RotateCcw } from 'lucide-react';
+import { BookOpen, Lightbulb, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
@@ -51,7 +51,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
   const [actionText, setActionText] = useState<string>(initSettings?.action ?? 'a');
   //const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
   const [showHints, setShowHints] = useState<boolean>(initSettings?.showHelp ?? true);
-  
+
   const [error, setError] = useState<string | null>(null);
   const [proofData, setProofData] = useState<{
     program: CCSProgram;
@@ -151,7 +151,7 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
           {error && <AlertBox type="error">{error}</AlertBox>}
         </div>
         <div className="flex items-center gap-4 mb-2">
-            {/*<Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
+          {/*<Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
               <Layers size={16} className={`${useStructRed ? 'text-primary' : ''}`} />
               <span className={`text-xs font-medium ${useStructRed ? 'text-primary' : ''}`}>
                 Strukturální redukce {useStructRed ? '(Zap)' : '(Vyp)'}
@@ -159,20 +159,20 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
             </Button>*/}
 
             <Button variant="secondary" className="cursor-pointer py-5" onClick={() => setShowHints(!showHints)} disabled={!allowEdit}>
-              <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
-              <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
-                {t('core.hint')} {showHints ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
-              </span>
-            </Button>
+            <Lightbulb size={16} className={`${showHints ? 'text-primary' : ''}`} />
+            <span className={`text-xs font-medium ${showHints ? 'text-primary' : ''}`}>
+              {t('core.hint')} {showHints ? '(' + t('core.on') + ')' : '(' + t('core.off') + ')'}
+            </span>
+          </Button>
 
-            <SOSRulesHelp>
-              <Button variant="secondary" className="cursor-pointer py-5">
-                <BookOpen size={16} />
+          <SOSRulesHelp>
+            <Button variant="secondary" className="cursor-pointer py-5">
+              <BookOpen size={16} />
                 <span className="text-xs font-medium">
                   {t('sos.ruleReference')}
                 </span>
-              </Button>
-            </SOSRulesHelp>
+            </Button>
+          </SOSRulesHelp>
         </div>
       </div>
 
@@ -223,25 +223,22 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
         </div>
 
         <div className="flex gap-2 pb-0.5">
-          <Button variant="outline" onClick={handleReset} size="icon" title={t('core.reset')}>
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={handleStartProof} className="w-32">
-            <ChartGantt className="h-4 w-4 mr-2" />
-            {t('sos.startProof')}
+          <Button variant="outline" onClick={handleStartProof} className="w-32">
+            <RotateCcw className="h-4 w-4 mr-2" />
+            {t('core.reset')}
           </Button>
         </div>
       </div>
 
       {proofData && (
-        <ProofBuilder 
+        <ProofBuilder
           showHints={showHints}
-          initialSource={proofData.source} 
-          initialTarget={proofData.target} 
-          initialAction={proofData.action} 
+          initialSource={proofData.source}
+          initialTarget={proofData.target}
+          initialAction={proofData.action}
           program={proofData.program}
           //useStructRed={useStructRed}
-        /> 
+        />
       )}
     </div>
   )

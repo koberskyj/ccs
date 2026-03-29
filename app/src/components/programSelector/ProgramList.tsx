@@ -23,6 +23,7 @@ export default function ProgramList({ ...props }: ProgramListType) {
   const handleDownload = (e: React.MouseEvent, program: ProgramSave) => {
     e.stopPropagation();
     
+    program.dateFrom = new Date().toISOString();
     const jsonString = JSON.stringify(program, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -51,8 +52,10 @@ export default function ProgramList({ ...props }: ProgramListType) {
   };
 
   const copyMachine = (id: number) => {
-    navigator.clipboard.writeText(JSON.stringify(programs[id]));
-    toast.info(t('selector.copyProgram', { name: programs[id].name.toLocaleLowerCase() }));
+    const program = programs[id];
+    program.dateFrom = new Date().toISOString();
+    navigator.clipboard.writeText(JSON.stringify(program));
+    toast.info(t('selector.copyProgram', { name: program.name.toLocaleLowerCase() }));
   }
 
   const handleNewProgram = (program: ProgramSave) => {

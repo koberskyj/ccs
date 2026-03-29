@@ -187,5 +187,36 @@
         "useStructRed": false
       }
     ]
+  },
+  {
+    "name": "Nekonečný LTS a SOS",
+    "description": "Příklady, kdy se může vygenerovat nekonečný LTS nebo probíhat nekonečný důkaz pomocí SOS",
+    "allowEdit": true,
+    "definition": "Counter = up.(Counter | 'down.0)\n\nA = A\nB = B + a.0",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Nekonečný LTS",
+        "process": "Counter",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "sos",
+        "name": "Nekonečný důkaz pomocí SOS",
+        "processX": "A",
+        "processY": "Counter",
+        "action": "up",
+        "showHelp": true
+      },
+      {
+        "type": "sos",
+        "name": "Další příklad nekonečného důkazu pomocí SOS",
+        "processX": "B",
+        "processY": "Counter",
+        "action": "b",
+        "showHelp": true
+      }
+    ]
   }
 ]

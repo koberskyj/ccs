@@ -1,16 +1,16 @@
 \chapter{Analýza požadavků}
 \label{sec:analyza_pozadavku}
 
-Tato kapitola se věnuje analýze požadavků vyvíjené aplikace, jejímž cílem je podpora výuky vybraných problémů z oblasti formální verifikace systémů. 
-V následujících sekcích je specifikován primární účel aplikace, zhodnocení existujících nástrojů a podrobná specifikace funkčních i nefunkčních požadavků definovaných na základě zadání.
+Tato kapitola se věnuje analýze požadavků na vyvíjenou aplikaci, jejímž cílem je podpora výuky vybraných problémů z oblasti formální verifikace systémů. 
+V následujících sekcích je specifikován primární účel aplikace, zhodnocení existujících nástrojů a podrobná specifikace funkčních i nefunkčních požadavků.
 
 \section{Účel aplikace}
 \label{sec:ucel_aplikace}
 Primárním účelem vyvíjené aplikace je sloužit jako interaktivní vizuální pomůcka pro studenty předmětu Modelování a verifikace (MaV), případně pro studenty připravovaného předmětu Formální Verifikace Systémů. 
-Teorie formální verifikace a modelování konkurentních systémů pomocí kalkulu komunikujících systémů (CCS) může být pro studenty zpočátku náročnější na pochopení, zejména pokud nemají k dispozici adekvátní nástroj pro vizualizaci chování těchto systémů. 
+Teorie formální verifikace a modelování konkurentních systémů pomocí kalkulu komunikujících systémů může být pro studenty zpočátku náročnější na pochopení, zejména pokud nemají k dispozici adekvátní nástroj pro vizualizaci chování těchto systémů. 
 
 Hlavním přínosem aplikace je provedení studenta prvními fázemi studia problematiky. 
-Uživatel si může interaktivně vyzkoušet sestrojení ohodnoceného přechodového systému (LTS) na základě definovaných CCS výrazů, případně krok za krokem dokazovat platnost přechodů za užití pravidel strukturální operační sémantiky (SOS).
+Uživatel si může interaktivně vyzkoušet sestrojení ohodnoceného přechodového systému na základě definovaných CCS výrazů, případně krok za krokem dokazovat platnost přechodů za užití pravidel strukturální operační sémantiky.
 
 Jedním z hlavních cílů aplikace je tento vzdělávací proces usnadnit poskytnutím okamžité vizuální zpětné vazby. 
 Aplikace umožní studentům experimentovat s vlastními procesy, vizualizovat jejich syntaktickou strukturu, krokovat jejich běh a především interaktivně budovat formální důkazy pomocí SOS pravidel. 
@@ -50,9 +50,9 @@ Funkční požadavky přímo definují chování a možnosti vyvíjené aplikace
 \begin{enumerate}
     \item \textbf{Zadávání a syntaktická analýza CCS výrazů}
     \begin{itemize}
-        \item Systém bude obsahovat textový editor pro zápis zdrojového kódu (procesních definic) v syntaxi jazyka CCS.
+        \item Systém bude obsahovat textový editor pro zápis zdrojového kódu v syntaxi jazyka CCS.
         \item Aplikace zajistí v reálném čase syntaktickou analýzu vstupu a vizuálně upozorní uživatele na případné chyby (např. chybějící závorky, nepovolené znaky, nedefinované procesy).
-        \item K zadanému a syntakticky korektnímu výrazu systém umožní vygenerování a zobrazení syntaktického stromu (AST), reprezentujícího hierarchickou strukturu výrazu a prioritu operátorů.
+        \item K zadanému a syntakticky korektnímu výrazu systém umožní vygenerování a zobrazení syntaktického stromu, reprezentujícího hierarchickou strukturu výrazu a prioritu operátorů.
     \end{itemize}
     
     \item \textbf{Interaktivní konstrukce odvozovacího stromu (SOS)}
@@ -95,7 +95,7 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
 \begin{enumerate}
     \item \textbf{Podpora offline režimu a PWA architektura:} 
     Aplikace bude navržena jako progresivní webová aplikace (PWA). 
-    Logika výpočtů a zpracování CCS poběží primárně na straně klienta, což umožní plnohodnotné využití nástroje i bez stabilního připojení k internetu. 
+    Logika výpočtů a zpracování CCS poběží primárně na straně klienta, což umožní téměř plnohodnotné využití nástroje i bez připojení k internetu. 
     Ukládání rozpracovaných příkladů zajistí lokální úložiště prohlížeče, aby bylo možné uchovat rozpracovaný stav přímo v zařízení i bez nutnosti přístupu k internetu.
     
     \item \textbf{Lokalizace uživatelského rozhraní (i18n):} 
@@ -106,7 +106,7 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
     \item \textbf{Export a vizualizace dat:} 
     Aplikace umožní export vygenerovaných syntaktických stromů a LTS grafů. 
     Podporován bude export do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
-    Vhodný bude i export struktury do strojově čitelného formátu (např. JSON).
+    Dostupný bude i export struktury do strojově čitelného formátu (JSON).
     
     \item \textbf{Sdílení programů:} 
     Systém poskytne mechanismus pro snadné sdílení vytvořených procesů. 
@@ -114,7 +114,7 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
     
     \item \textbf{Přístupnost a responsivní design:} 
     Přestože se předpokládá primární využití na desktopových zařízeních, rozhraní bude responsivní a funkční i na mobilních telefonech a tabletech. 
-    Aplikace by měla být také přístupná v souladu se zákonem o přístupnosti, platným od roku 2025. I přesto, že se na tuto aplikaci zákon momentálně nevztahuje, měla aspoň částečně respektovat metodiku WCAG 2.2. \cite{pristupnostWebu}
+    Aplikace by měla být také přístupná v souladu se zákonem o přístupnosti, platným od roku 2025. I přesto, že se na tuto aplikaci zákon momentálně nevztahuje, měla aspoň částečně respektovat metodiku WCAG 2.2 \cite{pristupnostWebu}.
     
     \item \textbf{Integrovaná nápověda a dokumentace:} 
     Součástí uživatelského rozhraní bude kontextová nápověda (např. tooltipy vysvětlující jednotlivá SOS pravidla) a centrální dokumentace, která stručně objasní jak ovládání samotné aplikace, tak i základní pojmy.
@@ -130,6 +130,9 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
 
     \item \textbf{Strukturální redukce LTS grafu:}
     Systém uživateli nabídne možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či aplikací základních pravidel strukturální kongruence.
+
+    \item \textbf{Automatické dokázání SOS přechodů:}
+    Uživatel si bude moct nechat při důkazu přechodu za pomoci SOS pravidel v režimu s nápovědou automaticky vygenerovat kompletní důkaz přechodu, pokud je tedy tento přechod vůbec platný.
 
 \end{enumerate}
 

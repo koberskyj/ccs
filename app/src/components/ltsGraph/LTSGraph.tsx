@@ -21,20 +21,20 @@ const baseNodeStyle = (mode: ViewMode): StylesheetStyle => ({
     'border-color': '#000000',
     'border-width': 2,
     'color': '#000000',
-    
+
     'label': 'data(label)',
     'font-size': 'data(fontSize)',
-    
+
     'text-wrap': 'wrap',
     'text-max-width': '140px',
     'text-valign': 'center',
     'text-halign': 'center',
-    
+
     'width': mode == 'full' ? 'label' : 40,
     'height': mode == 'full' ? 'label' : 40,
     'shape': mode == 'full' ? 'round-rectangle' : 'ellipse',
     'padding': mode == 'full' ? '6px' : '2px',
-    
+
     'transition-property': 'background-color, border-width, width, height, font-size',
     'transition-duration': 150
   } as any
@@ -68,7 +68,7 @@ const stylesheetDef: StylesheetStyle[] = [
     }
   },
   {
-    selector: '.active-state', 
+    selector: '.active-state',
     style: {
       'background-color': '#b7d6ff',
       'border-width': 2,
@@ -144,7 +144,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       cy.nodes().forEach(node => {
         const displayId = node.data('numId') || node.data('id');
         const ccs = node.data('ccs') || "";
-        
+
         let label = displayId;
         if(viewMode === 'full') {
           label = ccs;
@@ -181,7 +181,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
         }
       }
     });
-  }, [elements, viewMode, activeNodeId, edgeHighlight]); 
+  }, [elements, viewMode, activeNodeId, edgeHighlight]);
 
 
 
@@ -191,27 +191,20 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     }
     const cy = cyRef.current;
 
-    cy.style().update();    
+    cy.style().update();
     const layout = cy.layout({
       name: 'dagre',
       rankDir: 'LR',
       animate: false,
       fit: false,
-      nodeSep: viewMode === 'full' ? 40 : 40, 
+      nodeSep: viewMode === 'full' ? 40 : 40,
       rankSep: viewMode === 'full' ? 60 : 60,
-      align: 'UL', 
+      align: 'UL',
       ranker: 'network-simplex'
     } as any);
 
-    layout.on('layoutstop', () => { 
-      if(isCentering && activeNodeId) {
-        const activeNode = cy.$id(activeNodeId);
-        if(activeNode.length > 0) {
-          //cy.stop(true, true);
-          cy.animate({ center: { eles: activeNode }, zoom: 1.15, duration: 250, easing: 'ease-in-out' });
-        }
-      } 
-      else {
+    layout.on('layoutstop', () => {
+      if(!isCentering) {
         cy.fit(cy.elements(), 30);
         if(cy.zoom() > 1.15) {
           cy.zoom(1.15);
@@ -221,10 +214,27 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     });
 
     layout.run();
-  }, [viewMode, elements, isCentering, activeNodeId]);
+  }, [viewMode, elements]);
 
+  useEffect(() => {
+    if(!cyRef.current) {
+      return;
+    }
+    const cy = cyRef.current;
 
-
+    if(isCentering && activeNodeId) {
+      const activeNode = cy.$id(activeNodeId);
+      if(activeNode.length > 0) {
+        //cy.stop(true, true);
+        cy.animate({
+          center: { eles: activeNode },
+          zoom: 1.15,
+          duration: 250,
+          easing: 'ease-in-out',
+        });
+      }
+    }
+  }, [activeNodeId, isCentering]);
 
   const handleMouseOut = useCallback(() => {
     if(hoverTimeoutRef.current) {
@@ -234,7 +244,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
   }, []);
   const handleMouseOver = useCallback((evt: EventObject) => {
     const node = evt.target as NodeSingular;
-    const bb = node.renderedBoundingBox(); 
+    const bb = node.renderedBoundingBox();
     const container = containerRef.current;
     if(!container) {
       return;
@@ -304,7 +314,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
           <div className="font-mono wrap-break-word border border-primary/8 bg-[color-mix(in_srgb,var(--primary)_15%,white)] p-2 rounded-md">
             <CCSViewer code={tooltip.text} />
           </div>
-          
+
           <div className={`absolute w-0 h-0 border-8 border-transparent border-t-popover/95 bottom-0 translate-y-full`}
             style={{ left: '50.25%', transform: `translateX(-50%)`}}>
           </div>
@@ -337,7 +347,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+
       <CytoscapeComponent
         elements={elements ?? []}
         style={{ width: '100%', height: '100%' }}
@@ -345,7 +355,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
         cy={(cy) => { cyRef.current = cy; }}
         pixelRatio={1.5}
       />
-      
+
       {renderTooltip()}
     </div>
   );

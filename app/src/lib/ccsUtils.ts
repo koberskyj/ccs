@@ -100,6 +100,109 @@ export function ccsToString(rawNode: CCSNode, canonical: boolean = false): strin
   return printRecursive(rootNode);
 }
 
+export function extractAllActions(program: CCSProgram): string[] {
+  const actions = new Set<string>();
+
+  const traverse = (node: CCSNode) => {
+    switch(node.type) {
+      case 'Definition':
+        traverse(node.process);
+        break;
+      case 'Prefix':
+        if(node.action.label !== 'tau') {
+          actions.add(node.action.label);
+        }
+        traverse(node.next);
+        break;
+      case 'Summation':
+      case 'Parallel':
+        traverse(node.left);
+        traverse(node.right);
+        break;
+      case 'Restriction':
+        node.labels.forEach((l) => actions.add(l));
+        traverse(node.process);
+        break;
+      case 'Relabeling':
+        node.relabels.forEach((r) => {
+          actions.add(r.old);
+          actions.add(r.new);
+        });
+        traverse(node.process);
+        break;
+    }
+  };
+
+  program.forEach((def) => traverse(def));
+  return Array.from(actions);
+}
+
+export function autoProve(step: ProofStep, program: CCSProgram, allActions: string[], maxDepth: number = 10, currentDepth: number = 0): ProofStep {
+  if(currentDepth >= maxDepth) {
+    return { ...step, status: 'invalid', errorMessage: t('sos.autoProofLimitReached') + ' (' + maxDepth + ')' };
+  }
+
+  const applicableRules = getSOSApplicableRules(step.source);
+  for(const rule of applicableRules) {
+    let extraDataOptions: any[] = [undefined];
+
+    if(rule === 'COM_SYNC') {
+      extraDataOptions = allActions.flatMap((action) => [
+        { label: action, leftSends: true },
+        { label: action, leftSends: false },
+      ]);
+    } 
+    else if(rule === 'REL' && step.source.type === 'Relabeling') {
+      const isTau = step.action.label === 'tau';
+      if(isTau) {
+        extraDataOptions = [{ oldLabel: 'tau' }];
+      } 
+      else {
+        const expectedOuter = step.action.label;
+        const mappedFrom = step.source.relabels.filter((r) => r.new === expectedOuter).map((r) => r.old);
+        const isRenamed = step.source.relabels.some((r) => r.old === expectedOuter);
+        const implicit = !isRenamed ? [expectedOuter] : [];
+
+        extraDataOptions = [...mappedFrom, ...implicit].map((lbl) => ({ oldLabel: lbl }));
+      }
+    }
+
+    for(const extraData of extraDataOptions) {
+      const result = applySosRule(step.source, step.target, step.action, rule as ProofRuleName, program, false, extraData);
+
+      if(result.status === 'invalid') {
+        continue;
+      }
+
+      if(result.status === 'pending' && result.children.length > 0) {
+        const provedChildren = result.children.map((child) =>
+          autoProve(child, program, allActions, maxDepth, currentDepth + 1),
+        );
+
+        const allProved = provedChildren.every((c) => c.status === 'proved');
+        if(allProved) {
+          return {
+            ...step,
+            appliedRule: rule as ProofRuleName,
+            status: 'proved',
+            children: provedChildren,
+          };
+        }
+      } 
+      else if (result.status === 'proved') {
+        return {
+          ...step,
+          appliedRule: rule as ProofRuleName,
+          status: 'proved',
+          children: [],
+        };
+      }
+    }
+  }
+
+  return { ...step, status: 'invalid', errorMessage: t('sos.autoProofCannotProve') };
+}
+
 
 
 export function normalizeCCS(node: CCSDefinition): CCSDefinition;

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { CCSExpression, CCSAction, CCSProgram, ProofStep, ProofRuleName, ProofStatus } from '@/types';
 import ProofNode from '@/components/SOSProofer/ProofNode';
-import { applySosRule, ccsToString } from '@/lib/ccsUtils';
+import { applySosRule, autoProve, ccsToString, extractAllActions } from '@/lib/ccsUtils';
 import CCSViewer from '../custom/CCSViewer';
 import { cn } from '@/lib/utils';
 import { TransitionArrow } from './ProofRuleHelp';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../ui/button';
+import { Wand2 } from 'lucide-react';
 
 
 interface ProofBuilderProps {
@@ -114,6 +116,21 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
     });
   };
 
+  const handleAutoProve = () => {
+    const allActions = extractAllActions(program);
+    const initialStep: ProofStep = {
+      id: 'root',
+      source: initialSource,
+      target: initialTarget,
+      action: initialAction,
+      status: 'pending',
+      children: []
+    };
+    
+    const provedTree = autoProve(initialStep, program, allActions, 15); 
+    setRootStep(provedTree);
+  };
+
   return (
     <div className="md:shadow rounded-xl md:border border-stone-300 animate-in fade-in duration-300">
       <div className="p-3 px-4 mx-0 md:mx-4 mb-2 flex justify-between items-center flex-wrap gap-2 rounded-lg md:rounded-none border md:border-0 md:border-b border-stone-300">
@@ -127,8 +144,16 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
             <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialTarget) :*/ initialTarget)} className='w-auto! wrap-break-word p-1' />
           </div>
         </div>
-        <div className={cn('text-xs text-gray-500 p-2 rounded-md uppercase', getStatusColor(rootStep.status))}>
-          {rootStep.status === 'proved' ? t('sos.proved') : (rootStep.status === 'invalid' ? t('sos.invalidProof') : t('sos.inProgress'))}
+        <div className="flex gap-2 items-center">
+          {showHints && rootStep.status === 'pending' && (
+            <Button variant="outline" size="sm" onClick={handleAutoProve} className="h-8 shadow-none border-none">
+              <Wand2 className="h-4 w-4 mr-2" />
+              {t('sos.startProof')}
+            </Button>
+          )}
+          <div className={cn('text-xs text-gray-500 p-2 rounded-md uppercase', getStatusColor(rootStep.status))}>
+            {rootStep.status === 'proved' ? t('sos.proved') : (rootStep.status === 'invalid' ? t('sos.invalidProof') : t('sos.inProgress'))}
+          </div>
         </div>
       </div>
       

@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import ProgramList from "@/components/selector/ProgramList";
-import ProgramWorkspace from "@/components/selector/ProgramWorkspace";
+import ProgramList from "@/components/programSelector/ProgramList";
+import ProgramWorkspace from "@/components/programSelector/ProgramWorkspace";
 
 function Homepage() {
   const { t } = useTranslation();

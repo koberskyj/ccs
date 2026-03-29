@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Další SOS a LTS Příklady",
+    "description": "Složitější příklady na procvičení",
+    "allowEdit": true,
+    "definition": "P1 = a.b.0 + c.'sync.d.0\nP2 = sync.e.0 + f.0\nP3 = g.0\n\nIn = ((P1 | P2) \\ {sync}) | P3\nOut = (('sync.d.0 | P2) \\ {sync}) | P3\n\nIn2 = (('sync.d.0 | P2) \\ {sync}) | P3\nOut2 = ((d.0 | e.0) \\ {sync}) | P3",
+    "cards": [
+      {
+        "type": "lts",
+        "name": "Co generuje \"In\"?",
+        "process": "In",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "In",
+        "processY": "Out",
+        "action": "c",
+        "showHelp": true
+      },
+      {
+        "type": "lts",
+        "name": "Co generuje \"In2\"",
+        "process": "In2",
+        "style": "mixed",
+        "useStructRed": false
+      },
+      {
+        "type": "sos",
+        "name": "Důkaz",
+        "processX": "In2",
+        "processY": "Out2",
+        "action": "tau",
+        "showHelp": true
+      }
+    ],
+    "dateFrom": "2026-03-29T18:55:59.324Z"
+  }
+]

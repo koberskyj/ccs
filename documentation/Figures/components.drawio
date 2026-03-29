@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram name="Stránka-1" id="DKwpXrfIoQiVOcz2IOqW">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-23" parent="1" style="align=left;overflow=fill;html=1;dropTarget=0;whiteSpace=wrap;" value="&lt;p style=&quot;margin:0px;margin-top:6px;text-align:center;&quot;&gt;&lt;b&gt;Web App&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="550" width="680" x="100" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-24" parent="lpHfdSbIX_lxQLRDtkBw-23" style="shape=component;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-24" y="4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-3" parent="1" style="html=1;dropTarget=0;whiteSpace=wrap;" value="«component&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;»&lt;/span&gt;&lt;div&gt;&lt;b&gt;ProgramsContext&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="350" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-4" parent="lpHfdSbIX_lxQLRDtkBw-3" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-27" edge="1" parent="1" source="lpHfdSbIX_lxQLRDtkBw-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;endFill=0;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="lpHfdSbIX_lxQLRDtkBw-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-5" parent="1" style="html=1;dropTarget=0;whiteSpace=wrap;" value="«component&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;»&lt;/span&gt;&lt;div&gt;&lt;b&gt;Text&lt;/b&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Editor&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="150" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-6" parent="lpHfdSbIX_lxQLRDtkBw-5" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-29" edge="1" parent="1" source="lpHfdSbIX_lxQLRDtkBw-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="lpHfdSbIX_lxQLRDtkBw-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-13" parent="1" style="html=1;dropTarget=0;whiteSpace=wrap;" value="«component&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;»&lt;/span&gt;&lt;div&gt;&lt;b&gt;ProgramSelector&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="350" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-14" parent="lpHfdSbIX_lxQLRDtkBw-13" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-26" edge="1" parent="1" source="lpHfdSbIX_lxQLRDtkBw-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=open;endFill=0;dashed=1;" target="lpHfdSbIX_lxQLRDtkBw-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-7" parent="1" style="html=1;dropTarget=0;whiteSpace=wrap;" value="«component&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;»&lt;/span&gt;&lt;div&gt;&lt;b&gt;SOSProofer&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="350" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-8" parent="lpHfdSbIX_lxQLRDtkBw-7" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-25" edge="1" parent="1" source="lpHfdSbIX_lxQLRDtkBw-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="lpHfdSbIX_lxQLRDtkBw-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-9" parent="1" style="html=1;dropTarget=0;whiteSpace=wrap;" value="«component&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;»&lt;/span&gt;&lt;div&gt;&lt;b&gt;LTSGraph&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="175" x="550" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lpHfdSbIX_lxQLRDtkBw-10" parent="lpHfdSbIX_lxQLRDtkBw-9" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

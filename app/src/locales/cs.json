@@ -91,7 +91,11 @@
     "invalidCardStructureError": "Karta má chybnou strukturu",
     "invalidCardStyleError": "Karta obsahuje neplatný styl zobrazení.",
     "renameProgramName": "Upravit název programu {{name}}",
-    "createNewProgram": "Vytvořit nový program"
+    "createNewProgram": "Vytvořit nový program",
+    "suppProgramError": "Nepodařilo se načíst nové programy.",
+    "suppProgramWarning": "Nepodařilo se načíst nový doplňový program \"{{name}}\":",
+    "suppProgramSuccess": "Nově přidané příklady úspěšně načteny ({{count}}x).",
+    "programErrorParsing": "Chyba při načítání lokálního seznamu programů, načítám základní nastavení."
   },
   "sos": {
     "invalidSubproof": "Premisa selhala.",
@@ -114,6 +118,8 @@
     "emptyActionError": "Akce nesmí být prázdná",
     "tauCannotBeOutput": "Tau nemůže být výstupní akcí",
     "invalidActionName": "Neplatný název akce",
+    "autoProofLimitReached": "Automatický důkaz nelže dokončit. Dosažen limit hloubky důkazu",
+    "autoProofCannotProve": "Přechod nelze pomocí SOS pravidel dokázat.",
     "invalidProcessSelection": "Proces {{processName}} neexistuje.",
     "ruleReference": "Přehled pravidel SOS",
     "sourceProcess": "Počáteční proces",

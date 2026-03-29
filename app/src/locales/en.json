@@ -91,7 +91,11 @@
     "invalidCardStructureError": "Card has an incorrect structure",
     "invalidCardStyleError": "Card contains an invalid display style.",
     "renameProgramName": "Rename program {{name}}",
-    "createNewProgram": "Create new program"
+    "createNewProgram": "Create new program",
+    "suppProgramError": "Failed to load new supplementary programs.",
+    "suppProgramWarning": "Failed to load new supplementary program \"{{name}}\":",
+    "suppProgramSuccess": "Newly added examples loaded successfully ({{count}}x).",
+    "programErrorParsing": "Error while loading local program list, loading default settings."
   },
   "sos": {
     "invalidSubproof": "Premise failed.",
@@ -112,8 +116,10 @@
     "communicationRules": "Parallel composition",
     "structuralRules": "Structural operators",
     "emptyActionError": "Action cannot be empty",
-    "tauCannotBe an output action": "Tau cannot be an output action",
+    "tauCannotBeOutput": "Tau cannot be an output action",
     "invalidActionName": "Invalid action name",
+    "autoProofLimitReached": "Auto proof cannot be completed. Proof depth limit was reached",
+    "autoProofCannotProve": "This transition cannot be proven using SOS rules.",
     "invalidProcessSelection": "Process {{processName}} does not exist.",
     "ruleReference": "SOS rules reference",
     "sourceProcess": "Source process",
