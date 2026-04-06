@@ -70,7 +70,7 @@ export default function ProofNode({ step, program, showHints, depth, onApplyRule
                   <div className="flex items-center gap-3 font-mono">
                     <span className="text-sm text-foreground/90 shrink-0">{t('sos.appliedRule')}:</span> 
                     <Badge variant="secondary" className="px-3 py-1 border-stone-300 bg-stone-100">
-                      {step.appliedRule}
+                      {step.appliedRule ?? '-'}
                     </Badge>
                   </div>
                   

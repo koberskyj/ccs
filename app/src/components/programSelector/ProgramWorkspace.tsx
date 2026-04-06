@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePrograms } from "@/utils/usePrograms";
 import ProgramCard from "./ProgramCard";
-import { Pencil, RotateCcw, Save } from "lucide-react";
+import { Pencil, RotateCcw, Save, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ProgramCreator } from "./ProgramCreator";
 import ButtonHover from "../custom/ButtonHover";
@@ -64,7 +64,8 @@ export default function ProgramWorkspace() {
     setLocalProgram({
       ...localProgram,
       name: updated.name,
-      description: updated.description
+      description: updated.description,
+      allowEdit: updated.allowEdit
     });
   };
 
@@ -126,7 +127,7 @@ export default function ProgramWorkspace() {
     toast.info(t('selector.changesDiscarded'));
   };
   
-  const isDirtyLocal = activeProgram?.allowEdit && localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
+  const isDirtyLocal = localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
   useEffect(() => {
     setIsDirty(isDirtyLocal ?? false);
 
@@ -150,12 +151,12 @@ export default function ProgramWorkspace() {
                 <p className="text-sm text-muted-foreground">{localProgram.description}</p>
               </div>
 
-              {activeProgram.allowEdit &&
+              {
                 <div className="flex gap-2 items-center">
                   <ProgramCreator program={localProgram} onUpdate={handleNameChange}>
-                    <ButtonHover hoverContent={<p>{t('selector.renameProgram')}</p>} variant="ghost" size="icon" aria-label={t('selector.renameProgram')}
+                    <ButtonHover hoverContent={<p>{localProgram.allowEdit ? t('selector.renameProgram') : t('selector.unlockProgram')}</p>} variant="ghost" size="icon" aria-label={t('selector.renameProgram')}
                         className='h-8 w-8 text-muted-foreground/50 hover:text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity'>
-                      <Pencil className="w-4 h-4" />
+                      {localProgram.allowEdit ? <Pencil className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                     </ButtonHover>
                   </ProgramCreator>
 

@@ -213,7 +213,7 @@ export default function ProofControls({ step, onApplyRule, showHints }: ProofCon
 
         {needsBoolInput && (
           <div className="flex items-center gap-2 border px-3 h-9 rounded-md bg-white">
-            <Checkbox id={`manual-ls-${step.id}`} checked={manualBool} onCheckedChange={(c) => setManualBool(c as boolean)} />
+            <Checkbox id={`manual-ls-${step.id}`} checked={manualBool} onCheckedChange={(c) => setManualBool(c as boolean)} aria-label={t('sos.leftSends')} />
             <label htmlFor={`manual-ls-${step.id}`} className="text-sm cursor-pointer select-none">{t('sos.leftSends')}</label>
           </div>
         )}

@@ -1,38 +1,419 @@
 \chapter{Implementace}
 \label{sec:implementace}
 
-\section{Uživatelské rozhraní a logika aplikace}
+Tato kapitola se věnuje implementaci webové aplikace a detailně popisuje klíčové komponenty, jejich rozhraní, algoritmy a datové struktury, které tvoří její jádro. 
+Tímto tak navazuje na předchozí kapitoly, zabývající se návrhem architektury a teoretickými základy kalkulu komunikujících systémů. 
+Postupně je zde rozebráno uživatelské rozhraní, formát uchovávání dat, vnitřní logika aplikace, vyhodnocování sémantiky a správa uživatelských programů.
 
-\subsection{Výběr a správa programů}
+
+
+\section{Funkce aplikace}
+\label{sec:funkce_aplikace}
+
+\subsection{Správa a výběr programu}
+\label{sec:sprava_programu}
+Aby mohla aplikace sloužit jako plnohodnotný výukový nástroj, obsahuje poměrně komplexní systém pro správu jednotlivých programů, kdy jeden program v kontextu aplikace představuje právě jeden CCS program, definovaný v sekci \ref{sec:ccs_syntax}. 
+Uživatel má možnost mezi programy volně přepínat, vytvářet vlastní nebo načítat předpřipravené demonstrační příklady.
+
+\subsubsection*{Vytvoření a import programu}
+Proces založení nového programu nebo načtení existujícího je řešen prostřednictvím modálních oken. 
+Vytvoření nového prázdného programu vyžaduje pouze zadání názvu, přičemž uživatel může volitelně přidat textový popis a zvolit, zda má být program uzamčen pro editaci. 
+Ve výchozím stavu je doporučeno ponechat editaci zapnutou, jelikož takto vytvořený program obsahuje pouze výchozí kartu s textovým editorem a další specifické karty (LTS, SOS) si uživatel přidává manuálně dle vlastní potřeby.
+
+Alternativou je import programu, který lze provést nahráním souboru z lokálního disku nebo vložením obsahu přímo ze systémové schránky. 
+V obou případech se očekává validní JSON formát, odpovídající datové struktuře programu popsané dále v sekci \ref{sec:json_format}. 
+Aplikace před samotným importem provádí kontrolu formátu a integrity dat, čímž je minimalizováno riziko pádu aplikace za běhu v důsledku manuálně špatně upraveného souboru. 
+Importovaný program je načten včetně všech uložených karet a jejich konfigurací.
+
+\subsubsection*{Editace a odstranění programu}
+Jakýkoliv nahraný nebo vytvořený program lze v aplikaci dále upravovat, pakliže má nastaven příznak povolující editaci. 
+Možnost zablokování editace primárně neslouží jako bezpečnostní prvek, ale například jako ochrana proti nechtěnému přepsání demonstračních příkladů během výuky. 
+U uzamčeného programu je blokována pouze změna zdrojového kódu a konfigurace karet. 
+Jejich interaktivita (například krokování důkazu či procházení grafu) však zůstává plně zachována.
+
+V režimu editace může uživatel libovolně měnit název a popis programu prostřednictvím modálního okna, které lze otevřít tlačítkem v hlavičce hlavní karty programu. 
+Zároveň má možnost přidávat nové karty zaměřené na SOS důkazy nebo vizualizace ohodnocených přechodových systémů. 
+
+Během editace aplikace udržuje všechny změny pouze v operační paměti prohlížeče a k jejich trvalému uložení dojde až po explicitním potvrzení uživatelem. 
+Pokud existují neuložené úpravy, uživatel je na tuto skutečnost upozorněn v pravém horním rohu hlavní karty programu, kde má možnost změny buď uložit, nebo trvale zahodit. 
+Pokud se uživatel pokusí načíst jiný program nebo opustit aplikaci v době, kdy existují neuložené úpravy, zobrazí se potvrzovací dialog, který má za cíl zabránit nechtěné ztrátě úprav. 
+
+K odstranění programu ze seznamu slouží volba v hlavním seznamu, která je rovněž chráněna potvrzovacím modálním oknem.
+
+\subsubsection*{Kopie a stažení programu}
+Pro snadné sdílení dat napříč zařízeními nebo mezi studenty a vyučujícím nabízí aplikace exportní nástroje. 
+Uživatel si může celý program exportovat jako prostý text ve formátu JSON a zkopírovat jej do schránky, nebo si jej stáhnout jako soubor s příponou \texttt{.json}. 
+Oba způsoby generují strukturálně identická data, která lze následně kdykoliv znovu naimportovat.
+
+\subsubsection*{Předdefinované programy}
+\label{sec:preddefinovane_programy}
+Pro okamžité využití aplikace bez nutnosti vlastního definování programů je aplikace vybavena sadou předdefinovaných programů. 
+Architektonicky jsou tyto příklady rozděleny do dvou nezávislých definic, z nichž každá pokrývá jiný případ užití.
+
+První typ předdefinovaných programů je staticky zabudován přímo do zdrojového kódu aplikace v souboru \texttt{baseProgramList.json} a slouží k prvotnímu naplnění prázdného seznamu programů uživatele. 
+Výhodou tohoto přístupu je okamžitá dostupnost ihned po načtení stránky a absence nutnosti další síťové komunikace. 
+Jedná se o základ, který má každý uživatel k dispozici bez ohledu na stabilitu internetového připojení. 
+Tyto programy nelze upravit bez opětovného sestavení celé aplikace. 
+Navíc, pokud dojde ke změně této definice na serveru, u stávajících uživatelů se automaticky neprojeví, dokud nedojde k vymazání lokálních dat prohlížeče, čímž se vyvolá opětovné načtení.
+
+Druhý typ programů je získáván dynamicky prostřednictvím externího souboru \texttt{supplementaryPrograms.json}. 
+Tento soubor je umístěn ve veřejné složce na straně serveru a klientská aplikace se na něj dotazuje přes standardní HTTP požadavek. 
+Obsah souboru lze na serveru libovolně měnit za běhu bez nutnosti rekompilace zdrojového kódu. 
+Definice těchto programů procházejí při stahování na straně klienta stejnou validační logikou jako manuální import.
+
+Zásadní vlastností dynamických programů je možnost jejich opožděného publikování. 
+Každý program definovaný v tomto souboru obsahuje časový atribut (\texttt{dateFrom}). Pokud se tento čas nachází v budoucnosti, klientská aplikace program při načítání bude ignorovat. 
+Tato funkcionalita umožňuje vyučujícímu naplánovat automatické zveřejnění úloh, například přesně na začátek konkrétního cvičení. 
+Lokální klient si zároveň uchovává informaci o čase posledního dotazu, aby nedocházelo k opakovanému stahování již načtených dat.
 
 \subsection{Karta textového editoru}
+Karta textového editoru plní hlavní roli pro každý vytvořený program. 
+Jedná se o výchozí prvek, jehož prostřednictvím uživatel definuje syntaxi procesů. 
+Ty jsou následně analyzovány a využívány v dalších přidružených kartách. 
+Karta se vizuálně i funkčně dělí na dvě části: samotný textový editor zdrojového kódu a syntaktický strom. 
+Vizuálně již byla tato karta prezentována v předešlé kapitole na obrázku \ref{fig:card_ui}.
+
+\subsubsection*{Textový editor}
+Textový editor, sloužící pro zadávání CCS procesů, obsahuje vlastní zvýrazňování syntaxe (syntax highlighting). 
+Odlišuje tak klíčová slova (např. \texttt{Nil}, \texttt{tau}), identifikátory procesů a operátory. 
+Speciálním vizuálním prvkem je zobrazení výstupních akcí, které jsou vykreslovány s vodorovným pruhem nad textem (overline $\overline{a}$), což odpovídá matematické notaci. 
+
+Při psaní kódu probíhá na pozadí automatická validace vstupu. 
+Editor automaticky kontroluje vstup uživatele, a pokud je detekována syntaktická či sémantická chyba, uživatel je na ni upozorněn příslušnou chybovou hláškou.
+
+\subsubsection*{Syntaktický strom}
+Mimo textový editor poskytuje karta i vizuální reprezentaci zadaného CCS kódu ve formě syntaktického stromu, který je orientován směrem shora dolů.
+Prostorové uspořádání karty je plně responzivní, pokud je tedy k dispozici dostatek místa na obrazovce, strom je vykreslen vedle editoru. 
+Pokud však klesne šířka okna pod stanovenou mez, rozhraní se automaticky přepne do vertikálního rozložení a strom se umístí pod editor. 
+Tím je zajištěna optimální čitelnost grafu bez ohledu na velikost okna prohlížeče. 
+
+Užitečnou funkcionalitou je propojení textu a stromu. 
+Při najetí myší na libovolný vrchol v syntaktickém stromu dojde ke zvýraznění odpovídající části kódu přímo v textovém editoru. 
+Toto uživatelům usnadňuje orientaci ve složitějších výrazech a napomáhá k pochopení vztahu mezi textovou reprezentací syntaxe a stromovou strukturou. 
+
+Rozhraní dále nabízí možnost exportu celého grafu do formátů PNG, SVG a do formátu JSON pro případné další strojové zpracování.
 
 \subsection{Karta důkazu přechodů pomocí SOS pravidel}
+Tato karta představuje jednu ze dvou hlavních výukových funkcí aplikace a slouží k interaktivní konstrukci formálních důkazů. 
+Příklad průběhu dokazování z předdefinovaného příkladu \enquote{SOS Pravidla} je zobrazen na obrázku \ref{fig:card_sos}.
+Tato karta umožňuje ověřit, zda mezi dvěma procesy $P$ a $Q$ existuje platný přechod přes akci $\alpha$ (tj. $P \xrightarrow{\alpha} Q$), a to krok za krokem pomocí formálních pravidel strukturální operační sémantiky.
 
-\subsection{Karta zobrazení a krokování LTS grafu}
-\label{sec:theory_dagre}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Figures/sos_card.pdf}
+    \caption{Karta tvorby důkazu pomocí SOS pravidel}
+    \label{fig:card_sos}
+\end{figure}
+
+Před spuštěním samotného důkazu musí uživatel definovat vstupní konfiguraci.
+Ze seznamu dostupných procesů vybere výchozí a cílový proces (načtené z platné definice programu) a následně do textového pole zadá přechodovou akci. 
+Tento vstup je validován, nelze tak například zadat nepovolené znaky nebo označit interní akci $\tau$ jako výstupní. 
+V případě neplatného vstupu je uživateli zobrazena chybová hláška a spuštění důkazu je zablokováno.
+Posledním konfiguračním krokem je volba režimu s nápovědou nebo bez ní. 
+Celá tato konfigurace karty se ukládá do stavu programu a zůstává zachována i po opětovném načtení stránky.
+
+Jakmile je důkaz zahájen, zobrazí se interaktivní strom dokazování. 
+Kořenový uzel (nejvyšší úroveň) je umístěn na levé straně. 
+Jak uživatel postupně aplikuje další pravidla (premisy), důkaz se větví a zanořuje směrem doprava. 
+Cílem je úspěšně dokázat všechny vzniklé větve. 
+Celkový stav důkazu se dynamicky propisuje od listů až ke kořeni a je indikován v pravém horním rohu důkazu. 
+Jednotlivé uzly jsou pak podbarveny barvou odpovídající jejich aktuálnímu stavu. 
+Aby byl důkaz jako celek úspěšný, musí být validní všechny jeho podvětve, pokud je ale naopak aspoň jedna premisa neplatná, celý důkaz je označen za neplatný.
+
+V \textbf{režimu s nápovědou} systém uživateli napovídá a doporučuje mu pouze sémanticky relevantní pravidla. 
+Některá pravidla však vyžadují dodatečné parametry, které musí uživatel specifikovat ručně. 
+Například u synchronizace (\texttt{COM\_SYNC}) je nutné explicitně určit akci, přes kterou synchronizace probíhá, a směr vysílání. 
+U operátoru přejmenování (\texttt{REL}) systém nabídne seznam kandidátních původních akcí.
+Pokud aplikace zvoleného pravidla selže z důvodu nesplnění předpokladů, uzel se ihned podbarví červeně a dojde k zobrazení textu popisující danou chybu. 
+Uživatel však může kdykoliv jakýkoli krok vrátit a zkusit jinou strategii.
+Dále je v tomto režimu dostupné tlačítko pro automatické dokázání, které projde všechny smysluplné možnosti sestavení důkazu a v případě existence validní cesty tento důkaz uživateli sestaví.
+
+V \textbf{režimu bez nápovědy} musí uživatel ručně vybírat správná pravidla z kompletního seznamu a sám vyplnit jejich případné dodatečné parametry. 
+Aplikace však nadále na pozadí vyhodnocuje sémantickou platnost kroků,
+pokud tedy uživatel aplikuje nesprávné pravidlo, systém daný krok vyhodnotí jako chybný, protože by formální přechod na jeho základě nebylo možné sestavit.
+
+V obou režimech má uživatel k dispozici nápovědu, která obsahuje formální matematické definice všech pravidel. 
+V režimu s nápovědou se navíc při najetí myší na konkrétní pravidlo zobrazí \textit{tooltip} s jeho definicí, čímž uživateli odpadá nutnost pokaždé vyhledat kokrétní pravidlo.
+
+\subsection{Karta simulace LTS grafu}
+Tato sekce představuje druhou hlavní výukovou funkcionalitu aplikace, která slouží k vizuální reprezentaci ohodnocených přechodových systémů a interaktivní simulaci běhu procesů. 
+Příklad této karty je zobrazen na obrázku \ref{fig:card_lts}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Figures/lts_card.png}
+    \caption{Karta LTS grafu}
+    \label{fig:card_lts}
+\end{figure}
+
+Rozhraní je rozděleno na horní ovládací panel s konfigurací, hlavní plátno obsahující vykreslený graf a simulační panel v levé spodní části. 
+V rámci konfigurace uživatel nejprve vybere kořenový proces ze seznamu. 
+Po jeho volbě se graf ihned vykreslí a uživatel tak může začít ihned se simulací. 
+Graf si však ještě může následně zjednodušit aktivováním funkce \textit{strukturální redukce}, 
+která minimalizuje velikost stavového prostoru tím, že syntakticky odlišné, avšak sémanticky a strukturálně ekvivalentní procesy (např. $A|B$ a $B|A$, případně výrazy zbytečně obsahující \texttt{Nil}) slučuje do jediného identického vrcholu.
+
+Uživatel si dále může zvolit způsob zobrazení samotných vrcholů, což se hodí zejména u rozsáhlých stavových prostorů. 
+K dispozici jsou tři režimy:
+\begin{itemize}
+    \item \textbf{ID:} Uzly obsahují pouze unikátní číselné identifikátory.
+    \item \textbf{CCS:} Uzly změní tvar na zaoblené obdélníky a zobrazují kompletní CCS zápis daného stavu.
+    \item \textbf{Mix:} Kompromisní zobrazení, kde krátké výrazy zůstávají v plném znění, zatímco komplexní zápisy jsou nahrazeny identifikátorem.
+\end{itemize}
+Bez ohledu na zvolený režim však uživatel nepřichází o žádné informace. 
+Při interakci kurzorem na libovolný uzel se zobrazí \textit{tooltip} s barevně formátovaným kompletním CCS zápisem.
+
+Graf lze vykreslovat dvěma odlišnými přístupy: staticky nebo dynamicky. 
+Při dynamickém načítání není graf generován celý najednou, ale postupně se rozkrývá podle toho, jak jím uživatel během simulace prochází. 
+Tento režim je ideální zejména pro zobrazení explozivních nebo nekonečných stavových prostorů, které by se jinak rychle staly nepřehlednými. 
+Součástí tohoto režimu je i automatické centrování pohledu na aktivní stav. 
+Tuto funkci lze volitelně zapnout i ve statickém režimu.
+Při statickém načítání je naopak vygenerován celý dostupný stavový prostor najednou, který má však nastaveny limity pro zanoření a počet vrcholů. 
+
+Vrcholy jsou standardně organizovány hierarchicky ve směru zleva doprava, uživatel s nimi může volně manipulovat a tyto ruční úpravy pozic zůstávají ve statickém režimu během krokování zachovány. 
+Podobně jako syntaktický strom, i tento graf podporuje export do formátů PNG, SVG a JSON.
+
+Samotné krokování grafu pak probíhá prostřednictvím simulačního panelu, který dynamicky vypisuje všechny dostupné přechody z aktuálního stavu. 
+Při najetí kurzorem na některou z nabízených akcí se vizuálně přímo v grafu zvýrazní příslušná orientovaná hrana a cílový uzel. 
+Po kliknutí dojde k přechodu do nového stavu. 
+Panel rovněž umožňuje uživateli návrat o libovolný počet kroků zpět nebo kompletní reset simulace do výchozího stavu.
+
 
 \section{Komunikace mezi komponentami}
 
-\subsection{Programs store}
+\subsection{Datový formát programu}
+\label{sec:json_format}
+Kompletní stav jednotlivých programů a konfigurace všech jejich karet je v paměti aplikace reprezentován JSON strukturou, jejíž zkrácená podoba je uvedena v ukázce \ref{lst:json-config}. 
+
+Hlavním obalovacím typem je \texttt{ProgramSave}, jenž obsahuje veškerá data konkrétního programu. 
+Obsahuje název (\texttt{name}), textový popis (\texttt{description}), příznak povolující editaci (\texttt{allowEdit}), textovou definici zdrojového kódu CCS (\texttt{definition}) a volitelně i časový údaj zpřístupnění (\texttt{dateFrom}). 
+
+Dalším prvkem typu je pole \texttt{cards}, které uchovává dynamický seznam instancí karet přidružených k programu. 
+Jednotlivé karty mohou být typů \texttt{CardSOS} a \texttt{CardLTS} a každá z nich nese příslušný typový identifikátor a název. 
+Datová struktura \texttt{CardSOS} navíc udržuje kontext o výchozím procesu (\texttt{processX}), cílovém procesu (\texttt{processY}), konkrétní přechodové akci (\texttt{action}) a stavu povolení nápovědy (\texttt{showHelp}). 
+Struktura \texttt{CardLTS} naopak uchovává informaci o kořenovém procesu (\texttt{process}), nastavení zobrazení vrcholů (\texttt{style}) a přepínač strukturální redukce (\texttt{useStructRed}). 
+
+\begin{lstlisting}[label=lst:json-config,caption={Zkrácená ukázka JSON datového formátu programu \texttt{Sumace a Paralelizace}.}]
+{ // ProgramSave
+    name: "Sumace a Paralelizace (SUM, COM)",
+    description: "",
+    allowEdit: true,
+    definition: "Sum = a.b.0 + b.a.0\n\nCom = a.0 | 'a.0\nComn = 0 | 0",
+    cards: [ { // CardLTS
+        type: "lts", 
+        name: "Sumace", 
+        process: "Sum", 
+        style: "mixed", 
+        useStructRed: false 
+    }, { // CardSOS
+        type: "sos", 
+        name: "Proč je u paralelizace tau přechod?", 
+        processX: "Com", 
+        processY: "Comn", 
+        action: "tau", 
+        showHelp: true 
+    } ],
+    dateFrom: "2026-01-01T08:00:00.000Z"
+}
+\end{lstlisting}
+
+\subsection{Správa stavu a repozitář programů}
+\label{sec:programs_store}
+Pro centrální správu všech dostupných programů a aktuálního výběru využívá aplikace komponentu \texttt{ProgramsProvider}, která poskytuje globální stav a s ním spojené modifikační funkce (např. \texttt{addProgram}, \texttt{updateProgram}, \texttt{deleteProgram}) všem zanořeným částem aplikace.
+
+Aby byla zajištěna perzistence dat i po zavření prohlížeče, stav je automaticky synchronizován s lokálním úložištěm prohlížeče \texttt{localStorage}.
+Uchovává se zde jak samotný seznam programů, tak i index aktuálně aktivního programu. 
+Kompoenta navíc naslouchá na událost \texttt{storage}, což zajišťuje synchronizaci stavu v případě, že má uživatel aplikaci otevřenou ve více oknech prohlížeče současně.
+
+Při inicializaci aplikace se repozitář nejprve pokusí načíst data z úložiště. 
+Pokud je úložiště prázdné nebo dojde k chybě při deserializaci, stav je naplněn výchozími programy (ze souboru \texttt{baseProgramList.json}). 
+Následně je asynchronně zavolána funkce \texttt{fetchSupplementaryPrograms}, která se dotazuje na dodatečné dynamické programy ze serveru, jak bylo popsáno v sekci \ref{sec:preddefinovane_programy}. 
+Funkce filtruje programy dle atributu \texttt{dateFrom} a porovnává je s časem posledního úspěšného stažení. 
+Validní a časově přístupné programy jsou následně připojeny k lokálnímu seznamu, uloženy a uživatel je o jejich přidání informován notifikací.
+
+Samotná práce s konkrétním otevřeným programem probíhá v komponentě \texttt{ProgramWorkspace}. 
+Tato komponenta si vytváří vlastní lokální kopii programu, ve které pak může uživatel provádět rozsáhlé úpravy zdrojového kódu či libovolně konfigurovat karty důkazů.
+Tyto změny pak může následně buď uložit, čímž dojde k propsání do lokálního úložiště prohlížeče, nebo je trvale zahodit. 
+Komponenta rovněž detekuje přítomnost neuložených změn (stav \texttt{isDirty}) a za pomoci zachytávání události \texttt{beforeunload} brání nechtěnému opuštění stránky.
 
 \subsection{Formát zpracovaného CCS výrazu}
 \label{sec:struct_format}
+Výstupem syntaktické analýzy zdrojového kódu, popsaného v následující sekci \ref{sec:syntakticka_analyza}, je abstraktní syntaktický strom (AST).
+Tento strom je v aplikaci typově definován jako \texttt{CCSProgram}, který představuje pole objektů typu \texttt{CCSDefinition}. 
+Tato reprezentace odpovídá definici pojmu, kdy se každý CCS program skládá z konečné sady definic procesů (např. $A \stackrel{\text{def}}{=} a.A$).
 
-\section{Možné úpravy aplikace}
+Každý uzel stromu rozšiřuje základní rozhraní \texttt{BaseNode}, obsahující identifikátor typu (\texttt{type}) a volitelný lokalizační objekt (\texttt{loc}), mapující uzel na konkrétní pozici ve zdrojovém textu. 
+Jednotlivé sémantické konstrukce CCS jsou pak v paměti reprezentovány jako specifické podtypy výrazů (\texttt{CCSExpression}):
+\begin{itemize}
+    \item \textbf{Prefix (\texttt{CCSPrefix}):} Reprezentuje elementární krok výpočtu.
+    Obsahuje objekt akce (\texttt{CCSAction}) definovaný názvem (\texttt{label}) a příznakem \texttt{isOutput} určujícího, zda se jedná o výstupní akci. 
+    Následný proces je uložen v atributu \texttt{next}.
+    \item \textbf{Volba (\texttt{CCSSummation}) a Paralelní kompozice (\texttt{CCSParallel}):} Binární operátory dělící výpočetní strom na levou a pravou větev (\texttt{left}, \texttt{right}).
+    \item \textbf{Omezení (\texttt{CCSRestriction}) a Přejmenování (\texttt{CCSRelabeling}):} Unární operátory obalující podproces v atributu \texttt{process}. 
+    Restrikce obsahuje pole skrytých akcí (\texttt{labels}), přejmenování definuje množinu mapování v atributu \texttt{relabels}.
+    \item \textbf{Reference (\texttt{CCSProcessRef}) a Ukončení (\texttt{CCSNil}):} Koncové uzly představující listy syntaktického stromu. 
+    Reference odkazuje textovým identifikátorem na jinou definici, zatímco \texttt{Nil} reprezentuje deadlock a není tak schopný další akce.
+\end{itemize}
 
-\subsection{Přidání nových definic předdefinovaných programů}
+Takto definovaná, striktně typovaná stromová struktura je ideální pro strojové zpracování a tvoří výchozí bod pro všechny další logické moduly aplikace, zejména pro konstrukci SOS důkazů a generování stavového prostoru LTS grafu.
 
-\subsection{Lokalizace}
 
-\section{Kompilace a nasazení}
+\section{Algoritmy a logické moduly aplikace}
+V této sekci je probrána vnitřní výpočetní logika a klíčové algoritmy aplikace. 
+Je zde popsáno propojení lexikální a syntaktické analýzy, rekurzivní vyhodnocování stromů strukturální operační sémantiky a algoritmy pro generování stavového prostoru. 
 
-\section{Optimalizace}
+\subsection{Zpracování uživatelského vstupu a syntaktická analýza}
+\label{sec:syntakticka_analyza}
+Proces transformace čistého textu do datových struktur probíhá ve dvou částech. Jako první probíhá lexikální analýza pro účely textového editoru, která je následována syntaktickou analýzou pro tvorbu abstraktního syntaktického stromu.
+
+Pro zajištění validace a parsování CCS výrazů byl vytvořen vlastní analyzátor s využitím knihovny \texttt{Peggy.js}.
+Tento parser vychází z bezkontextové gramatiky definované v souboru \texttt{ccs\_grammar.pegjs}, která respektuje všechna pravidla, jako je například precedence a asociativita operátorů CCS, popsáné v sekci \ref{sec:ccs_syntax}.
+Tato gramatika rozkládá uživatelský vstup a tvoří AST složený z uzlů jako \texttt{Summation}, \texttt{Parallel}, \texttt{Prefix} či \texttt{Nil}.
+Nad tímto stromem je následně spuštěna sémantická validační funkce \texttt{validateCCS}, která ověřuje, zda každý volaný proces je skutečně v programu definován a že názvy procesů jsou unikátní.
+Záměrně zde nedochází k detekci zacyklení, o toto ošetření se stará až na běhové prohledávání v LTS modulu.
+
+Nezávisle na parseru CCS výrazů probíhá i vizuální formátování textového editoru uvnitř komponenty \texttt{CodeMirror}.
+Definice lexikálních pravidel je realizována prostřednictvím třídy \texttt{StreamLanguage}.
+Tento lexer sekvenčně čte vstup a přiděluje sémantické značky (tokeny, třídy), například \texttt{typeName} pro procesy s velkým počátečním písmenem nebo \texttt{keyword} klíčová slova jako \texttt{0}, \texttt{Nil} či \texttt{tau}.
+
+Pro převod AST na vstup do syntaktického stromu, který se zobrazuje po boku textového editoru, se využívá transformační algoritmus \texttt{transformAstToSyntaxTree}.
+Tato rekurzivní funkce převádí vnořený formát do pole vrcholů a hran, který vyžaduje knihovna \texttt{Cytoscape.js} vykreslující syntaktický strom.
+Každému uzlu je navíc přiřazena informace o jeho absolutní pozici v původním zdrojovém textu, kterou poskytuje parser od \texttt{Peggy.js}.
+Když následně prezentační vrstva grafu zachytí pohyb myši nad daným vrcholem, extrahuje z něj tyto souřadnice a ty následně předá zpět do textového editoru, který následně tento rozsah zvýrazní pomocí proměnné \texttt{highlightRange}.
+Syntaktický strom se následně vykreslí podle rozložení \texttt{dagre TB}, které se běžně využívá pro stromové zobrazení vrcholů grafu \cite{cytoscape_2022_github}.
+
+\subsection{Práce se strukturální operační sémantikou}
+Veškerá logika za interaktivním dokazováním přechodů je řízena stavovým automatem udržovaným v komponentě \texttt{ProofBuilder}.
+Stav důkazu je reprezentován n-ární stromovou strukturou objektů \texttt{ProofStep}.
+Každý uzel obsahuje výchozí a cílový proces (ve formě AST), dokazovanou akci, seznam následujících premis a svůj aktuální stav dokázání (\texttt{pending}, \texttt{proved}, \texttt{invalid}).
+
+Evaluaci aplikování pravidel provádí centrální funkce \texttt{applySosRule} z modulu \texttt{ccsUtils}.
+Když je na uzel aplikováno konkrétní pravidlo, funkce analyzuje jeho AST strukturu a porovnává ji s matematickou definicí pravidla.
+Například při aplikaci pravidla \texttt{COM\_LEFT} algoritmus ověří, zda má výchozí proces kořen typu \texttt{Parallel}. Pokud ano, vygeneruje nový objekt premisy pro levou stranu a pravou stranu prozatím ponechá nedotčenou.
+Při aplikaci pravidla \texttt{CON} funkce vyhledá tělo procesu a vrátí novou premisu s rozbaleným AST.
+Pokud struktura neodpovídá předpokladům, kdy například synchronizace u \texttt{COM\_SYNC} generuje akci odlišnou od $\tau$, funkce vrátí chybový stav s popisem porušení daného pravidla.
+
+Propagace stavu napříč stromem je řešena rekurzivní funkcí \texttt{recalculateTreeStatus}.
+Tato funkce je volána po každé změně a prochází strom od listů ke kořeni.
+Uzel se pak pomocí této funkce stává dokázaným (\texttt{proved}), pokud jsou všechny jeho premisy \texttt{proved}.
+Pokud je alespoň jedna premisa \texttt{invalid}, daný uzel se taky stane \texttt{invalid}.
+
+Aplikace dále obsahuje deterministický algoritmus \texttt{autoProve} pro generování důkazu.
+Jedná se o prohledávání hrubou silou všech možností s pevnou limitací maximálního zanoření, aby se zabránilo zacyklení na rekurzivních CCS definicích.
+Algoritmus v každém kroku vyhledá všechna použitelná pravidla (podle stejného způsobu jako funguje režim s nápovědou) a pro pravidla vyžadující parametry si získá všechny dostupné akce v CCS programu pomocí funkce \texttt{extractAllActions}.
+Následně simuluje aplikaci \texttt{applySosRule} a testuje vzniklé větve, dokud nenarazí na kompletně validní cestu nebo nevyčerpá všechny možnosti.
+
+\subsection{Generování LTS a vizualizace}
+Modul \texttt{ltsLogic} zapouzdřuje veškeré algoritmy pro konstrukci grafu přechodového systému.
+Hlavní funkce \texttt{generateLTS} je postavena na algoritmu prohledávání do šířky (BFS).
+Algoritmus prochází frontu neprozkoumaných stavů a uchovává si seznam již navštívených uzlů.
+Pro každý stav se volá funkce \texttt{getPossibleTransitions}, která rekurzivně aplikuje SOS pravidla na strukturu procesu a zjišťuje tak kompletní množinu bezprostředně dostupných kroků.
+
+Základní funkcí optimalizace prohledávání je deduplikace stavů.
+Aby se zabránilo nekonečnému generování stejných uzlů, tak je každý nalezený CCS výraz serializován do textového řetězce, ze kterého je vytvořen hash.
+Tento hash slouží jako unikátní identifikátor v mapě prozkoumaných stavů. Pokud hash odpovídá již dříve navštívenému uzlu, algoritmus místo tvorby nového vrcholu pouze vygeneruje orientovanou hranu k tomu stávajícímu.
+
+Pokud je povolena strukturální redukce, dojde k předzpracování CCS výrazů pomocí funkce \texttt{normalizeCCS}, která výrazy upravuje ještě před samotným hashováním.
+Využívá komutativních vlastností některých operátorů (například abecedně řadí procesy v paralelní kompozici) a eliminuje prázdné procesy, čímž redukuje sémanticky shodné větve výpočtu do jediného deterministického tvaru.
+
+Vygenerované struktury jsou opět transformovány pro \texttt{Cytoscape.js}, tentokrát však do rozložení \texttt{dagre LR}, které graf na rozdíl od syntaktického stromu generuje zleva doprava.
+Aby aplikace zvládla velké nebo nekonečné LTS grafy, implementuje dynamický režim, který omezuje běh algoritmu \texttt{generateLTS}.
+Místo výpočtu všech stavů se BFS omezí pouze na bezprostřední okolí z nízkou hloubkou zanoření od aktuálně aktivního stavu uloženého ve stavové proměnné simulace.
+Okolní neprozkoumané stavy jsou tak dynamicky generovány až v momentě, kdy uživatel provede krok tímto směrem.
+
+
+
+\section{Kompilace, nasazení a správa obsahu}
+
+\subsection{Postup přidání předdefinovaných programů}
+Nejvhodnějším postupem přidání nového předdefinovaného programu je jej nejdříve navrhnout, odladit a nakonfigurovat jako nový program (včetně SOS a LTS karet) přímo v uživatelském rozhraní. 
+Následně jej lze exportovat pomocí vestavěné funkce pro stažení.
+
+Stáhnutý soubor je pak nutné integrovat do jednoho ze dvou konfiguračních seznamů:
+\begin{itemize}
+    \item \textbf{baseProgramList.json:} Manipulace s tímto souborem vyžaduje rekompilaci celé aplikace a její opětovné nasazení na server. 
+    Programy načtené z tohoto souboru slouží jako základ pro vyplnění nových dat a uživatelům se ukládají přímo do lokálního úložiště, změny se tak u stávajících uživatelů projeví až po resetu klientských dat prohlížeče.
+    \item \textbf{supplementaryPrograms.json:} Poskytuje dynamické přidávání příkladů bez nutnosti rekompilace. 
+    Podmínkou je přítomnost atributu \texttt{dateFrom} ve formátu ISO 8601 (např. \texttt{"2026-01-01T08:00:00.000Z"}).
+    Pokud je tento atribut v minulosti, aplikace uživatele si tento program stáhne při dalším spuštění či obnovení stránky. 
+    Tento způsob je tak vhodný pro publikování příkladů v průběhu semestru.
+\end{itemize}
 
 \subsection{Rychlost, Přístupnost, SEO}
+Celá aplikace běží výhradně na straně klienta v prostředí webového prohlížeče, tím odpadá nutnost backendového serveru a s ním spojená latence.
+Aplikace je po prvotním načtení okamžitě responzivní a dostupná i v offline režimu.
+Single page aplikace většinou moc nepodporují SEO (Search Engine Optimization), pro použití této aplikace to však není problém, neboť vyhledávání specifických podstránek není cílem.
+Aplikace dále dodržuje sémantické standardy HTML a komponenty z užité knihovny \texttt{shadcn/ui} obsahují zabudovanou podporu pro technologie přístupnosti, které jsou v aplikaci plně využity (např. správné použití ARIA atributů, klávesové navigace a dodržování dostatečného kontrastu barev).
+Výstup z nástroje Lighthouse, který měří tyto metriky, je zobrazen na obrázku \ref{fig:lighthouse}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/lighthouse.pdf}
+    \caption{Lighthouse Report přístupnosti aplikace}
+    \label{fig:lighthouse}
+\end{figure}
 
 \subsection{Vite komprimace}
+Pro kompilaci projektu byl použit nástroj Vite, který je známý svým rychlým vývojovým serverem a optimalizací při produkčním sestavení.
+Během kompilace aplikace dochází k minimalizaci a zřetězení kódů knihoven pomocí nástroje \texttt{Rollup}, a k následné kompresi vygenerovaných artefaktů.
+Zaručuje se tak, že výsledné JS a CSS soubory jsou co nejmenší a aplikace se tím pádem rychle stahuje i na pomalejším připojení.
 
-\section{Možná vylepšení}
+\subsection{Postup kompilace}
+\label{sec:kompilace}
+Ke kompilaci a spuštění projektu je vyžadováno prostředí Node.js (doporučena je verze 18 a novější) a standardní balíčkovací systém \texttt{npm}.
+Celá kompilace probíhá pomocí příkazů v příkazové řádce z kořenového adresáře projektu.
+
+Prvním krokem je instalace všech potřebných závislostí zapsaných v souboru \texttt{package.json}, která se provede příkazem:
+\begin{verbatim}
+npm install
+\end{verbatim}
+
+Po dokončení instalace závislostí se pro finální distribuci zdrojový kód musí sestavit do optimalizované podoby připravené pro produkční nasazení příkazem:
+\begin{verbatim}
+npm run build
+\end{verbatim}
+Po úspěšném dokončení tohoto příkazu vytvoří nástroj Vite novou složku \texttt{dist}, která obsahuje veškeré zkompilované nástroje potřebné pro nasazení.
+
+\subsection{Postup nasazení}
+\label{sec:nasazení}
+Nasazení aplikace je díky absenci backendové části poměrně přímočaré.
+Výstupem kompilačního procesu je sada statických souborů, zahrnující jeden vstupní \texttt{index.html} soubor, minifikovaný JS, CSS a statické soubory, mezi kterými je i již zmíněný soubor \texttt{supplementaryPrograms.json}.
+
+Tuto strukturu lze nahrát na libovolný běžný webhosting, virtuální privátní server, nebo službu typu GitHub Pages.
+Aplikace však nesmí být načtena přímo z lokálního souborového systému (přes protokol \texttt{file://}), musí být obsloužena webovým serverem, a to z důvodu CORS policy \cite{mdnwebdocs_2025_crossorigin}.
+Tato policy by pak totiž ze strany prohlížeče blokovala načítání všech doplňujících datových souborů a fontů z lokálního disku.
+
+\section{Možná rozšíření}
+\label{sec:rozsireni}
+Vzhledem k modulární architektuře je aplikace připravena na případný budoucí rozvoj.
+Následující podkapitoly nastiňují některé návrhy rozšíření.
+Zavedení těchto funkcionalit již ale vyžáduje přímý zásah do zdrojového kódu.
+
+\subsection{Podpora více jazyků}
+Architektura rozhraní by poměrně jednoduše umožnila podporu dalšího jazyka.
+Pro zavedení nového jazyka stačí vytvořit nové lokalizační slovníky ve složce \texttt{locales} a následně přidat příslušnou volbu do existující komponenty \texttt{LanguageSwitcher}.
+Specifický přístup by si vyžádala komponenta \texttt{Tutorial}, která zobrazuje centrální nápovědu aplikaci a vzhledem k rozsahu textu je překládána vlastním způsobem.
+
+\subsection{Motivy vzhledu a tmavý režim}
+Aplikace již obsahuje předpřipravené styly připravené na změny motivu, neobsahuje však uživatelské rozhraní pro jejich přepínání.
+Definice jednotlivých motivů se nachází v souboru \texttt{index.css}.
+Změna motivu za běhu je možná připojením příslušné CSS třídy \texttt{theme-indigo} (základní), \texttt{theme-warm} nebo \texttt{theme-yellow} na kořenový element \texttt{<body>}.
+Příklad vzhledu motivu \texttt{theme-warm} s více neutrálních schématem je zobrazen na obrázku \ref{fig:custom_theme}. Porovnat jej lze s motivem \texttt{theme-indigo} z obrázku \ref{fig:card_ui} z minulé kapitoly.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.95\textwidth]{Figures/custom_theme.pdf}
+    \caption{Barevný motiv aplikace \texttt{theme-warm}}
+    \label{fig:custom_theme}
+\end{figure}
+
+Kromě barevných schémat je aplikace z velké části připravena na implementaci tmavého režimu, který je možné aktivovat přidáním třídy \texttt{dark}.
+Nasazení tohoto režimu by však vyžadovalo úpravu komponent textového editoru a grafů, jejichž vzhled je definován uvnitř logiky těchto komponent a musely by dynamicky reagovat na změnu systémového motivu.
+
+\subsection{Podpora ekvivalence chování a HML}
+Pro plné pokrytí učiva kalkulu komunikujících systémů, jež se vyučuje v rámci předmětu Modelování a verifikace, by bylo vhodné aplikaci rozšířit o moduly/karty zaměřené na ekvivalenci procesů a verifikaci pomocí Hennessy-Milnerovy logiky (HML).
+
+Díky univerzálnímu formátu AST, popsaném v sekci \ref{sec:struct_format}, a existující logice pro generování přechodů by tyto funkce mohly být integrovány poměrně jednoduše bez nutnosti větších zásahů do existujících kompoent.
+Funkce by mohly být realizovány formou nových typů karet (např. \texttt{CardEq} a \texttt{CardHML}), které by z uživatelského hlediska sdílely podobnou interaktivitu jako stávající karty pro SOS pravidla a LTS grafy.
+
 
 \endinput

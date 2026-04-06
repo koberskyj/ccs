@@ -7,22 +7,22 @@ Vzhledem k požadavkům na interaktivitu a vizualizaci formálních modelů byly
 \section{Vývojové prostředí a sestavení aplikace}
 
 \subsection{Visual Studio Code}
-Jako primární vývojové prostředí byl zvolen editor Visual Studio Code (VS Code) od společnosti Microsoft \cite{TODO}. 
+Jako primární vývojové prostředí byl zvolen editor Visual Studio Code (VS Code) od společnosti Microsoft \cite{microsoft_2025_visual}. 
 Jedná se o open-source editor, který se stal standardem pro vývoj webových aplikací. 
 Jeho hlavní výhodou v kontextu této práce je nativní podpora jazyka TypeScript a Node.js. 
 Editor nabízí zabudovanou spolupráci s verzovacím nástrojem Git a integrovaný terminál, přes který je pak možné spouštět lokální vývojový server nebo skripty pro sestavení aplikace, bez nutnosti opouštět okno editoru.
 
 \subsection{GitHub}
-Pro verzování zdrojových kódů a zálohování projektu byl využit systém Git v kombinaci s platformou GitHub \cite{TODO}. 
+Pro verzování zdrojových kódů a zálohování projektu byl využit systém Git v kombinaci s platformou GitHub \cite{github_2025_github}. 
 Využití repozitáře na této platformě zajistilo nejen transparentní historii vývoje pro vedoucího práce, ale také bezpečné a snadno dostupné úložiště pro zdrojové kódy. 
 
-Platforma GitHub nabízí také spoustu rozšíření, příkladem může být služba GitHub Pages \cite{TODO}, která byla v této práci využita pro kontinuální nasazení (Continuous Deployment) webové aplikace. 
+Platforma GitHub nabízí také spoustu rozšíření, příkladem může být služba GitHub Pages \cite{github_pages_2026_github}, která byla v této práci využita pro kontinuální nasazení (Continuous Deployment) webové aplikace. 
 Pro usnadnění přístupu k aplikaci byla k repozitáři připojena vlastní doména. 
 Aktuální verze aplikace je tedy dostupná na adrese \texttt{ccs.koberskyj.cz}. 
 Využití služby GitHub Pages poskytuje stabilní a ověřené hostingové řešení, které garantuje vysokou dostupnost aplikace pro uživatele.
 
 \subsection{Node.js a npm}
-Node.js je běhové prostředí (runtime environment) postavené na enginu V8 z prohlížeče Google Chrome, které umožňuje spouštět JavaScript kód mimo webový prohlížeč \cite{TODO}. 
+Node.js je běhové prostředí (runtime environment) postavené na enginu V8 z prohlížeče Google Chrome, které umožňuje spouštět JavaScript kód mimo webový prohlížeč \cite{nodejs_2025_nodejs}. 
 V tomto projektu neslouží Node.js pro běh serverové části (backendu), jelikož je aplikace navržena jako čistě klientská, ale poskytuje infrastrukturu pro běh vývojových a sestavovacích nástrojů. 
 
 Společně s Node.js byl využit balíčkovací systém \texttt{npm} (Node Package Manager), který spravuje všechny externí závislosti projektu. 
@@ -30,7 +30,7 @@ Pomocí \texttt{npm} byly do projektu integrovány veškeré knihovny zmíněné
 Správa verzí v souboru \texttt{package.json} navíc zajišťuje deterministická sestavení aplikace na různých počítačích s různým operačním systémem.
 
 \subsection{Vite}
-Pro samotné sestavení a běh vývojového serveru byl použit nástroj Vite \cite{TODO}. 
+Pro samotné sestavení a běh vývojového serveru byl použit nástroj Vite \cite{vite_2024_vite}. 
 Oproti starším bundlerům, jako je například Webpack, přináší Vite značné zrychlení vývojového procesu. 
 Využívá nativních ES modulů v prohlížeči, což znamená, že při úpravě kódu není nutné překompilovávat celou aplikaci. 
 
@@ -44,18 +44,18 @@ Z tohoto důvodu byla zvolena architektura Single Page Application (SPA).
 V tomto modelu se veškeré HTML, JavaScript a CSS soubory načtou pouze jednou a obsah stránky je pak dynamicky přepisován na základě interakce uživatele bez nutnosti znovunačtení celé webové stránky ze serveru.
 
 \subsection{React.js a TypeScript}
-Pro vývoj uživatelského rozhraní byla použita JavaScript knihovna React.js, vyvinutá společností Meta \cite{TODO}. 
+Pro vývoj uživatelského rozhraní byla použita JavaScript knihovna React.js, vyvinutá společností Meta \cite{metaopensource_2025_react}. 
 React umožňuje tvorbu komplexních uživatelských rozhraní skládáním malých, znovupoužitelných a izolovaných komponent. 
 Deklarativní přístup Reactu výrazně usnadňuje synchronizaci vnitřního stavu aplikace (například informace o aktuálním kroku v SOS důkazu nebo vizuálním stavu LTS grafu) s tím, co uživatel vidí na obrazovce.
 
 Knihovna React byla také doplněna o jazyk TypeScript, který obohacuje standardní JavaScript o statické typování. 
 
-Při návrhu React komponent byly navíc uplatňovány principy metodiky SOLID, což je sada doporučení pro psaní znovupoužitelných komponent \cite{TODO}. 
+Při návrhu React komponent byly navíc uplatňovány principy metodiky SOLID, což je sada doporučení pro psaní znovupoužitelných komponent \cite{drruvari_2024_mastering}. 
 Jedná se například o jasné vymezení odpovědnosti komponenty nebo o to, aby byly komponenty otevřené pro vnější rozšíření.
 Příkladem takovéto komponenty může být \texttt{CCSViewer}, který umožňuje zvýraznit syntaxi vloženého CCS výrazu a zobrazit jej jako klasický textový element, jakým je například značka \texttt{span}.
 
 \subsection{Tailwind CSS}
-Pro stylování aplikace byl využit framework Tailwind CSS \cite{TODO}. 
+Pro stylování aplikace byl využit framework Tailwind CSS \cite{tailwindcss_2025_tailwind}. 
 Na rozdíl od tradičních CSS frameworků (jako je např. Bootstrap), které poskytují předpřipravené komponenty, je Tailwind \enquote{utility-first} framework. 
 Poskytuje nízkoúrovňové třídy (např. pro nastavení okrajů, barev či flexboxu), které se aplikují přímo do HTML/JSX kódu komponent. 
 
@@ -65,10 +65,10 @@ Zásadní výhodou knihovny Tailwind je přítomnost \enquote{Just-In-Time} komp
 Tím je zajištěna minimální výsledná velikost aplikace. 
 
 \subsection{Shadcn}
-Zatímco Tailwind poskytuje nástroje pro základní formátování, pro komplexnější interaktivní prvky uživatelského rozhraní byla využita kolekce komponent Shadcn/ui \cite{TODO}. 
+Zatímco Tailwind poskytuje nástroje pro základní formátování, pro komplexnější interaktivní prvky uživatelského rozhraní byla využita kolekce komponent Shadcn/ui \cite{shadcn_2024_shadcnui}. 
 Nejedná se o tradiční knihovnu, která se instaluje přes \texttt{npm}, ale spíše o sadu přizpůsobitelných komponent generovaných přímo do zdrojového kódu projektu, nad kterými má vývojář plnou kontrolu. 
 
-Komponenty z rodiny Shadcn jsou postavené na knihovně Radix UI \cite{TODO}, což garantuje jejich vysokou přístupnost (accessibility) pro uživatele s omezením, včetně podpory pro ovládání z klávesnice a čtečky obrazovky. 
+Komponenty z rodiny Shadcn jsou postavené na knihovně Radix UI \cite{radixui_2025_primitives}, což garantuje jejich vysokou přístupnost (accessibility) pro uživatele s omezením, včetně podpory pro ovládání z klávesnice a čtečky obrazovky. 
 V aplikaci byly tyto prvky využity pro tvorbu rozbalovacích nabídek, tlačítek, modálních oken a vyskakovacích upozornění. 
 
 \section{Zpracování a vizualizace formálních modelů}
@@ -76,7 +76,7 @@ Hlavní cíl této práce spočívá ve schopnosti aplikace syntakticky analyzov
 K tomuto účelu byly využity specifické knihovny pro zpracování textu a interaktivní vykreslení grafů.
 
 \subsection{Peggy.js}
-Pro zpracování zadaných programů v kalkulu komunikujících systémů byl využit generátor syntaktických analyzátorů Peggy.js \cite{TODO}. 
+Pro zpracování zadaných programů v kalkulu komunikujících systémů byl využit generátor syntaktických analyzátorů Peggy.js \cite{peggyjs_2024_peggy}. 
 Tento nástroj umožňuje definovat formální gramatiku jazyka pomocí zápisu PEG (Parsing Expression Grammar). 
 Z této deklarativní definice Peggy.js následně vygeneruje deterministický a vysoce efektivní parser přímo v jazyce JavaScript.
 
@@ -88,7 +88,7 @@ Tento strom je následně zkontrolován dodatečnými sémantickými kontrolami 
 Po úspěšné validaci tvoří AST základní datovou strukturu pro generování LTS grafu a pro konstruování jednotlivých kroků strukturální operační sémantiky.
 
 \subsection{CodeMirror}
-O zadávání a zobrazování zdrojových kódů CCS programů se stará editorová komponenta CodeMirror \cite{TODO}. 
+O zadávání a zobrazování zdrojových kódů CCS programů se stará editorová komponenta CodeMirror \cite{codemirrornet_2025_codemirror}. 
 Jedná se o flexibilní webový textový editor navržený pro implementaci vývojářských nástrojů přímo v prohlížeči. 
 
 Pro potřeby této práce byl vytvořen vlastní režim lexikální analýzy (syntax highlighting), specifický pro jazyk CCS, jehož pravidla odpovídají gramatice použité v Peggy.js. 
@@ -97,7 +97,7 @@ Kromě hlavního okna pro zápis kódu je CodeMirror v aplikaci využit i v rež
 To umožňuje zachovat konzistentní zvýraznění syntaxe v celém uživatelském rozhraní, od instrukcí a nápověd, až po samotný text interaktivních SOS důkazů.
 
 \subsection{Cytoscape.js a doplňky}
-Pro vizualizaci ohodnocených přechodových systémů a syntaktických stromů, z nichž mohou vzniknout rozsáhlé orientované grafy, byla použita knihovna Cytoscape.js \cite{TODO}. 
+Pro vizualizaci ohodnocených přechodových systémů a syntaktických stromů, z nichž mohou vzniknout rozsáhlé orientované grafy, byla použita knihovna Cytoscape.js \cite{keiichiroono_2019_cytoscape}. 
 Jedná se o vysoce optimalizovanou JavaScript knihovnu určenou primárně pro modelování a interaktivní vizualizaci komplexních síťových struktur.
 
 V rámci aplikace Cytoscape vykresluje stavy reprezentované jako vrcholy grafu a přechody definované akcemi ve formě orientovaných hran. 
@@ -134,7 +134,7 @@ Prostřednictvím \texttt{localStorage} aplikace uchovává veškerá uživatels
 
 \subsection{Lokalizace}
 Jelikož se problematika formální verifikace a kalkulu komunikujících systémů může vyučovat v českém i anglickém jazyce, byla aplikace od začátku navržena s podporou pro internacionalizaci (i18n). 
-Textové řetězce nejsou pevně zakomponovány v logice komponent, ale jsou externě a dynamicky načítány pomocí lokalizačního frameworku \texttt{i18next} \cite{TODO}. 
+Textové řetězce nejsou pevně zakomponovány v logice komponent, ale jsou externě a dynamicky načítány pomocí lokalizačního frameworku \texttt{i18next} \cite{i18nextcom_2026_introduction}. 
 Tato architektura zajišťuje spolehlivý překlad veškerých prvků uživatelského rozhraní, chybových zpráv i nápověd do češtiny a angličtiny, a to se schopností okamžitého přepnutí jazyka za běhu aplikace, bez nutnosti obnovení stránky.
 
 \subsection{Progresivní webová aplikace}
@@ -147,7 +147,7 @@ Součástí konfigurace je i webový manifest, který uživatelům dává možno
 Aplikace se následně spouští ve vlastním vyhrazeném okně bez prvků internetového prohlížeče.
 
 \subsection{Lighthouse}
-Při vývoji aplikace byl pravidelně využíván analytický nástroj Google Lighthouse \cite{TODO}. 
+Při vývoji aplikace byl pravidelně využíván analytický nástroj Google Lighthouse \cite{chromefordevelopers_2016_overview}. 
 Jedná se o automatizovaný open-source nástroj určený pro auditování a vylepšování kvality webových stránek. 
 
 Lighthouse simuluje průchod aplikací a generuje detailní metriky pokrývající výkon, SEO a dodržení standardů webových stránek. 

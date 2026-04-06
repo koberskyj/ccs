@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { TransitionArrow } from './ProofRuleHelp';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
-import { Wand2 } from 'lucide-react';
+import { BookText } from 'lucide-react';
 
 
 interface ProofBuilderProps {
@@ -147,7 +147,7 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
         <div className="flex gap-2 items-center">
           {showHints && rootStep.status === 'pending' && (
             <Button variant="outline" size="sm" onClick={handleAutoProve} className="h-8 shadow-none border-none">
-              <Wand2 className="h-4 w-4 mr-2" />
+              <BookText className="h-4 w-4 mr-2" />
               {t('sos.startProof')}
             </Button>
           )}

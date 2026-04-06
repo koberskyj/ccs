@@ -78,7 +78,7 @@ export function ProgramsProvider({ children }: { children: React.ReactNode }) {
         setPrograms(updatedPrograms);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrograms));
         localStorage.setItem(STORAGE_KEY_LATEST_DATE, newMaxTime.toString());
-        toast.success(t('selector.suppProgramSuccess', { count: programsToAdd.length }));
+        toast.success(t('selector.suppProgramSuccess'));
       }
 
     } catch (error) {

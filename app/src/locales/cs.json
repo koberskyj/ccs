@@ -90,12 +90,13 @@
     "unknownCardTypeError": "Neznámý typ karty '{{type}}'",
     "invalidCardStructureError": "Karta má chybnou strukturu",
     "invalidCardStyleError": "Karta obsahuje neplatný styl zobrazení.",
-    "renameProgramName": "Upravit název programu {{name}}",
+    "renameProgramName": "Upravit program {{name}}",
     "createNewProgram": "Vytvořit nový program",
     "suppProgramError": "Nepodařilo se načíst nové programy.",
     "suppProgramWarning": "Nepodařilo se načíst nový doplňový program \"{{name}}\":",
-    "suppProgramSuccess": "Nově přidané příklady úspěšně načteny ({{count}}x).",
-    "programErrorParsing": "Chyba při načítání lokálního seznamu programů, načítám základní nastavení."
+    "suppProgramSuccess": "Nově přidané příklady úspěšně načteny.",
+    "programErrorParsing": "Chyba při načítání lokálního seznamu programů, načítám základní nastavení.",
+    "unlockProgram": "Program je uzamčen. Klikněte zde pro odemčení a povolení úprav."
   },
   "sos": {
     "invalidSubproof": "Premisa selhala.",

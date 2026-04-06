@@ -10,6 +10,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{bussproofs}
+\usepackage{minted}
+\usepackage{dirtree}
 
 % Zadame pozadovane vstupy pro generovani titulnich stran.
 \ThesisAuthor{Bc. Jakub Koběrský}
@@ -25,15 +27,29 @@
 \ThesisAssignmentFileName{TheSisSpecification.pdf}
 
 % Pokud nechceme nikomu dekovat makro zapoznamkujeme.
-\Acknowledgement{TODO}
+\Acknowledgement{Chtěl bych poděkovat mému vedoucímu diplomové práce, panu Ing. Martinu Kotovi Ph.D., za rychlou, pečlivou a nápomocnou zpětnou vazbu při psaní této práce.}
 
-\CzechAbstract{TODO}
+\CzechAbstract{Tato diplomová práce se zabývá návrhem a implementací webové aplikace určené k podpoře výuky formální verifikace systémů, 
+konkrétně pak problematikou kalkulu komunikujících systémů, strukturální operační sémantiky a ohodnocených přechodových systémů. 
+Cílem této práce je vytvořit interaktivní nástroj, který studium této problematiky usnadní prostřednictvím vizuální zpětné vazby. 
+Výsledná aplikace je vyvinuta jako jednostránková webová aplikace za využití knihovny React.js. 
+Aplikace umožňuje uživatelům zadávat CCS výrazy, nad kterými v reálném čase probíhá syntaktická analýza a generování příslušného syntaktického stromu. 
+Klíčovou funkcionalitou, kterou se aplikace odlišuje od existujících alternativ, je možnost interaktivního konstruování důkazu přechodů na základě pravidel SOS. 
+Aplikace dále poskytuje automatizované generování a vizualizaci stavových prostorů ve formě LTS grafů, a to včetně simulace běhu vzájemně komunikujících procesů. 
+Součástí řešení je i sada předdefinovaných ukázkových příkladů, díky nimž je možné aplikaci ihned využít pro výuku.}
 
-\CzechKeywords{diplomová práce; TODO}
+\CzechKeywords{formální verifikace; komunikující systémy; kalkulus komunikujících systémů; CCS; strukturální operační sémantika; SOS; ohodnocené přechodové systémy; LTS; React.js; Vite; výuková aplikace; diplomová práce}
 
-\EnglishAbstract{TODO}
+\EnglishAbstract{Main focus of this master's thesis is the design and implementation of a web application intended to support the teaching of formal system verification, 
+specifically focusing on the Calculus of Communicating Systems, Structural Operational Semantics, and Labelled Transition Systems. 
+The aim of this work is to create an interactive tool that facilitates the learning of these concepts through immediate visual feedback. 
+The resulting software is developed as a Single Page Application using the React.js library. 
+The application allows users to input CCS expressions, which are subjected to real-time syntax analysis and the generation of a corresponding syntax tree. 
+A key feature that distinguishes this application from existing alternatives is the ability to interactively construct transition proofs based on SOS rules. 
+Furthermore, the application provides automated generation and visualization of state spaces in the form of LTS graphs, including the simulation of mutually communicating processes. 
+The solution also includes a set of predefined examples, allowing the application to be immediately integrated into the educational process.}
 
-\EnglishKeywords{master thesis; TODO}
+\EnglishKeywords{formal verification; communicating systems; Calculus of Communicating Systems; CCS; Structural Operational Semantics; SOS; Labelled Transition Systems; LTS; React.js; Vite; educational application; master thesis}
 
 \AddAcronym{CCS}{Calculus of Communicating Systems, kalkulus komunikujících systémů}
 \AddAcronym{SOS}{Structural Operational Semantics, strukturální operační sémantika}
@@ -47,18 +63,20 @@
 \AddAcronym{MaV}{Modelování a verifikace}
 \AddAcronym{CAAL}{Algebra of Communicating Processes}
 \AddAcronym{CWB}{Edinburgh Concurrency Workbench}
-\AddAcronym{UX}{User experience, Uživatelská přívětivost}
-\AddAcronym{UI/UX}{User interface / User experience, Uživatelské rozhraní / Uživatelská přívětivost}
-\AddAcronym{PWA}{Progressive web app, Progresivní webová aplikace}
+\AddAcronym{UX}{User experience}
+\AddAcronym{UI}{User interface}
+\AddAcronym{PWA}{Progressive web app}
 \AddAcronym{SPA}{Single Page Application}
 \AddAcronym{JS}{JavaScript}
 \AddAcronym{TS}{TypeScript}
-\AddAcronym{CSS}{Cascading Style Sheets, kaskádové styly}
+\AddAcronym{CSS}{Cascading Style Sheets}
 \AddAcronym{HTML}{HyperText Markup Language}
 \AddAcronym{JSON}{JavaScript Object Notation}
 \AddAcronym{HMR}{Hot Module Replacement}
 \AddAcronym{PEG}{Parsing Expression Grammar}
 \AddAcronym{JSON}{JavaScript Object Notation}
+\AddAcronym{BFS}{Breadth-First Search}
+\AddAcronym{SEO}{Search Engine Optimization}
 
 \addbibresource{citations.bib}
 

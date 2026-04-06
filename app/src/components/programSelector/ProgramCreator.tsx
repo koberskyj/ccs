@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import type { ProgramSave } from "@/types";
@@ -16,6 +16,15 @@ export function ProgramCreator({ children, onUpdate, program }: { children: Reac
   const [allowEditInput, setAllowEditInput] = useState<boolean>(program?.allowEdit ?? true);
   const [isOpen, setIsOpen] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState<string>("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setNameInput(program?.name ?? "");
+      setDescriptionInput(program?.description ?? "");
+      setAllowEditInput(program?.allowEdit ?? true);
+      setErrorMessage("");
+    }
+  }, [isOpen, program]);
 
   const createProgram = () => {
 

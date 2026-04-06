@@ -1,4 +1,30 @@
 \chapter{Úvod}
 \label{sec:Introduction}
+S neustálým rozvojem informačních technologií pronikají počítačové systémy do všech aspektů lidského života, kde se stále častěji setkáváme s takzvanými reaktivními systémy.
+Příkladem těchto systémů mohou být běžné webové služby, nápojové automaty, ale i kritické řídicí systémy v dopravě, zdravotnictví a průmyslu. 
+Tyto systémy nejsou navrženy k jednorázovému výpočtu a následnému ukončení, ale k neustálé interakci se svým okolím. 
+Vzhledem k jejich paralelní a nedeterministické povaze je zaručení jejich bezchybného chování pomocí tradičních způsobů testování prakticky nemožné. 
+
+Pro zaručení korektnosti systémů se proto využívají matematicky podložené metody formální verifikace. 
+Jednou ze základních metod v této oblasti je kalkulus komunikujících systémů, který představil britský informatik Robin Milner. 
+Tento formální jazyk umožňuje modelovat složité konkurentní systémy pomocí propojení jednoduchých nezávislých procesů, zkoumat jejich chování přes strukturální operační sémantiku a vizualizovat je pomocí ohodnocených přechodových systémů.
+
+Výuka těchto systémů ale často naráží na překážky, a to zejména v prvotních hodinách, kdy se studenti setkají s formálními matematickými důkazy. 
+Existující nástroje jsou totiž často navrženy pro potřeby pokročilé analýzy, nejsou tedy přizpůsobeny pro interaktivitu a výuku úplných základů.
+Cílem této diplomové práce je proto navrhnout a implementovat výukovou webovou aplikaci, která studentům usnadní pochopení základních problémů z oblasti formální verifikace systémů. 
+Práce si klade za cíl vytvořit dynamickou a uživatelsky přívětivou aplikaci, ve které mohou uživatelé experimentovat s vlastními modely a vizualizovat jejich chování. 
+Aplikace zajišťuje kontrolu syntaxe zadaných CCS výrazů, zobrazení jejich syntaktických stromů a poskytuje uživateli prostředí pro interaktivní a kontrolovanou tvorbu formálních důkazů podle pravidel SOS. 
+Vedle toho systém umožňuje automatické generování odpovídajících LTS grafů a simulaci běhu jednotlivých procesů. 
+Aby byla aplikace co nejpřístupnější, obsahuje také sadu připravených ukázkových vstupů.
+
+Text práce je rozdělen do pěti na sebe navazujících kapitol. 
+V kapitole \ref{sec:reaktivni_systemy} se probírá teoretický základu reaktivních systémů a detailně popisuje formalismus kalkulu komunikujících systémů, ohodnocených přechodových systémů a strukturální operační sémantiky. 
+Kapitola \ref{sec:analyza_pozadavku} analyzuje existující řešení a definuje funkční i nefunkční požadavky na vyvíjenou aplikaci. 
+V kapitole \ref{sec:technologie} jsou představeny použité moderní webové technologie a knihovny, jako jsou React.js, Peggy.js a Cytoscape.js. 
+Kapitola \ref{sec:navrh} se věnuje celkovému architektonickému návrhu řešení a uživatelského rozhraní.
+V neposlední řadě popisuje kapitola \ref{sec:implementace} samotnou implementaci výpočetní logiky, datových struktur, algoritmů a způsob nasazení aplikace.
+
+Výsledná verze aplikace je díky nástroje Github Pages \cite{github_pages_2026_github} nazasena na veřejné adrese \texttt{https://ccs.koberskyj.cz/}. 
+Během psaní této práce byla zejména při formátování textu využívána umělá inteligence \cite{googlellc_2024_gemini}.
 
 \endinput
