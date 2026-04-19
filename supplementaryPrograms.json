@@ -10,7 +10,8 @@
         "name": "Co generuje \"In\"?",
         "process": "In",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "f3e6d7cb-2899-4180-aa90-f3e6a33e5741"
       },
       {
         "type": "sos",
@@ -18,10 +19,12 @@
         "processX": "In",
         "processY": "Out",
         "action": "c",
-        "showHelp": true
+        "showHelp": true,
+        "id": "9de716d1-6f91-4b5b-9cb5-562bdcffae97"
       },
       {
         "type": "lts",
+        "id": "7b64f013-758b-473d-8703-5bd9a44d1d6d",
         "name": "Co generuje \"In2\"?",
         "process": "In2",
         "style": "mixed",
@@ -29,6 +32,7 @@
       },
       {
         "type": "sos",
+        "id": "97c7f6cc-1560-4f35-a20e-5555de8dc645",
         "name": "Důkaz",
         "processX": "In2",
         "processY": "Out2",
