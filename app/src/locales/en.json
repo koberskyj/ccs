@@ -39,7 +39,10 @@
     "back": "Back",
     "process": "Process",
     "confirm": "Potvrdit",
-    "cancel": "Zrušit"
+    "cancel": "Zrušit",
+    "processDefinition": "Process definition",
+    "exportAs": "Export as {{name}}",
+    "printOrPDF": "Print / Save as PDF"
   },
   "selector": {
     "renameCard": "Rename card",
@@ -143,7 +146,12 @@
     "noOldLabelError": "Original action was not selected.",
     "relabelingLabelsChangedError": "Relabeling set must not be changed.",
     "invalidRelabelingError": "Invalid relabeling ({{old}} -> {{expected}}).",
-    "unknownRuleError": "Unknown rule."
+    "unknownRuleError": "Unknown rule.",
+    "errorSourceProcess": "Error in a definition of source process: {{error}}",
+    "errorTargetProcess": "Error in a definition of target process: {{error}}",
+    "allProcessDefinitions": "List of all process definitions",
+    "processDefinitions": "Processes list",
+    "emptyExpressionError": "Process cannot be empty"
   },
   "textEditor": {
     "parserInitError": "CCS parser initialization failed.",
@@ -157,6 +165,12 @@
     "noTransitions": "Deadlock",
     "structuralReduction": "Structural reduction",
     "dynamicMode": "Dynamic loading",
-    "centering": "Graph centering"
+    "centering": "Graph centering",
+    "tooltipTip": "TIP: Right clicking a node or edge will show context menu.",
+    "copyNode": "Copy CCS",
+    "copyEdge": "Copy transition",
+    "defCopied": "Definition was copied to clipboard",
+    "createSosProof": "Prove transition",
+    "sosCreated": "A card for prove of this transition was created at the end of this site."
   }
 }

@@ -1,5 +1,6 @@
 import type { CCSAction, CCSDefinition, CCSExpression, CCSNode, CCSProgram, ProofRuleName, ProofStatus, ProofStep } from "@/types";
 import { t } from "i18next";
+import type { Parser } from "peggy";
 
 
 export function getPrecedence(node: CCSNode): number {
@@ -98,6 +99,56 @@ export function ccsToString(rawNode: CCSNode, canonical: boolean = false): strin
   }
 
   return printRecursive(rootNode);
+}
+
+export function parseCCSAction(input: string): CCSAction|{ error: string } {
+  if(!input || input.trim() === "") {
+    return { error: t('sos.emptyActionError') };
+  }
+
+  const trimmedInput = input.trim();
+  const isOutput = trimmedInput.startsWith("'");
+  const rawLabel = isOutput ? trimmedInput.substring(1) : trimmedInput;
+  if(rawLabel === "tau" || rawLabel === "τ") {
+    if(isOutput) {
+      return { error: t('sos.tauCannotBeOutput') };
+    }
+    return { label: "tau", isOutput: false };
+  }
+
+  const labelRegex = /^[a-z][a-z0-9_]*$/;
+  if(!labelRegex.test(rawLabel)) {
+    return { error: t('sos.invalidActionName') };
+  }
+  return { label: rawLabel, isOutput };
+}
+
+export function parseExpression(parser: Parser, program: CCSProgram, input: string): CCSExpression|{ error: string } {
+  const trimmed = input.trim();
+  if(!trimmed) {
+    return { error: t('sos.emptyExpressionError') };
+  }
+
+  const existing = getExpressionByName(program, trimmed);
+  if(existing) {
+    return existing;
+  }
+
+  try {
+    const processCode = `TmpProcessDef = ${trimmed}`;
+    const ast: CCSProgram = parser.parse(processCode);
+    if(ast && ast.length > 0) {
+      return ast[0].process;
+    }
+    return { error: 'Neznámá chyba při parsování výrazu.' };
+  } 
+  catch (e: any) {
+    return { error: e.message };
+  }
+}
+
+export function getExpressionByName(program: CCSProgram, name: string): CCSExpression | undefined {
+  return program.find((def) => def.name === name)?.process;
 }
 
 export function extractAllActions(program: CCSProgram): string[] {
@@ -472,3 +523,69 @@ export function getSOSApplicableRules(expression: CCSExpression): string[] {
 }
 
 export const ALL_SOS_RULES = [ 'ACT', 'SUM_LEFT', 'SUM_RIGHT', 'COM_LEFT', 'COM_RIGHT', 'COM_SYNC', 'RES', 'REL', 'CON' ];
+
+
+export function ccsToLatex(node: CCSNode): string {
+  let str = ccsToString(node);
+  str = str.replace(/ \| /g, ' \\mid ');
+  str = str.replace(/ \\ /g, ' \\setminus ');
+  str = str.replace(/\btau\b/g, '\\tau');
+  str = str.replace(/'([a-zA-Z0-9_]+)/g, '\\overline{$1}');
+  return str;
+}
+
+function formatLatexTransition(step: ProofStep): string {
+  const s = ccsToLatex(step.source);
+  const t = ccsToLatex(step.target);
+  const a = step.action.label === 'tau' ? '\\tau' : (step.action.isOutput ? `\\overline{${step.action.label}}` : step.action.label);
+  return `${s} \\xrightarrow{${a}} ${t}`;
+}
+
+function generateLatexTree(step: ProofStep): string {
+  let res = "";
+  
+  if(step.children.length === 0) {
+    res += "\\AxiomC{}\n";
+    if(step.appliedRule) {
+      res += `\\LeftLabel{${step.appliedRule.replace('_', '\\_')} }\n`;
+      res += `\\UnaryInfC{$${formatLatexTransition(step)}$}\n`;
+    } 
+    else {
+      res += `\\UnaryInfC{$${formatLatexTransition(step)}$}\n`;
+    }
+  } 
+  else if (step.children.length === 1) {
+    res += generateLatexTree(step.children[0]);
+    res += `\\LeftLabel{${step.appliedRule?.replace('_', '\\_') || ''} }\n`;
+    res += `\\UnaryInfC{$${formatLatexTransition(step)}$}\n`;
+  } 
+  else if (step.children.length === 2) {
+    res += generateLatexTree(step.children[0]);
+    res += generateLatexTree(step.children[1]);
+    res += `\\LeftLabel{${step.appliedRule?.replace('_', '\\_') || ''} }\n`;
+    res += `\\BinaryInfC{$${formatLatexTransition(step)}$}\n`;
+  }
+  
+  return res;
+}
+
+export function exportToLatex(rootStep: ProofStep): string {
+  return `\\begin{prooftree}\n${generateLatexTree(rootStep)}\\end{prooftree}`;
+}
+
+export function exportToJson(rootStep: ProofStep): string {
+  return JSON.stringify(rootStep, null, 2);
+}
+
+export function exportToText(step: ProofStep, depth: number = 0): string {
+  const indent = "  ".repeat(depth);
+  const s = ccsToString(step.source);
+  const t = ccsToString(step.target);
+  const a = step.action.label === 'tau' ? 'tau' : (step.action.isOutput ? `'${step.action.label}` : step.action.label);
+  
+  let res = `${indent}[${step.appliedRule || '-'}] ${s} -${a}-> ${t} (${step.status})\n`;
+  step.children.forEach(child => {
+    res += exportToText(child, depth + 1);
+  });
+  return res;
+}

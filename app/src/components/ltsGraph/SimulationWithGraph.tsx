@@ -20,10 +20,11 @@ type SimulationWithGraphProps = {
   initSettings?: CardLTS;
   hideSettings?: boolean;
   onSettingsUpdate?: (settings: CardLTS) => void;
+  onCreateProofCard?: (sourceCCS: string, targetCCS: string, action: string) => void;
   allowEdit?: boolean;
 };
 
-export default function SimulationWithGraph({program, initSettings, hideSettings=true, onSettingsUpdate, allowEdit}: SimulationWithGraphProps) {
+export default function SimulationWithGraph({program, initSettings, hideSettings=true, onSettingsUpdate, onCreateProofCard, allowEdit}: SimulationWithGraphProps) {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>(initSettings?.style || 'id');
   const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
@@ -49,6 +50,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
     if(onSettingsUpdate) {
       onSettingsUpdate({
         type: 'lts',
+        id: initSettings?.id!,
         name: initSettings?.name ?? t('core.simulation'),
         process: selectedProcessName,
         style: viewMode,
@@ -340,6 +342,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
             edgeHighlight={edgeHighlightRequest}
             viewMode={viewMode}
             isCentering={isCentering}
+            onCreateProofCard={onCreateProofCard}
           />
         </div>
 

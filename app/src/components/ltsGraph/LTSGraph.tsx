@@ -7,10 +7,11 @@ import type { ViewMode, EdgeHighlightRequest } from '@/types';
 import CCSViewer from '../custom/CCSViewer';
 import { createPortal } from 'react-dom';
 import { Button } from '../ui/button';
-import { Download } from 'lucide-react';
+import { Copy, Download, PlusCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { handleExport } from '@/lib/ccsToSyntaxTree';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 cytoscape.use(dagre);
 
@@ -102,6 +103,7 @@ type LTSGraphProps = {
   edgeHighlight?: EdgeHighlightRequest;
   viewMode: ViewMode;
   isCentering?: boolean;
+  onCreateProofCard?: (sourceCCS: string, targetCCS: string, action: string) => void;
 }
 
 type TooltipState = {
@@ -112,12 +114,23 @@ type TooltipState = {
   numId: string;
 } | null;
 
-export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode, isCentering }: LTSGraphProps) {
+type ContextMenuState = {
+  x: number;
+  y: number;
+  type: 'node' | 'edge';
+  ccs?: string;
+  sourceCcs?: string;
+  targetCcs?: string;
+  action?: string;
+} | null;
+
+export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode, isCentering, onCreateProofCard }: LTSGraphProps) {
   const { t } = useTranslation();
   const cyRef = useRef<Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
+  const hoverTimeoutRef = useRef<number | null>(null);
 
   const stylesheet = useMemo(() => {
     return [
@@ -240,7 +253,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     if(hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
-    setTooltip(null)
+    setTooltip(null);
   }, []);
   const handleMouseOver = useCallback((evt: EventObject) => {
     const node = evt.target as NodeSingular;
@@ -265,24 +278,67 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
     }, 250);
   }, []);
 
+  const handleRightClick = useCallback((evt: EventObject) => {
+    evt.preventDefault();
+    const ele = evt.target;
+    const container = containerRef.current;
+    if(!container) {
+      return;
+    }
+    
+    setTooltip(null);
+    const containerRect = container.getBoundingClientRect();
+    const absoluteX = containerRect.left + evt.renderedPosition.x;
+    const absoluteY = containerRect.top + evt.renderedPosition.y;
+
+    if(ele.isNode()) {
+      setContextMenu({
+        x: absoluteX,
+        y: absoluteY,
+        type: 'node',
+        ccs: ele.data('ccs')
+      });
+    } 
+    else if (ele.isEdge()) {
+      setContextMenu({
+        x: absoluteX,
+        y: absoluteY,
+        type: 'edge',
+        sourceCcs: ele.source().data('ccs'),
+        targetCcs: ele.target().data('ccs'),
+        action: ele.data('label') || ele.data('actions')?.[0] || ''
+      });
+    }
+  }, []);
+
 
   useEffect(() => {
     if(!cyRef.current) {
       return;
     }
     const cy = cyRef.current;
-
     cy.on('mouseover', 'node', handleMouseOver);
-    cy.on('mouseout', 'node', handleMouseOut);
-    cy.on('pan zoom', handleMouseOut);
-    cy.on('grab drag', 'node', handleMouseOut);
+    cy.on('mouseout', 'node, edge', handleMouseOut);
+    cy.on('cxttap', 'node, edge', handleRightClick);
+    cy.on('tap', () => setContextMenu(null));
+    cy.on('pan zoom', () => { handleMouseOut(); setContextMenu(null); });
+    cy.on('grab drag', 'node', () => { handleMouseOut(); setContextMenu(null); });
+
     return () => {
       cy.off('mouseover', 'node', handleMouseOver);
-      cy.off('mouseout', 'node', handleMouseOut);
-      cy.off('pan zoom', handleMouseOut);
-      cy.off('grab drag', 'node', handleMouseOut);
+      cy.off('mouseout', 'node, edge', handleMouseOut);
+      cy.off('cxttap', 'node, edge', handleRightClick);
+      cy.off('tap');
+      cy.off('pan zoom');
+      cy.off('grab drag');
     };
-  }, [handleMouseOver, handleMouseOut]);
+  }, [handleMouseOver, handleMouseOut, handleRightClick]);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(t('simulation.defCopied'));
+    setContextMenu(null);
+  };
 
   const renderTooltip = () => {
     if(!tooltip) {
@@ -301,13 +357,13 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       transform: `translate(-50%, -100%)`,
       width: 'max-content',
       maxWidth: `${TOOLTIP_WIDTH}px`,
-      zIndex: 99999,
+      zIndex: 99998,
       pointerEvents: 'none'
     };
 
     return createPortal(
       <div style={style}>
-        <div className="animate-in fade-in-0 zoom-in-95 duration-200 px-4 py-3 text-sm bg-popover/80 text-popover-foreground border border-foreground/20 shadow-lg backdrop-blur-sm rounded-lg">
+        <div className="animate-in fade-in-0 zoom-in-95 duration-200 px-4 py-3 text-sm bg-popover/90 text-popover-foreground border border-foreground/20 shadow-lg backdrop-blur-sm rounded-lg">
           <div className="font-mono border-b border-stone-400 pb-1 mb-2 font-bold text-xs uppercase tracking-wider flex justify-between">
             <span>{t('core.node')} {tooltip.numId} <span className="text-[0.65rem] text-foreground/50">({tooltip.nodeId})</span></span>
           </div>
@@ -315,10 +371,52 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
             <CCSViewer code={tooltip.text} />
           </div>
 
+          <div className="mt-2 text-[0.75rem] text-muted-foreground italic text-center border-t border-border/50 pt-1">
+            {t('simulation.tooltipTip')}
+          </div>
+
           <div className={`absolute w-0 h-0 border-8 border-transparent border-t-popover/95 bottom-0 translate-y-full`}
             style={{ left: '50.25%', transform: `translateX(-50%)`}}>
           </div>
         </div>
+      </div>,
+      document.body
+    );
+  };
+
+  const renderContextMenu = () => {
+    if(!contextMenu) {
+      return null;
+    }
+
+    const style: React.CSSProperties = {
+      position: 'fixed', left: contextMenu.x, top: contextMenu.y,
+      zIndex: 99999
+    };
+
+    return createPortal(
+      <div style={style} className="bg-popover border border-border shadow-md rounded-md p-1 min-w-40 animate-in fade-in-0 zoom-in-95">
+        {contextMenu.type === 'node' ? (
+          <button onClick={() => copyToClipboard(contextMenu.ccs!)} className="w-full text-left px-2 py-1.5 text-sm hover:bg-muted rounded flex items-center gap-2">
+            <Copy className="w-4 h-4" /> {t('simulation.copyNode')}
+          </button>
+        ) : (
+          <>
+            <button onClick={() => copyToClipboard(`${contextMenu.sourceCcs} -${contextMenu.action}-> ${contextMenu.targetCcs}`)} 
+                className="w-full text-left px-2 py-1.5 text-sm hover:bg-muted rounded flex items-center gap-2">
+              <Copy className="w-4 h-4" /> {t('simulation.copyEdge')}
+            </button>
+            {onCreateProofCard && (
+              <button onClick={() => {
+                onCreateProofCard(contextMenu.sourceCcs!, contextMenu.targetCcs!, contextMenu.action!);
+                toast.success(t('simulation.sosCreated'), { duration: 10000 });
+                setContextMenu(null);
+              }} className="w-full text-left px-2 py-1.5 text-sm hover:bg-muted rounded flex items-center gap-2 text-primary">
+                <PlusCircle className="w-4 h-4" /> {t('simulation.createSosProof')}
+              </button>
+            )}
+          </>
+        )}
       </div>,
       document.body
     );
@@ -336,13 +434,13 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'png')}>
-              {t('core.downloadAs')} PNG
+              {t('core.exportAs', { name: 'PNG'})}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'svg')}>
-              {t('core.downloadAs')} SVG
+              {t('core.exportAs', { name: 'SVG'})}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'json')}>
-              {t('core.downloadAs')} JSON
+              {t('core.exportAs', { name: 'JSON'})}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -357,6 +455,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
       />
 
       {renderTooltip()}
+      {renderContextMenu()}
     </div>
   );
 }

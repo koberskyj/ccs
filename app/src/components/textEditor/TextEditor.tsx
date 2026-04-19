@@ -79,7 +79,7 @@ export const ccsLanguage = StreamLanguage.define({
     }
 
     // Klíčová slova
-    if (stream.match(/^(Nil|0|def)\b/)) {
+    if (stream.match(/^(Nil|0)\b/)) {
       return "keyword";
     }
 

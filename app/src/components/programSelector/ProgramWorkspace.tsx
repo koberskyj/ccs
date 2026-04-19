@@ -3,7 +3,7 @@ import EditorWrap from "@/components/textEditor/EditorWrap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { CCSProgram, ProgramCardType, CardSOS, CardLTS, ProgramSave } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePrograms } from "@/utils/usePrograms";
 import ProgramCard from "./ProgramCard";
@@ -18,7 +18,21 @@ export default function ProgramWorkspace() {
   const { activeProgram, selectedProgramIndex, isDirty, updateProgram, setIsDirty } = usePrograms();
   const [changeVersion, setChangeVersion] = useState<number>(0);
   const [localProgram, setLocalProgram] = useState<ProgramSave | null>(null);
+  const [prevActiveIndex, setPrevActiveIndex] = useState<number | null>(null);
   const [ccsAst, setCcsAst] = useState<CCSProgram | null>(null);
+
+  if(selectedProgramIndex !== prevActiveIndex) {
+    setPrevActiveIndex(selectedProgramIndex);
+    if(activeProgram) {
+      const cloned = structuredClone(activeProgram);
+      cloned.cards = cloned.cards.map(card => card.id ? card : { ...card, id: crypto.randomUUID() });
+      setLocalProgram(cloned);
+    } 
+    else {
+      setLocalProgram(null);
+    }
+    setChangeVersion(prev => prev + 1);
+  }
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -36,47 +50,66 @@ export default function ProgramWorkspace() {
 
   useEffect(() => {
     if(activeProgram) {
-      setLocalProgram(structuredClone(activeProgram));
+      const cloned = structuredClone(activeProgram);
+      // Backward compatibility with programs with no id
+      cloned.cards = cloned.cards.map(card => card.id ? card : { ...card, id: crypto.randomUUID() });
+      setLocalProgram(cloned);
     } 
     else {
       setLocalProgram(null);
     }
 
-    setChangeVersion(changeVersion + 1);
+    setChangeVersion(prev => prev + 1);
   }, [activeProgram]);
 
   const handleCodeUpdate = (ast: CCSProgram, codeString: string) => {
     setCcsAst(ast);
-
-    if(localProgram && codeString !== localProgram.definition) {
-      setLocalProgram({
-        ...localProgram,
-        definition: codeString
-      });
-    }
-  };
-
-  const handleNameChange = (updated: ProgramSave) => {
-    if(!localProgram) {
-      return;
-    }
-    
-    setLocalProgram({
-      ...localProgram,
-      name: updated.name,
-      description: updated.description,
-      allowEdit: updated.allowEdit
+    setLocalProgram(prev => {
+      if(prev && codeString !== prev.definition) {
+        return { ...prev, definition: codeString };
+      }
+      return prev;
     });
   };
 
-  const addCard = (type: 'sos' | 'lts') => {
+  const handleNameChange = (updated: ProgramSave) => {
+    setLocalProgram(prev => {
+      if(!prev) {
+        return prev;
+      }
+
+      return { 
+        ...prev, 
+        name: updated.name, 
+        description: updated.description, 
+        allowEdit: updated.allowEdit
+      }
+    });
+  };
+
+  const addCard = (type: 'sos' | 'lts', defaultData?: any) => {
     if(!localProgram) {
       return;
     }
 
     const newCard: ProgramCardType = type === 'sos'
-      ? { type: 'sos', name: t('core.proof'), processX: '', processY: '', action: '', showHelp: true } as CardSOS
-      : { type: 'lts', name: t('core.simulation'), process: '', useStructRed: false, style: 'mixed' } as CardLTS;
+      ? { 
+          type: 'sos', 
+          id: crypto.randomUUID(),
+          name: defaultData?.name || t('core.proof'), 
+          processX: defaultData?.processX || '', 
+          processY: defaultData?.processY || '', 
+          action: defaultData?.action || '', 
+          showHelp: defaultData?.showHelp || true 
+        } as CardSOS
+      : { 
+          type: 'lts', 
+          id: crypto.randomUUID(),
+          name: defaultData?.name || t('core.simulation'), 
+          process: defaultData?.process || '', 
+          useStructRed: defaultData?.useStructRed || false, 
+          style: defaultData?.style || 'mixed' 
+        } as CardLTS;
 
     setLocalProgram({
       ...localProgram,
@@ -121,16 +154,46 @@ export default function ProgramWorkspace() {
     });
   };
 
+  const moveCard = (index: number, direction: 'up' | 'down') => {
+    if(!localProgram) {
+      return;
+    }
+
+    const newCards = [...localProgram.cards];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if(targetIndex < 0 || targetIndex >= newCards.length) {
+      return;
+    }
+
+    const temp = newCards[index];
+    newCards[index] = newCards[targetIndex];
+    newCards[targetIndex] = temp;
+
+    setLocalProgram({
+      ...localProgram,
+      cards: newCards
+    });
+  };
+
   const handleDiscard = () => {
     setLocalProgram(activeProgram);
     setChangeVersion(changeVersion + 1);
     toast.info(t('selector.changesDiscarded'));
   };
   
-  const isDirtyLocal = localProgram && (activeProgram ? JSON.stringify(localProgram) !== JSON.stringify(activeProgram) : false);
-  useEffect(() => {
-    setIsDirty(isDirtyLocal ?? false);
+  const isDirtyLocal = useMemo(() => {
+    if(!localProgram || !activeProgram) {
+      return false;
+    }
+    const sanitize = (prog: ProgramSave) => ({
+      ...prog,
+      cards: prog.cards.map(({ id, ...rest }) => rest)
+    });
+    return JSON.stringify(sanitize(localProgram)) !== JSON.stringify(sanitize(activeProgram));
+  }, [localProgram, activeProgram]);
 
+  useEffect(() => {
+    setIsDirty(isDirtyLocal);
     return () => setIsDirty(false);
   }, [isDirtyLocal, setIsDirty]);
   
@@ -186,7 +249,18 @@ export default function ProgramWorkspace() {
         <>
           <div className="space-y-6">
             {localProgram.cards.map((card, index) => {
-              return <ProgramCard key={index + changeVersion} card={card} index={index} ccsAst={ccsAst} onUpdate={data => updateCard(index, data)} onDelete={() => removeCard(index)}/>;
+              return <ProgramCard 
+                key={card.id || index + changeVersion}
+                card={card} 
+                index={index} 
+                ccsAst={ccsAst} 
+                totalCards={localProgram.cards.length}
+                onUpdate={data => updateCard(index, data)} 
+                onDelete={() => removeCard(index)}
+                onMoveUp={() => moveCard(index, 'up')}
+                onMoveDown={() => moveCard(index, 'down')}
+                onCreateProofCard={(processX, processY, action) => addCard('sos', { processX, action, processY })}
+              />;
             })}
           </div>
 

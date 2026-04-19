@@ -18,15 +18,15 @@ Díky tomu si mohou uživatelé lépe představit abstraktní principy synchroni
 
 \section{Analýza existujících řešení}
 \label{sec:analyza_existujicich_reseni}
-Oblast formální verifikace a analýzy systémů popsaných pomocí CCS již disponuje řadou aplikací. 
-Většina z nich však byla navržena primárně pro výzkumné nebo průmyslové účely, nikoliv explicitně jako pomůcky pro začátečníky. 
+Oblast formální verifikace a analýzy systémů popsaných pomocí CCS již disponuje řadou aplikací, 
+většina z nich však byla navržena primárně pro výzkumné nebo průmyslové účely, nikoliv explicitně jako pomůcky pro začátečníky. 
 Mezi nejvýznamnější programy v kontextu existujícího softwaru je vhodné zmínit následující aplikace.
 
 \subsection{Concurrency Workbench Aalborg (CAAL)}
 Jako nejvýznamnější moderní nástroj lze uvést CAAL (Concurrency Workbench Aalborg) \cite{caal}. 
 Jedná se o komplexní webovou aplikaci umožňující specifikaci procesů v CCS, generování LTS, ověřování bisimulačních ekvivalencí a model checking pomocí modální logiky.
-Je to poměrně intuitivní nástroj, který se i během výuky předmětu používá, obsahuje však i určité limity. 
-Hlavní nevýhodou je absence podpory pro dokazování přechodů pomocí jednotlivých SOS pravidel, což omezuje jeho využití v úvodních fázích výuky.
+Je to poměrně intuitivní nástroj, který je i během výuky předmětu využíván. Nástroj ale obsahuje i určité limity. 
+Hlavní nevýhodou je totiž absence podpory pro dokazování přechodů pomocí jednotlivých SOS pravidel, což omezuje jeho využití v úvodních fázích výuky.
 Při generování LTS grafů navíc CAAL využívá algoritmy optimalizované spíše pro rozsáhlé stavové prostory, což má za následek horší přehlednost u menších výukových příkladů. 
 Nástroj rovněž neposkytuje vizualizaci abstraktního syntaktického stromu (AST), která je pro pochopení sémantiky a priorit operátorů klíčová.
 
@@ -34,11 +34,11 @@ Nástroj rovněž neposkytuje vizualizaci abstraktního syntaktického stromu (A
 Historicky důležitým nástrojem, který definoval standard pro automatizovanou analýzu CCS, je CWB \cite{CWB}. 
 Ačkoliv se jedná o spolehlivý software s vysokým výkonem, v dnešní době již není dále vyvíjen.
 Na tento nástroj později navázal projekt Concurrency Workbench of the New Century (CWB-NC), který přinesl další rošíření a vylepšení architektury, avšak i jeho vývoj byl nakonec opuštěn.
-Zásadním nedostatkem obou těchto nástrojů pro účely moderní výuky je zastaralé uživatelské rozhraní založené výhradně na příkazové řádce. 
-Neposkytují žádnou formu interaktivní vizualizace grafů či syntaktických stromů, nejsou tedy pro výuku a vizualizaci příliš v vhodné.
+Zásadním nedostatkem obou těchto nástrojů pro účely moderní výuky je zastaralé uživatelské rozhraní, založené výhradně na příkazové řádce. 
+Neposkytují žádnou formu interaktivní vizualizace grafů či syntaktických stromů, nejsou tedy pro výuku a vizualizaci příliš vhodné.
 
 \subsection{Zhodnocení a opodstatnění nového řešení}
-Z analýzy existujících řešení vyplývá, že jejich hlavním nedostatkem je složitost uživatelského rozhraní a absence nástrojů zaměřených čistě na pochopení základních principů (např. krokové budování SOS důkazů a vizualizace AST).
+Z analýzy existujících řešení vyplývá, že jejich hlavním nedostatkem je složitost uživatelského rozhraní nebo absence nástrojů zaměřených čistě na pochopení základních principů (např. krokové budování SOS důkazů a vizualizace AST).
 Hlavním opodstatněním vývoje nového řešení je tak primárně zaměření na výuku. 
 Aplikace nabídne validaci syntaxe v reálném čase, možnost vizuální nápovědy při volbě SOS pravidel a moderní, čisté prostředí. 
 Stane se tak vhodným doplňkem (zejména pro úvodní přednášky a cvičení) k robustnějším nástrojům, nikoliv však jejich plnohodnotnou náhradou.
@@ -51,7 +51,7 @@ Funkční požadavky přímo definují chování a možnosti vyvíjené aplikace
     \item \textbf{Zadávání a syntaktická analýza CCS výrazů}
     \begin{itemize}
         \item Systém bude obsahovat textový editor pro zápis zdrojového kódu v syntaxi jazyka CCS.
-        \item Aplikace zajistí v reálném čase syntaktickou analýzu vstupu a vizuálně upozorní uživatele na případné chyby (např. chybějící závorky, nepovolené znaky, nedefinované procesy).
+        \item Aplikace zajistí v reálném čase syntaktickou analýzu vstupu a vizuálně uživatele upozorní na případné chyby (např. chybějící závorky, nepovolené znaky, nedefinované procesy).
         \item K zadanému a syntakticky korektnímu výrazu systém umožní vygenerování a zobrazení syntaktického stromu, reprezentujícího hierarchickou strukturu výrazu a prioritu operátorů.
     \end{itemize}
     
@@ -90,12 +90,12 @@ Funkční požadavky přímo definují chování a možnosti vyvíjené aplikace
 \section{Vedlejší požadavky}
 \label{sec:vedlejsi_pozadavky}
 
-Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouvisejí přímo s hlavní funkcionalitou verifikace, ale jsou klíčové pro celkovou uživatelskou přívětivost (UX), stabilitu a moderní standardy vývoje webových aplikací.
+Vedlejší požadavky definují vlastnosti systému, které nesouvisí přímo s hlavní funkcionalitou verifikace, ale jsou klíčové pro celkovou uživatelskou přívětivost (UX), stabilitu a moderní standardy vývoje webových aplikací.
 
 \begin{enumerate}
     \item \textbf{Podpora offline režimu a PWA architektura:} 
     Aplikace bude navržena jako progresivní webová aplikace (PWA). 
-    Logika výpočtů a zpracování CCS poběží primárně na straně klienta, což umožní téměř plnohodnotné využití nástroje i bez připojení k internetu. 
+    Logika výpočtů a zpracování CCS poběží na straně klienta, což umožní téměř plnohodnotné využití nástroje i bez připojení k internetu. 
     Ukládání rozpracovaných příkladů zajistí lokální úložiště prohlížeče, aby bylo možné uchovat rozpracovaný stav přímo v zařízení i bez nutnosti přístupu k internetu.
     
     \item \textbf{Lokalizace uživatelského rozhraní (i18n):} 
@@ -104,9 +104,10 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
     Architektura aplikace by měla umožnit snadné přidání dalších jazyků v budoucnosti.
     
     \item \textbf{Export a vizualizace dat:} 
-    Aplikace umožní export vygenerovaných syntaktických stromů a LTS grafů. 
-    Podporován bude export do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
-    Dostupný bude i export struktury do strojově čitelného formátu (JSON).
+    Aplikace umožní export vygenerovaných syntaktických stromů, LTS grafů a SOS důkazů. 
+    Podporován bude v případě grafů export do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
+    Důkazový strom pak bude možné exportovat jako text, \LaTeX, PDF nebo vyvoláním tisku části stránky.
+    Dostupný bude i export všech struktur do strojově čitelného formátu JSON.
     
     \item \textbf{Sdílení programů:} 
     Systém poskytne mechanismus pro snadné sdílení vytvořených procesů. 
@@ -132,7 +133,7 @@ Vedlejší (nefunkční) požadavky definují vlastnosti systému, které nesouv
     Systém uživateli nabídne možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či aplikací základních pravidel strukturální kongruence.
 
     \item \textbf{Automatické dokázání SOS přechodů:}
-    Uživatel si bude moct nechat při důkazu přechodu za pomoci SOS pravidel v režimu s nápovědou automaticky vygenerovat kompletní důkaz přechodu, pokud je tedy tento přechod vůbec platný.
+    Uživatel si bude moct nechat při důkazu přechodu za pomoci SOS pravidel v režimu s nápovědou automaticky vygenerovat kompletní důkaz přechodu, pokud je tedy tento přechod platný.
 
 \end{enumerate}
 

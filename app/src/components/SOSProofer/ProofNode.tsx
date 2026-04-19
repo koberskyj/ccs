@@ -34,22 +34,29 @@ interface ProofNodeProps {
 export default function ProofNode({ step, program, showHints, depth, onApplyRule, onReset }: ProofNodeProps) {
   const { t } = useTranslation();
 
+  const processDefinitions: Record<string, string> = {};
+  program.forEach(node => {
+    if(node.type === 'Definition') {
+      processDefinitions[node.name] = ccsToString(node.process); 
+    }
+  });
+
   return (
     <div className="relative group">
       {depth > 0 && <div className="absolute -left-4 top-6 w-[15px] h-px bg-gray-300 hidden md:block" />}
 
-      <div className={cn("mb-2 relative animate-in fade-in transition-all duration-300 z-10 shadow-xs rounded-lg overflow-hidden border-y border-r bg-card", getStatusStyle(step.status))}>
+      <div className={cn("mb-2 relative animate-in fade-in transition-all duration-300 z-10 shadow-xs rounded-lg border-y border-r bg-card", getStatusStyle(step.status))}>
         <div className="flex items-stretch">
           <div className={cn("w-1 shrink-0", step.status === 'proved' ? 'bg-green-500' : step.status === 'invalid' ? 'bg-red-500' : 'bg-primary')} />
 
           <div className="flex-1 p-3">
             <div className="flex flex-wrap items-center gap-3 mb-3">
               <div className="flex flex-wrap items-center px-1 font-mono">
-                <CCSViewer code={ccsToString(step.source)} className='w-auto! wrap-break-word p-1' />
+                <CCSViewer code={ccsToString(step.source)} className='w-auto! wrap-break-word p-1' definitions={processDefinitions} />
                 <div className="-translate-y-1.25">
                   <TransitionArrow label={<CCSViewer code={(step.action.isOutput ? "'" : "") +step.action.label} />} />
                 </div>
-                <CCSViewer code={ccsToString(step.target)} className='w-auto! wrap-break-word p-1' />                  
+                <CCSViewer code={ccsToString(step.target)} className='w-auto! wrap-break-word p-1' definitions={processDefinitions} />                  
               </div>
 
               {step.status === 'proved' && (
@@ -74,8 +81,8 @@ export default function ProofNode({ step, program, showHints, depth, onApplyRule
                     </Badge>
                   </div>
                   
-                  <ButtonHover variant="ghost" size="sm" onClick={() => onReset(step.id)} className="h-8 w-8 p-0 border border-stone-300 bg-stone-100 hover:bg-stone-200" hoverContent={t('sos.resetStep')}>
-                      <RotateCcw className="h-4 w-4" />
+                  <ButtonHover variant="ghost" size="sm" onClick={() => onReset(step.id)} className="h-8 w-8 p-0 print:hidden border border-stone-300 bg-stone-100 hover:bg-stone-200" hoverContent={t('sos.resetStep')}>
+                    <RotateCcw className="h-4 w-4" />
                   </ButtonHover>
                 </div>
               )}

@@ -33,7 +33,7 @@ Případy užití z pohledu vyučujícího zahrnují:
     Tento přístup může výuku zrychlit a studenty motivovat, aby si předváděné postupy následně zkusili dokázat sami.
     \item \textbf{Příprava výukových materiálů:} 
     Pedagog může v aplikaci navrhnout specifické modely LTS, které vizualizují nejrůznější stavy a přechody. 
-    Tyto modely lze následně exportovat ve formě obrázků nebo datových souborů, které se mohou dále využít například při tvorbě prezentací. 
+    Tyto modely lze následně exportovat ve formě obrázků nebo datových souborů, které se mohou dále využít, například při tvorbě prezentací. 
     Stejným způsobem byly vytvořeny obrázky \ref{fig:ccs_parallel} a \ref{fig:ccs_sync_restricted} z kapitoly \ref{sec:reaktivni_systemy}.
 \end{itemize}
 
@@ -88,8 +88,9 @@ Veškeré úkony spojené s globální správou programů, jako je jejich vytvá
 
 \section{Uživatelské rozhraní}
 \label{sec:ui_uvod}
-Návrh uživatelského rozhraní klade důraz na interaktivitu, plynulost a přehlednost. 
+Návrh uživatelského rozhraní klade důraz na interaktivitu, plynulost a celkovou přehlednost. 
 Uživatelské prostředí se skládá z jediné dynamické stránky, jejíž obsah je spravován prostřednictvím překryvných modálních oken a variabilního systému karet, zobrazených na obrázku \ref{fig:card_ui}.
+Neměnným prvkem napříč celou aplikací je hlavička stránky, která nabízí možnost změny lokalizace a vyvolání nápovědy.
 
 \begin{figure}[h!]
     \centering
@@ -98,25 +99,29 @@ Uživatelské prostředí se skládá z jediné dynamické stránky, jejíž obs
     \label{fig:card_ui}
 \end{figure}
 
-Při úvodním načtení aplikace vidí uživatel pouze výchozí kartu určenou k výběru programu. 
-Zde má uživatel možnost načíst již vytvořený program, importovat vlastní zadání, nebo přes dialogové okno vytvořit program zcela nový. 
-Hlavička stránky zůstává neměnná a nabízí změnu lokalizace i vyvolání nápovědy.
+Jádrem interakce se systémem jsou samotné karty, které se dynamicky generují podle aktuálního stavu aplikace a zvoleného programu. 
+Pro lepší přehlednost lze karty rozdělit do následujících typů:
 
-Jakmile je program zvolen či vytvořen, systém dynamicky vygeneruje hierarchicky podřazené karty. 
-Výchozím a trvale přítomným prvkem je karta textového editoru. 
-Uživatel v ní zadává definice procesů CCS, přičemž editor v reálném čase provádí validaci vstupu a graficky upozorňuje na případné syntaktické chyby. 
-Při úspěšné validaci výrazu se ve stejné kartě rovněž automaticky vykresluje struktura syntaktického stromu.
-Kromě textového editoru může k jednomu programu náležet libovolné množství dalších podkaret. Ty mohou být dvou typů:
-\begin{enumerate}
-    \item \textbf{Karta důkazu SOS:} 
-    Nabízí interaktivní prostředí pro krokovou konstrukci důkazu přechodu z jednoho CCS výrazu do druhého za využití formálních pravidel strukturální operační sémantiky.
-    \item \textbf{Karta LTS:} 
-    Zajišťuje vizualizaci ohodnocených přechodových systémů, kde jednotlivé vrcholy grafu reprezentují dosažitelné stavy programu a hrany odpovídají akcím, které mění jeho stav.
-\end{enumerate}
+\begin{description}
+    \item[Karta výběru programu:] Zůstává vždy načtená a slouží jako výchozí bod aplikace. 
+    Uživatel zde má možnost načíst již vytvořený program, importovat vlastní zadání nebo vytvořit program zcela nový. 
+    Přes tuto kartu je také možné jednotlivé programy exportovat.
+    
+    \item[Karta textového editoru:] Jakmile je program zvolen či vytvořen, je tato karta dynamicky vygenerována jako výchozí a trvale přítomný prvek daného programu. 
+    Uživatel v ní zadává definice procesů CCS, přičemž editor v reálném čase provádí validaci vstupu a graficky upozorňuje na případné syntaktické chyby. 
+    Při úspěšné validaci výrazu se v této kartě rovněž automaticky vykresluje struktura syntaktického stromu.
+    
+    \item[Karta důkazu SOS:] Nabízí interaktivní prostředí pro krokovou konstrukci důkazu přechodu z jednoho CCS výrazu do druhého za využití formálních pravidel strukturální operační sémantiky.
+    
+    \item[Karta LTS:] Zajišťuje vizualizaci ohodnocených přechodových systémů, kde jednotlivé vrcholy grafu reprezentují dosažitelné stavy programu a hrany odpovídají akcím, které mění jeho stav.
+\end{description}
 
-Na konci zobrazení podkaret je umístěna silueta karty, fungující jako rozcestník pro přidávání dalších karet obou zmíněných typů. 
-Aby si uživatel udržel orientaci při vysokém počtu karet, umožňuje rozhraní každou z nich individuálně pojmenovat (funkcí editace v pravém horním rohu karty) a popsat tak, jakou konkrétní část systému daná karta vizualizuje či dokazuje. 
-U vybraných karet je také dostupná nápověda pro specifické funkce karty. 
-V případě, že je program explicitně uzamčen proti úpravám, přejde uživatelské rozhraní do režimu pouze pro čtení, kde není možné měnit obsah editoru a nelze jakkoli manipulovat s kartami.
+Zatímco textový editor je pro daný program vždy jeden, uživatel může ke zvolenému programu přidat libovolné množství podkaret typu SOS a LTS. 
+Na konci zobrazení podkaret je proto trvale umístěna silueta prázdné karty, jež funguje jako rozcestník pro vytváření dalších pracovních ploch. 
+
+Aby si uživatel udržel orientaci i při vysokém počtu otevřených karet, umožňuje rozhraní každou z nich individuálně pojmenovat (pomocí editační ikony v pravém horním rohu) a popsat tak, jakou konkrétní část systému daná karta vizualizuje či dokazuje. 
+U vybraných karet je rovněž dostupná kontextová nápověda pro její specifické funkce. 
+V případě, že je načtený program explicitně uzamčen proti úpravám, přejde uživatelské rozhraní do režimu \uv{pouze pro čtení}, ve kterém není možné měnit obsah editoru a nelze jakkoli manipulovat s rozložením a základní konfigurací karet.
+Procházet LTS graf nebo tvořit důkaz přechodu zůstává tak v tomto režimu povoleno.
 
 \endinput

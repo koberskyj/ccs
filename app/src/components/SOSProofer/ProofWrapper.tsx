@@ -1,41 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import type { CCSExpression, CCSAction, CCSProgram, CardSOS } from '@/types';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Lightbulb, RotateCcw } from 'lucide-react';
+import { AlignStartVertical, BookOpen, Lightbulb, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AlertBox from '@/components/custom/AlertBox';
-import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { SOSRulesHelp } from './ProofRuleHelp';
 import ProofBuilder from './ProofBuilder';
+import { parseCCSAction, parseExpression } from '@/lib/ccsUtils';
+import ccsParser from '@/lib/ccsParser';
+import { ProofDefinitions } from './ProofDefinitions';
 
-
-function parseCCSAction(input: string): CCSAction|{ error: string } {
-  if(!input || input.trim() === "") {
-    return { error: t('sos.emptyActionError') };
-  }
-
-  const trimmedInput = input.trim();
-  const isOutput = trimmedInput.startsWith("'");
-  const rawLabel = isOutput ? trimmedInput.substring(1) : trimmedInput;
-  if(rawLabel === "tau" || rawLabel === "τ") {
-    if(isOutput) {
-      return { error: t('sos.tauCannotBeOutput') };
-    }
-    return { label: "tau", isOutput: false };
-  }
-
-  const labelRegex = /^[a-z][a-z0-9_]*$/;
-  if(!labelRegex.test(rawLabel)) {
-    return { error: t('sos.invalidActionName') };
-  }
-  return { label: rawLabel, isOutput };
-}
-
-function getExpressionByName(program: CCSProgram, name: string): CCSExpression | undefined {
-  return program.find((def) => def.name === name)?.process;
-}
 
 interface ProofWrapperProps {
   program: CCSProgram;
@@ -46,11 +21,12 @@ interface ProofWrapperProps {
 
 export default function ProofWrapper({ program, initSettings, onSettingsUpdate, allowEdit }: ProofWrapperProps) {
   const { t } = useTranslation();
-  const [sourceProcessName, setSourceProcessName] = useState<string>(initSettings?.processX ?? program[0].name);
-  const [targetProcessName, setTargetProcessName] = useState<string>(initSettings?.processY ?? program[0].name);
+  const [sourceInput, setSourceInput] = useState<string>(initSettings?.processX ?? (program.length > 0 ? program[0].name : ''));
+  const [targetInput, setTargetInput] = useState<string>(initSettings?.processY ?? (program.length > 0 ? program[0].name : ''));
   const [actionText, setActionText] = useState<string>(initSettings?.action ?? 'a');
   //const [useStructRed, setUseStructRed] = useState<boolean>(initSettings?.useStructRed ?? false);
   const [showHints, setShowHints] = useState<boolean>(initSettings?.showHelp ?? true);
+  const datalistId = useId();
 
   const [error, setError] = useState<string | null>(null);
   const [proofData, setProofData] = useState<{
@@ -60,19 +36,28 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
     action: CCSAction;
   } | null>(null);
 
+  const parser = useMemo(() => {
+    const parser = ccsParser();
+    if(parser === null) {
+      setError(t('textEditor.parserInitError'));
+    }
+    return parser;
+  }, []);
+
   useEffect(() => {
     if(onSettingsUpdate) {
       onSettingsUpdate({
         type: 'sos',
+        id: initSettings?.id!,
         name: initSettings?.name ?? t('core.proof'),
-        processX: sourceProcessName,
-        processY: targetProcessName,
+        processX: sourceInput,
+        processY: targetInput,
         action: actionText,
         //useStructRed: useStructRed,
         showHelp: showHints
       });
     }
-  }, [sourceProcessName, targetProcessName, actionText, showHints]);
+  }, [sourceInput, targetInput, actionText, showHints]);
 
   /*useEffect(() => {
     if(!initSettings?.useStructRed) {
@@ -100,19 +85,19 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
 
   useEffect(() => {
     handleStartProof();
-  }, [initSettings]);
+  }, [initSettings, program]);
 
   useEffect(() => {
-    if(program.length > 0 && !sourceProcessName) {
-      setSourceProcessName(program[0].name);
+    if(program.length > 0 && !sourceInput) {
+      setSourceInput(program[0].name);
     }
-  }, [program, sourceProcessName]);
+  }, [program]);
 
   useEffect(() => {
-    if(program.length > 0 && !targetProcessName) {
-      setTargetProcessName(program[0].name);
+    if(program.length > 0 && !targetInput) {
+      setTargetInput(program[0].name);
     }
-  }, [program, targetProcessName]);
+  }, [program]);
 
   const handleReset = () => {
     setProofData(null);
@@ -122,16 +107,20 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
   const handleStartProof = () => {
     handleReset();
 
-    const sourceAST = getExpressionByName(program, sourceProcessName);
-    const targetAST = getExpressionByName(program, targetProcessName);
+    const sourceAST = parseExpression(parser!, program, sourceInput);
+    const targetAST = parseExpression(parser!, program, targetInput);
     const actionObj = parseCCSAction(actionText);
 
     if('error' in actionObj) {
       setError(actionObj.error);
       return;
     }
-    if(!sourceAST || !targetAST) {
-      setError(t('sos.invalidProcessSelection', { processName: !sourceAST ? sourceProcessName : targetProcessName }));
+    if('error' in sourceAST) {
+      setError(t('sos.errorSourceProcess', { error: sourceAST.error }));
+      return;
+    }
+    if('error' in targetAST) {
+      setError(t('sos.errorTargetProcess', { error: targetAST.error }));
       return;
     }
 
@@ -146,9 +135,15 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
 
   return (
     <div className="max-w-4xl mx-auto">
+      <datalist id={datalistId}>
+        {program.map((def) => (
+          <option key={def.name} value={def.name} />
+        ))}
+      </datalist>
+
       <div className='flex justify-between gap-2 flex-wrap'>
         <div>
-          {error && <AlertBox type="error">{error}</AlertBox>}
+          {error && <AlertBox type="error" className='max-w-[500px] mb-2'>{error}</AlertBox>}
         </div>
         <div className="flex items-center gap-4 mb-2">
           {/*<Button variant="secondary" className="cursor-pointer py-5" onClick={() => setUseStructRed(!useStructRed)}>
@@ -173,26 +168,30 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
                 </span>
             </Button>
           </SOSRulesHelp>
+
+          <ProofDefinitions definitions={program}>
+            <Button variant="secondary" className="cursor-pointer py-5">
+              <AlignStartVertical size={16} />
+                <span className="text-xs font-medium">
+                  {t('sos.processDefinitions')}
+                </span>
+            </Button>
+          </ProofDefinitions>
         </div>
       </div>
 
       <div className="flex gap-4 items-end flex-wrap md:flex-nowrap mb-6">
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>{t('sos.sourceProcess')}</span>
-          <Select value={sourceProcessName} onValueChange={e => setSourceProcessName(e)} disabled={!allowEdit}>
-            <SelectTrigger aria-label={t('sos.sourceProcess')}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup className="max-h-64">
-                {program.map((def) => (
-                  <SelectItem key={def.name} value={def.name}>
-                    {def.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Input 
+            list={datalistId}
+            value={sourceInput} 
+            onChange={e => setSourceInput(e.target.value)} 
+            disabled={!allowEdit} 
+            placeholder={t('sos.sourceProcess')} 
+            aria-label={t('sos.sourceProcess')} 
+            className='hide-datalist-arrow'
+          />
         </div>
 
         <div className="w-48 space-y-2">
@@ -206,20 +205,15 @@ export default function ProofWrapper({ program, initSettings, onSettingsUpdate, 
 
         <div className="flex-1 space-y-2">
           <span className='pl-1 text-sm font-semibold'>{t('sos.targetProcess')}</span>
-          <Select value={targetProcessName} onValueChange={e => setTargetProcessName(e)} disabled={!allowEdit}>
-            <SelectTrigger aria-label={t('sos.sourceProcess')}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup className="max-h-64">
-                {program.map((def) => (
-                  <SelectItem key={def.name} value={def.name}>
-                    {def.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Input 
+            list={datalistId}
+            value={targetInput} 
+            onChange={e => setTargetInput(e.target.value)} 
+            disabled={!allowEdit} 
+            placeholder={t('sos.targetProcess')}
+            aria-label={t('sos.targetProcess')} 
+            className='hide-datalist-arrow'
+          />
         </div>
 
         <div className="flex gap-2 pb-0.5">

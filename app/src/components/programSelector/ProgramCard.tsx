@@ -1,6 +1,6 @@
 import type { CCSProgram, ProgramCardType } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import ProofWrapper from "../SOSProofer/ProofWrapper";
 import SimulationWithGraph from "../ltsGraph/SimulationWithGraph";
 import ButtonHover from "../custom/ButtonHover";
@@ -12,11 +12,15 @@ export interface ProgramCardProps {
   card: ProgramCardType,
   index: number,
   ccsAst: CCSProgram,
+  totalCards: number,
   onUpdate: (updatedCard: ProgramCardType) => void,
-  onDelete: () => void
+  onDelete: () => void,
+  onMoveUp: () => void,
+  onMoveDown: () => void,
+  onCreateProofCard?: (sourceCCS: string, targetCCS: string, action: string) => void
 }
 
-export default function ProgramCard({ card, index, ccsAst, onUpdate, onDelete }: ProgramCardProps) {
+export default function ProgramCard({ card, index, ccsAst, totalCards, onUpdate, onDelete, onMoveUp, onMoveDown, onCreateProofCard }: ProgramCardProps) {
   const { t } = useTranslation();
   const { activeProgram, selectedProgramIndex } = usePrograms();
 
@@ -36,6 +40,16 @@ export default function ProgramCard({ card, index, ccsAst, onUpdate, onDelete }:
         
         <div className="flex items-center gap-2">
           {activeProgram?.allowEdit && (<>
+            <ButtonHover variant="ghost" size="icon" onClick={onMoveUp} disabled={index === 0} hoverContent={<p>{t('selector.moveUp', 'Posunout nahoru')}</p>} aria-label={t('selector.moveUp', 'Posunout nahoru')}
+              className="h-8 w-8 text-muted-foreground/50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-30">
+              <ChevronUp className="w-4 h-4" />
+            </ButtonHover>
+
+            <ButtonHover variant="ghost" size="icon" onClick={onMoveDown} disabled={index === totalCards - 1} hoverContent={<p>{t('selector.moveDown', 'Posunout dolů')}</p>} aria-label={t('selector.moveDown', 'Posunout dolů')}
+              className="h-8 w-8 text-muted-foreground/50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-30">
+              <ChevronDown className="w-4 h-4" />
+            </ButtonHover>
+
             <CardEditBox currentName={card.name} onUpdate={handleRename}>
               <ButtonHover variant="ghost" size="icon" hoverContent={<p>{t('selector.renameCard')}</p>} aria-label={t('selector.renameCard')}
                 className="h-8 w-8 text-muted-foreground/50 hover:text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -54,24 +68,11 @@ export default function ProgramCard({ card, index, ccsAst, onUpdate, onDelete }:
       <CardContent>
         {card.type === 'sos' ? (
           <ProofWrapper program={ccsAst} onSettingsUpdate={onUpdate} allowEdit={activeProgram?.allowEdit}
-            initSettings={{
-              type: 'sos',
-              name: card.name,
-              processX: card.processX,
-              processY: card.processY,
-              action: card.action,
-              //useStructRed: card.useStructRed,
-              showHelp: card.showHelp
-            }} />
+            initSettings={card} />
         ) : (
           <SimulationWithGraph program={ccsAst} onSettingsUpdate={onUpdate} allowEdit={activeProgram?.allowEdit}
-            initSettings={{ 
-              type: 'lts', 
-              name: card.name,
-              process: card.process, 
-              style: card.style, 
-              useStructRed: card.useStructRed 
-            }} />
+            onCreateProofCard={onCreateProofCard}
+            initSettings={card} />
         )}
       </CardContent>
     </Card>

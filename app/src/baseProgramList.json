@@ -3,27 +3,30 @@
     "name": "Sumace a Paralelizace (SUM, COM)",
     "description": "",
     "allowEdit": true,
-    "definition": "Sum = a.b.0 + b.a.0\n\nCom = a.0 | 'a.0\nComn = 0 | 0",
+    "definition": "Sum = a.b.0 + b.a.0\n\nCom = a.0 | 'a.0",
     "cards": [
       {
         "type": "lts",
         "name": "Sumace",
         "process": "Sum",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "e5e2312d-f80e-40bf-8984-3298d832e5f0"
       },
       {
         "type": "lts",
         "name": "Paralelizace",
         "process": "Com",
         "style": "mixed",
-        "useStructRed": true
+        "useStructRed": true,
+        "id": "c7931b34-7079-4097-b293-d910707c0326"
       },
       {
         "type": "sos",
+        "id": "0f571b0b-6688-47bd-93fa-d4dfb479192b",
         "name": "Proč je u paralelizace tau přechod?",
         "processX": "Com",
-        "processY": "Comn",
+        "processY": "0 | 0",
         "action": "tau",
         "showHelp": true
       }
@@ -40,24 +43,28 @@
         "name": "Simulace",
         "process": "A",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "7e7b2699-1d02-4249-ba9b-f2b43e89ace2"
       },
       {
         "type": "lts",
         "name": "Simulace",
         "process": "B",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "249f6aa4-87b4-429d-a879-7bd0ac8b95a8"
       },
       {
         "type": "lts",
         "name": "Simulace",
         "process": "C",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "38609d32-6a04-4593-9e84-73c8add915a4"
       },
       {
         "type": "sos",
+        "id": "4c379198-e28b-46f4-86b0-af86b6de9f20",
         "name": "Důkaz - nelze použít žádnou akci",
         "processX": "C",
         "processY": "Cn",
@@ -78,10 +85,12 @@
         "processX": "In",
         "processY": "In",
         "action": "c",
-        "showHelp": true
+        "showHelp": true,
+        "id": "57201e1d-363a-41b1-b313-d6ff0f0e018c"
       },
       {
         "type": "lts",
+        "id": "a32a8d4e-3e5d-466c-8325-44079d0847f0",
         "name": "Simulace",
         "process": "In",
         "style": "mixed",
@@ -101,7 +110,8 @@
         "processX": "E1",
         "processY": "E1n",
         "action": "tau",
-        "showHelp": true
+        "showHelp": true,
+        "id": "d6f898f5-7a61-4913-95b2-0593233e04b6"
       },
       {
         "type": "sos",
@@ -109,7 +119,8 @@
         "processX": "E2",
         "processY": "E2n",
         "action": "'b",
-        "showHelp": true
+        "showHelp": true,
+        "id": "726b7216-f524-46cd-be8c-7b3144c3887a"
       },
       {
         "type": "sos",
@@ -117,10 +128,12 @@
         "processX": "E3",
         "processY": "E3n",
         "action": "'a",
-        "showHelp": false
+        "showHelp": false,
+        "id": "a9583f63-ad05-4973-b80e-443a7935f799"
       },
       {
         "type": "lts",
+        "id": "92c48a2f-ec82-4e67-9a9f-89a84a7d2dd2",
         "name": "Simulace",
         "process": "Mutex1",
         "style": "mixed",
@@ -139,7 +152,8 @@
         "name": "Proběhne zde synchronizace?",
         "process": "A",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "b1a089a4-96a0-468b-a4f8-233205ea6bdc"
       },
       {
         "type": "sos",
@@ -147,7 +161,8 @@
         "processX": "A",
         "processY": "Ak",
         "action": "tau",
-        "showHelp": true
+        "showHelp": true,
+        "id": "988350f3-79b3-4b75-ac72-e1619d0c4487"
       },
       {
         "type": "sos",
@@ -155,10 +170,12 @@
         "processX": "B",
         "processY": "Bk",
         "action": "tau",
-        "showHelp": true
+        "showHelp": true,
+        "id": "d3e51438-4f1f-46c6-8f2a-74a5b07fa846"
       },
       {
         "type": "lts",
+        "id": "c89caba1-71e0-4fca-9311-5f18b01898c0",
         "name": "Simulace",
         "process": "B",
         "style": "mixed",
@@ -177,10 +194,12 @@
         "name": "Uni",
         "process": "Uni",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "078d5020-e9be-4d15-8fa1-948a230249ef"
       },
       {
         "type": "lts",
+        "id": "ffdd0a2f-2775-4a0f-8f44-92798eb7ec3d",
         "name": "Spec",
         "process": "Spec",
         "style": "mixed",
@@ -199,10 +218,12 @@
         "name": "Nekonečný LTS",
         "process": "Counter",
         "style": "mixed",
-        "useStructRed": false
+        "useStructRed": false,
+        "id": "f5a2333e-9931-4300-a6d4-16b063c74cca"
       },
       {
         "type": "sos",
+        "id": "4b3d827c-799b-4df5-87a8-21275f810cf9",
         "name": "Nekonečný důkaz pomocí SOS",
         "processX": "A",
         "processY": "Counter",
@@ -211,6 +232,7 @@
       },
       {
         "type": "sos",
+        "id": "94c128e2-8f28-4da5-931e-42c4daffcbd2",
         "name": "Další příklad nekonečného důkazu pomocí SOS",
         "processX": "B",
         "processY": "Counter",

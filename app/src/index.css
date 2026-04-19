@@ -234,3 +234,8 @@ body *::-webkit-scrollbar-thumb:hover {
 .ͼ1 .cm-scroller {
   overflow-x: unset;
 }
+
+.hide-datalist-arrow::-webkit-calendar-picker-indicator {
+  display: none !important;
+  opacity: 0;
+}

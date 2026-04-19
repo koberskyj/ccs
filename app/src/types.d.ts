@@ -130,6 +130,7 @@ export type ProgramCardType = CardSOS | CardLTS;
 
 export type CardSOS = {
   type: 'sos';
+  id: string;
   name: string;
   processX: string;
   processY: string;
@@ -140,6 +141,7 @@ export type CardSOS = {
 
 export type CardLTS = {
   type: 'lts';
+  id: string;
   name: string;
   process: string;
   useStructRed?: boolean;

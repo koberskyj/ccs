@@ -186,13 +186,13 @@ export default function SyntaxTree({ parsedAst, onHoverNode, onContentResize, cl
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'png')}>
-              {t('core.downloadAs')} PNG
+              {t('core.exportAs', { name: 'PNG'})}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'svg')}>
-              {t('core.downloadAs')} SVG
+              {t('core.exportAs', { name: 'SVG'})}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport(cyRef.current, 'json')}>
-              {t('core.downloadAs')} JSON
+              {t('core.exportAs', { name: 'JSON'})}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -39,7 +39,10 @@
     "back": "Zpět",
     "process": "Proces",
     "confirm": "Potvrdit",
-    "cancel": "Zrušit"
+    "cancel": "Zrušit",
+    "processDefinition": "Definice procesu",
+    "exportAs": "Exportovat jako {{name}}",
+    "printOrPDF": "Tisk / Uložit PDF"
   },
   "selector": {
     "renameCard": "Přejmenovat kartu",
@@ -143,7 +146,12 @@
     "noOldLabelError": "Nebyla vybrána původní akce.",
     "relabelingLabelsChangedError": "Sada přejmenování se nesmí měnit.",
     "invalidRelabelingError": "Neplatné přejmenování ({{old}} -> {{expected}}).",
-    "unknownRuleError": "Neznámé pravidlo."
+    "unknownRuleError": "Neznámé pravidlo.",
+    "errorSourceProcess": "Chyba v definici počátečního procesu: {{error}}",
+    "errorTargetProcess": "Chyba v definici cílového procesu: {{error}}",
+    "allProcessDefinitions": "Seznam všech definic procesů",
+    "processDefinitions": "Seznam procesů",
+    "emptyExpressionError": "Proces nesmí být prázdný"
   },
   "textEditor": {
     "parserInitError": "Inicializace CCS parseru selhala.",
@@ -157,6 +165,12 @@
     "noTransitions": "Deadlock",
     "structuralReduction": "Strukturální redukce",
     "dynamicMode": "Dynamické dočítání",
-    "centering": "Centrování grafu"
+    "centering": "Centrování grafu",
+    "tooltipTip": "TIP: Pravým klikem na vrchol nebo hranu zobrazíte menu.",
+    "copyNode": "Kopírovat CCS výraz",
+    "copyEdge": "Kopírovat přechod",
+    "defCopied": "Definice byla zkopírována do schránky",
+    "createSosProof": "Dokázat přechod",
+    "sosCreated": "Karta pro dokázání tohoto přechodu byla vytvořena na konci stránky."
   }
 }

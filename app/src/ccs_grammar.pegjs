@@ -64,19 +64,6 @@ PrefixComponent
 
 
 
-TightComponent
-  = base:Primary ops:(_ (Restriction / Relabeling))* {
-      return ops.reduce((acc, op) => {
-        const operation = op[1];
-        if(operation.type === "Restriction") {
-          return node("Restriction", { process: acc, labels: operation.labels });
-        } 
-        else {
-          return node("Relabeling", { process: acc, relabels: operation.relabels });
-        }
-      }, base);
-    }
-
 Restriction
   = "\\" _ "{" _ labels:LabelList _ "}" { 
       if(labels.includes("tau")) {
@@ -131,4 +118,3 @@ White
 
 Comment
   = "//" [^\n]*
-  / "/*" (!"*/" .)* "*/"
