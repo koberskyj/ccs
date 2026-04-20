@@ -342,7 +342,7 @@ export default function SimulationWithGraph({program, initSettings, hideSettings
             edgeHighlight={edgeHighlightRequest}
             viewMode={viewMode}
             isCentering={isCentering}
-            onCreateProofCard={onCreateProofCard}
+            onCreateProofCard={useStructRed ? undefined : onCreateProofCard}
           />
         </div>
 

@@ -130,7 +130,7 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
-  const hoverTimeoutRef = useRef<number | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const stylesheet = useMemo(() => {
     return [

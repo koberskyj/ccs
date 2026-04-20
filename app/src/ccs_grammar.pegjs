@@ -32,9 +32,8 @@ Expression
         node("Summation", { left: acc, right: curr[3] }), head);
     }
 
-
 ParallelComponent
-  = head:RestrictionComponent tail:(_ "|" _ RestrictionComponent)* {
+  = head:PrefixComponent tail:(_ "|" _ PrefixComponent)* {
       if(tail.length === 0) {
         return head;
       }
@@ -42,8 +41,14 @@ ParallelComponent
         node("Parallel", { left: acc, right: curr[3] }), head);
     }
 
-RestrictionComponent
-  = base:PrefixComponent ops:(_ (Restriction / Relabeling))* {
+PrefixComponent
+  = action:Action _ "." _ next:PrefixComponent {
+      return node("Prefix", { action, next });
+    }
+  / PostfixComponent
+
+PostfixComponent
+  = base:Primary ops:(_ (Restriction / Relabeling))* {
       return ops.reduce((acc, op) => {
         const operation = op[1];
         if(operation.type === "Restriction") {
@@ -54,15 +59,6 @@ RestrictionComponent
         }
       }, base);
     }
-
-
-PrefixComponent
-  = action:Action _ "." _ next:PrefixComponent {
-      return node("Prefix", { action, next });
-    }
-  / Primary
-
-
 
 Restriction
   = "\\" _ "{" _ labels:LabelList _ "}" { 
