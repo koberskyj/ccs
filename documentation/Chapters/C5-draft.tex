@@ -1,7 +1,7 @@
 \chapter{Návrh řešení}
 \label{sec:navrh}
-Tato kapitola se věnuje návrhu webové aplikace, která přímo vychází z teoretických poznatků o reaktivních systémech a z analýzy požadavků definovaných v kapitole \ref{sec:analyza_pozadavku}. 
-Cílem tohoto návrhu je vytvořit modulární a uživatelsky přívětivé prostředí, které studentům i vyučujícím usnadní práci s formálními modely. 
+Tato kapitola se věnuje návrhu webové aplikace, která přímo vychází z teoretických poznatků o~reaktivních systémech a z analýzy požadavků definovaných v kapitole \ref{sec:analyza_pozadavku}. 
+Cílem tohoto návrhu je~vytvořit modulární a uživatelsky přívětivé prostředí, které studentům i vyučujícím usnadní práci s~formálními modely. 
 Architektura je koncipována tak, aby oddělovala prezentační logiku od výpočetního jádra, což umožňuje flexibilní rozšiřování aplikace. 
 Návrh konkrétní implementace a detailní popis použitých algoritmů jsou následně předmětem kapitoly \ref{sec:implementace}.
 
@@ -20,13 +20,13 @@ Mezi hlavní případy užití ze strany uživatele jako studenta patří:
     Student obdrží od vyučujícího konkrétní příklady (například ve formě exportovaného \texttt{.json} souboru), které snadno naimportuje do svého pracovního prostředí. 
     V něm danou problematiku analyzuje, příklad vyřeší a následným exportem odevzdá vyučujícímu.
     \item \textbf{Tvorba vlastních příkladů:} 
-    Uživatel může v aplikaci založit zcela nový projekt, ve kterém si nadefinuje vlastní procesy kalkulu komunikujících systémů, odpovídající LTS grafy či důkazy přechodů. 
+    Uživatel může v aplikaci založit zcela nový projekt, ve kterém si~nadefinuje vlastní procesy kalkulu komunikujících systémů, odpovídající LTS grafy či důkazy přechodů. 
     Tato funkcionalita je využitelná například při řešení zápočtových projektů nebo pokud si chce student sám něco zkusit vytvořit k procvičení.
 \end{itemize}
 
 Případy užití z pohledu vyučujícího zahrnují:
 \begin{itemize}
-    \item \textbf{Plný rozsah studentských případů užití.}
+    \item Plný rozsah studentských případů užití.
     \item \textbf{Interaktivní ukázky ve výuce:} 
     Vyučující může aplikaci aktivně prezentovat během přednášek či cvičení. 
     Namísto vypisování důkazů na tabuli lze v aplikaci demonstrovat přechod mezi stavy krok za krokem, striktně podle formálních pravidel SOS. 
@@ -37,8 +37,8 @@ Případy užití z pohledu vyučujícího zahrnují:
     Stejným způsobem byly vytvořeny obrázky \ref{fig:ccs_parallel} a \ref{fig:ccs_sync_restricted} z kapitoly \ref{sec:reaktivni_systemy}.
 \end{itemize}
 
-Po spuštění aplikace má uživatel rychlý přístup k nápovědě umístěné v pravé části hlavičky stránky, která objasňuje základní principy ovládání a fungování aplikace.
-Tuto nápovědu i celý program si také může přeložit tlačítkem volby jazyka, která se nachází vedle nápovědy. 
+Po spuštění aplikace má uživatel rychlý přístup k nápovědě, umístěné v pravé části hlavičky stránky, která objasňuje základní principy ovládání a fungování aplikace.
+Tuto nápovědu i celý program si také může přeložit tlačítkem volby jazyka, které se nachází vedle nápovědy. 
 V hlavním rozcestníku si uživatel volí, zda chce pracovat s předdefinovaným programem, importovat existující, nebo vytvořit program zcela nový. 
 Všechny tyto případy užití jsou ve zjednodušené podobě znázorněny na obrázku \ref{fig:use_case}.
 
@@ -68,16 +68,16 @@ Zdrojové kódy a aplikační logika jsou logicky rozděleny do dvou hlavních v
     \item \textbf{Vrstva aplikační logiky (adresář \texttt{lib}):} 
     Zajišťuje zapouzdření doménové logiky celého systému. 
     Obsahuje pouze funkce, které nejsou závislé na uživatelském rozhraní. 
-    Nachází se zde například zpracování uživatelského vstupu, generátor syntaktického stromu či algoritmy pro výpočet stavových prostorů i přechodů pro LTS, včetně přípravy struktury pro následné vykreslení grafu.
+    Nachází se~zde například zpracování uživatelského vstupu, generátor syntaktického stromu či algoritmy pro výpočet stavových prostorů i přechodů pro LTS, včetně přípravy struktury pro následné vykreslení grafu.
     \item \textbf{Vrstva uživatelského rozhraní (adresář \texttt{components}):} 
-    Vrstva sdružuje veškeré vizuální a interaktivní prvky aplikace, navržené jako znovupoužitelné komponenty.
+    Vrstva sdružuje veškeré vizuální a~interaktivní prvky aplikace, navržené jako znovupoužitelné komponenty.
     Součástí této vrstvy jsou také UI prvky z knihovny \texttt{shadcn/ui}, které tak mohou být funkčně přizpůsobeny potřebám projektu.
 \end{itemize}
 
 Základní adresář komponent je dále hierarchicky členěn podle své funkčnosti, viz obrázek \ref{fig:component_structure}. 
 Mezi základní funkční celky patří \texttt{TextEditor}, obalující knihovnu CodeMirror pro zápis CCS a syntakticky strom, \texttt{SOSProofer} pro vše potřebné z oblasti interaktivní konstrukce důkazů a \texttt{LTSGraph} pro všechny komponenty specifické pro zobrazení LTS grafu. 
 Klíčovou roli hraje \texttt{ProgramsContext}, který centralizovaně spravuje stavy aplikace jakožto jediný zdroj pravdy (Single Source of Truth). Tímto přístupem se zamezuje desynchronizaci dat napříč komponentami.
-Veškeré úkony spojené s globální správou programů, jako je jejich vytváření, aktualizace, mazání a obecně práce s dynamicky generovanými kartami, jsou zpracovávany komponentami z \texttt{ProgramsSelector}.
+Veškeré úkony spojené s~globální správou programů, jako je jejich vytváření, aktualizace, mazání a obecně práce s dynamicky generovanými kartami, jsou zpracovávany komponentami z \texttt{ProgramsSelector}.
 
 \begin{figure}[h!]
     \centering
@@ -102,19 +102,19 @@ Neměnným prvkem napříč celou aplikací je hlavička stránky, která nabíz
 Jádrem interakce se systémem jsou samotné karty, které se dynamicky generují podle aktuálního stavu aplikace a zvoleného programu. 
 Pro lepší přehlednost lze karty rozdělit do následujících typů:
 
-\begin{description}
-    \item[Karta výběru programu:] Zůstává vždy načtená a slouží jako výchozí bod aplikace. 
-    Uživatel zde má možnost načíst již vytvořený program, importovat vlastní zadání nebo vytvořit program zcela nový. 
+\begin{itemize}
+    \item \textbf{Karta výběru programu:} Zůstává vždy načtená a slouží jako výchozí bod aplikace. 
+    Uživatel přes ní má možnost načíst již vytvořený program, importovat vlastní zadání nebo vytvořit program zcela nový. 
     Přes tuto kartu je také možné jednotlivé programy exportovat.
     
-    \item[Karta textového editoru:] Jakmile je program zvolen či vytvořen, je tato karta dynamicky vygenerována jako výchozí a trvale přítomný prvek daného programu. 
-    Uživatel v ní zadává definice procesů CCS, přičemž editor v reálném čase provádí validaci vstupu a graficky upozorňuje na případné syntaktické chyby. 
+    \item \textbf{Karta textového editoru:} Jakmile je program zvolen či vytvořen, je tato karta dynamicky vygenerována jako výchozí a trvale přítomný prvek daného programu. 
+    Uživatel v ní zadává definice procesů CCS, přičemž editor v reálném čase provádí validaci vstupu a graficky uživatele upozorňuje na případné syntaktické chyby. 
     Při úspěšné validaci výrazu se v této kartě rovněž automaticky vykresluje struktura syntaktického stromu.
     
-    \item[Karta důkazu SOS:] Nabízí interaktivní prostředí pro krokovou konstrukci důkazu přechodu z jednoho CCS výrazu do druhého za využití formálních pravidel strukturální operační sémantiky.
+    \item \textbf{Karta důkazu SOS:} Nabízí interaktivní prostředí pro krokovou konstrukci důkazu přechodu z jednoho CCS výrazu do druhého za využití formálních pravidel strukturální operační sémantiky.
     
-    \item[Karta LTS:] Zajišťuje vizualizaci ohodnocených přechodových systémů, kde jednotlivé vrcholy grafu reprezentují dosažitelné stavy programu a hrany odpovídají akcím, které mění jeho stav.
-\end{description}
+    \item \textbf{Karta LTS:} Zajišťuje vizualizaci ohodnocených přechodových systémů, kde jednotlivé vrcholy grafu reprezentují dosažitelné stavy programu a hrany odpovídají akcím, které mění jeho stav.
+\end{itemize}
 
 Zatímco textový editor je pro daný program vždy jeden, uživatel může ke zvolenému programu přidat libovolné množství podkaret typu SOS a LTS. 
 Na konci zobrazení podkaret je proto trvale umístěna silueta prázdné karty, jež funguje jako rozcestník pro vytváření dalších pracovních ploch. 

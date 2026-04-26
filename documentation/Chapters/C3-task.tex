@@ -20,7 +20,7 @@ Díky tomu si mohou uživatelé lépe představit abstraktní principy synchroni
 \label{sec:analyza_existujicich_reseni}
 Oblast formální verifikace a analýzy systémů popsaných pomocí CCS již disponuje řadou aplikací, 
 většina z nich však byla navržena primárně pro výzkumné nebo průmyslové účely, nikoliv explicitně jako pomůcky pro začátečníky. 
-Mezi nejvýznamnější programy v kontextu existujícího softwaru je vhodné zmínit následující aplikace.
+Mezi nejvýznamnější programy v kontextu existujícího softwaru je~vhodné zmínit následující aplikace.
 
 \subsection{Concurrency Workbench Aalborg (CAAL)}
 Jako nejvýznamnější moderní nástroj lze uvést CAAL (Concurrency Workbench Aalborg) \cite{caal}. 
@@ -31,11 +31,11 @@ Při generování LTS grafů navíc CAAL využívá algoritmy optimalizované sp
 Nástroj rovněž neposkytuje vizualizaci abstraktního syntaktického stromu (AST), která je pro pochopení sémantiky a priorit operátorů klíčová.
 
 \subsection{Edinburgh Concurrency Workbench (CWB)}
-Historicky důležitým nástrojem, který definoval standard pro automatizovanou analýzu CCS, je CWB \cite{CWB}. 
+Historicky důležitým nástrojem, který definoval standard pro automatizovanou analýzu CCS, je~CWB \cite{CWB}. 
 Ačkoliv se jedná o spolehlivý software s vysokým výkonem, v dnešní době již není dále vyvíjen.
 Na tento nástroj později navázal projekt Concurrency Workbench of the New Century (CWB-NC), který přinesl další rošíření a vylepšení architektury, avšak i jeho vývoj byl nakonec opuštěn.
 Zásadním nedostatkem obou těchto nástrojů pro účely moderní výuky je zastaralé uživatelské rozhraní, založené výhradně na příkazové řádce. 
-Neposkytují žádnou formu interaktivní vizualizace grafů či syntaktických stromů, nejsou tedy pro výuku a vizualizaci příliš vhodné.
+Neposkytují žádnou formu interaktivní vizualizace grafů či~syntaktických stromů, nejsou tedy pro výuku a vizualizaci příliš vhodné.
 
 \subsection{Zhodnocení a opodstatnění nového řešení}
 Z analýzy existujících řešení vyplývá, že jejich hlavním nedostatkem je složitost uživatelského rozhraní nebo absence nástrojů zaměřených čistě na pochopení základních principů (např. krokové budování SOS důkazů a vizualizace AST).
@@ -68,7 +68,7 @@ Funkční požadavky přímo definují chování a možnosti vyvíjené aplikace
     
     \item \textbf{Generování a vizualizace ohodnoceného přechodového systému (LTS)}
     \begin{itemize}
-        \item Na základě zadaného CCS výrazu systém vygeneruje odpovídající stavový prostor a zobrazí jej jako orientovaný graf, kde vrcholy reprezentují stavy prostoru a orientované hrany jednotlivé akce.
+        \item Na základě zadaného CCS výrazu systém vygeneruje odpovídající stavový prostor a~zobrazí jej jako orientovaný graf, kde vrcholy reprezentují stavy prostoru a orientované hrany jednotlivé akce.
         \item Systém musí být odolný vůči zacyklení v případech, kdy je generovaný LTS nekonečný (např. vlivem neomezeného vytváření nových paralelních komponent nebo nezastavené rekurze). Generování bude omezeno vhodným limitem hloubky či počtu stavů tak, aby se předešlo zamrznutí uživatelského rozhraní.
     \end{itemize}
     
@@ -101,11 +101,11 @@ Vedlejší požadavky definují vlastnosti systému, které nesouvisí přímo s
     \item \textbf{Lokalizace uživatelského rozhraní (i18n):} 
     Aplikace nabídne podporu lokalizace minimálně pro češtinu a angličtinu. 
     Přepnutí jazyka proběhne plynule bez nutnosti opětovného načtení celé stránky. 
-    Architektura aplikace by měla umožnit snadné přidání dalších jazyků v budoucnosti.
+    Architektura aplikace by měla umožnit snadné přidání dalších jazyků v~budoucnosti.
     
     \item \textbf{Export a vizualizace dat:} 
     Aplikace umožní export vygenerovaných syntaktických stromů, LTS grafů a SOS důkazů. 
-    Podporován bude v případě grafů export do rastrových (PNG) i vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
+    Podporován bude v případě grafů export do rastrových (PNG) i~vektorových (SVG) formátů, aby je studenti mohli snadno začlenit do svých úkolů či prací. 
     Důkazový strom pak bude možné exportovat jako text, \LaTeX, PDF nebo vyvoláním tisku části stránky.
     Dostupný bude i export všech struktur do strojově čitelného formátu JSON.
     
@@ -130,7 +130,7 @@ Vedlejší požadavky definují vlastnosti systému, které nesouvisí přímo s
     Toto uzamčení bude sloužit zejména jen jako ochrana proti nechtěným změnám, uživatel si jej bude moci u programů libovolně aktivovat či deaktivovat.
 
     \item \textbf{Strukturální redukce LTS grafu:}
-    Systém uživateli nabídne možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či aplikací základních pravidel strukturální kongruence.
+    Systém uživateli nabídne možnost zjednodušit generované grafy a stromy, například automatickým odstraňováním zbytečných \texttt{Nil} procesů či~aplikací základních pravidel strukturální kongruence.
 
     \item \textbf{Automatické dokázání SOS přechodů:}
     Uživatel si bude moct nechat při důkazu přechodu za pomoci SOS pravidel v režimu s nápovědou automaticky vygenerovat kompletní důkaz přechodu, pokud je tedy tento přechod platný.

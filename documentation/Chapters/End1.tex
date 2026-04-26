@@ -1,24 +1,23 @@
 \chapter{Popis adresářové struktury}
-TODO, prozatím překopírováno z mé bakalářské práce.
-
-% Návod na zprovoznění Latex na Windows
-
+V této příloze je stručně popsána adresářová struktura přílohy aplikace a lokace vybraných souborů zmíněných v textové části práce.
+\\
 \dirtree{%
 .1 /\DTcomment{Kořenový adresář}.
-.2 esp32\DTcomment{Adresář základny}.
-.3 main\DTcomment{Zdrojový kód základny}.
-.2 mobile\_app\DTcomment{Adresář mobilní aplikace}.
-.3 assets\DTcomment{Zdroje aplikace}.
-.4 icons\DTcomment{Adresář ikon}.
-.3 components\DTcomment{Komponenty}.
-.4 addKey\DTcomment{Komponenty strany přídání klíče}.
-.4 adminScreen\DTcomment{Komponenty admin stránky}.
-.4 doorDetail\DTcomment{Komponenty detailu dveří}.
-.4 layout\DTcomment{Základní komponenty}.
-.3 constants\DTcomment{Konstanty, např. barvy, obrázky a stíny}.
-.3 screens\DTcomment{Komponenty stránek aplikace}.
-.3 types\DTcomment{Definice datových typů}.
-.3 utilities\DTcomment{Vlastní hooks}.
+.2 dist\DTcomment{Sestavená verze aplikace}.
+.2 public\DTcomment{Veřejný adresář stránky}.
+.3 supplementaryPrograms.json\DTcomment{Seznam doplňkových programů}.
+.2 src\DTcomment{Zdrojový kód aplikace}.
+.3 components\DTcomment{UI komponenty aplikace}.
+.4 ltsGraph\DTcomment{Komponenty spojené s kartou LTS}.
+.4 programSelector\DTcomment{Komponenty spojené s výběrem programu}.
+.4 sosProofer\DTcomment{Komponenty spojené s kartou SOS}.
+.4 textEditor\DTcomment{Komponenty spojené s textovým editorem}.
+.4 LanguageSwitcher.tsx\DTcomment{Komponenta pro přepínání jazyka}.
+.4 Tutorial.tsx\DTcomment{Komponenta centrální nápovědy aplikace}.
+.3 lib\DTcomment{Logické moduly aplikace}.
+.3 locales\DTcomment{Lokalizační soubory}.
+.3 utils\DTcomment{React hooks a kontexty}.
+.3 baseProgramList.json\DTcomment{Seznam základních programů}.
 }
 
 \endinput
