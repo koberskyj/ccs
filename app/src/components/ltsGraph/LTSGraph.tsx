@@ -121,7 +121,8 @@ type ContextMenuState = {
   ccs?: string;
   sourceCcs?: string;
   targetCcs?: string;
-  action?: string;
+  actions?: string[];
+  label?: string;
 } | null;
 
 export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMode, isCentering, onCreateProofCard }: LTSGraphProps) {
@@ -306,7 +307,8 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
         type: 'edge',
         sourceCcs: ele.source().data('ccs'),
         targetCcs: ele.target().data('ccs'),
-        action: ele.data('label') || ele.data('actions')?.[0] || ''
+        actions: ele.data('actions') || [],
+        label: ele.data('label') || ''
       });
     }
   }, []);
@@ -402,19 +404,20 @@ export default function LTSGraph({ elements, activeNodeId, edgeHighlight, viewMo
           </button>
         ) : (
           <>
-            <button onClick={() => copyToClipboard(`${contextMenu.sourceCcs} -${contextMenu.action}-> ${contextMenu.targetCcs}`)} 
+            <button onClick={() => copyToClipboard(`${contextMenu.sourceCcs} -${contextMenu.label}-> ${contextMenu.targetCcs}`)} 
                 className="w-full text-left px-2 py-1.5 text-sm hover:bg-muted rounded flex items-center gap-2">
               <Copy className="w-4 h-4" /> {t('simulation.copyEdge')}
             </button>
-            {onCreateProofCard && (
-              <button onClick={() => {
-                onCreateProofCard(contextMenu.sourceCcs!, contextMenu.targetCcs!, contextMenu.action!);
+            {onCreateProofCard && contextMenu.actions && 
+            contextMenu.actions.map((action, index) => (
+              <button key={index} onClick={() => {
+                onCreateProofCard(contextMenu.sourceCcs!, contextMenu.targetCcs!, action);
                 toast.success(t('simulation.sosCreated'), { duration: 10000 });
                 setContextMenu(null);
               }} className="w-full text-left px-2 py-1.5 text-sm hover:bg-muted rounded flex items-center gap-2 text-primary">
-                <PlusCircle className="w-4 h-4" /> {t('simulation.createSosProof')}
+                <PlusCircle className="w-4 h-4" /> {t('simulation.createSosProof')} {action}
               </button>
-            )}
+            ))}
           </>
         )}
       </div>,

@@ -462,13 +462,13 @@ Pro samotnou vizualizaci je využita grafová knihovna \texttt{Cytoscape.js} dop
 
 Jelikož jsou interní identifikátory uzlů tvořeny hashem, je zde implementován slovník, který uzlům v pořadí jejich objevení přiřazuje sekvenční číselná ID. 
 Uživatel tak vždy vidí logicky navazující stavy pojmenované jako \texttt{1, 2, 3}, nezávisle na interním označení uzlů. 
-Zobrazení uzlů v~grafu je~navíc možno změnit podle režimu zobrazení (ID, Mix, CCS), kdy komponenta přepočítává jak geometrický tvar (\texttt{ellipse} vs. \texttt{round-rectangle}), tak velikost písma na základě délky vykreslovaného řetězce.
+Zobrazení uzlů v~grafu je~navíc možno změnit podle režimu zobrazení (ID, Mix, CCS), kdy komponenta přepočítává jak geometrický tvar (\texttt{ellipse} nebo \texttt{round-rectangle}), tak velikost písma na základě délky vykreslovaného řetězce.
 
-Velký důraz byl kladen na zpětnou vazbu rozhraní. 
-Simulační smyčka je oddělena do vlastního React hooku \texttt{useSimulation}, který zapouzdřuje historii kroků a umožňuje krokování vzad. 
+Důraz byl také kladen na propojuení jednotlivých komponent rozhraní. 
+Simulační smyčka je~oddělena do vlastního React hooku \texttt{useSimulation}, který zapouzdřuje historii kroků a umožňuje krokování vzad. 
 Interaktivitě a přehlednosti napomáhají následující prvky:
 \begin{itemize}
-    \item Při najetí myší na konkrétní dostupný přechod v simulačním panelu dojde přes mechanismus \texttt{edgeHighlightRequest} k dočasnému zvýraznění hrany a cílového stavu přímo ve grafu.
+    \item Při najetí myší na konkrétní dostupný přechod v simulačním panelu dojde přes funkci\\\texttt{edgeHighlightRequest} k dočasnému zvýraznění hrany a cílového stavu přímo ve grafu.
     \item Pokud je aktivováno centrování kamery, graf po každém kroku simulace automaticky plynule přejede na nově aktivní stav, což usnadňuje orientaci v rozsáhlých topologiích.
     \item Kontextové nabídky a detailní \textit{tooltipy} s \texttt{CCSViewer} komponentou jsou vykreslovány mimo strukturu samotného grafu na úrovni těla dokumentu (\texttt{document.body}) pomocí technologie React Portal. 
     Tím je zajištěno, že nebudou oříznuty okraji grafu.

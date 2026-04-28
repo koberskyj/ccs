@@ -177,10 +177,10 @@ export function ProofBuilder({ initialSource, initialTarget, initialAction, prog
       <div className="p-3 px-4 mx-0 md:mx-4 mb-2 flex justify-between items-center flex-wrap gap-2 rounded-lg md:rounded-none border md:border-0 md:border-b border-stone-300">
         <div className='flex items-center gap-2 flex-wrap font-mono'>
           <span className="text-sm text-foreground/90 shrink-0">{t('sos.proving')}:</span> 
-          <div className='flex flex-wrap items-center px-1 font-mono border border-primary/10 bg-primary/5 rounded-md'>
+          <div className='flex flex-wrap items-center px-1 py-1 font-mono border border-primary/10 bg-primary/5 rounded-md'>
             <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialSource) :*/ initialSource)} className='w-auto! wrap-break-word p-1' definitions={processDefinitions} />
             <div className="-translate-y-1.25">
-              <TransitionArrow label={<CCSViewer code={initialAction.label} />} />
+              <TransitionArrow label={<CCSViewer code={(initialAction.isOutput ? "'" : "") + initialAction.label} />} />
             </div>
             <CCSViewer code={ccsToString(/*useStructRed ? normalizeCCS(initialTarget) :*/ initialTarget)} className='w-auto! wrap-break-word p-1' definitions={processDefinitions} />
           </div>
